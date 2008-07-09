@@ -2,6 +2,7 @@ package com.awebstorm.loadgenerator.robot;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
@@ -27,10 +28,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ScriptReader extends DefaultHandler {
 	
-	private String _script;
-	private Logger _consoleLog;
+	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private String tempString;
-	private Step tempStep;
 	private PriorityQueue<Step> stepQueue;
 	private HashMap<String,String> prefs;
 	private boolean propertiesMode;
@@ -43,18 +42,15 @@ public class ScriptReader extends DefaultHandler {
 	 * @param stepQueue Queue to place new Steps into
 	 * @param prefs HashMap to place Robot preferences into
 	 */
-		public void run(String script,Logger consoleLog, PriorityQueue<Step> stepQueue, HashMap<String,String> prefs) {
+		public void run(InputStream script, PriorityQueue<Step> stepQueue, HashMap<String,String> prefs) {
 
-			_script = script;
 			SAXParserFactory newFactory;
 			newFactory = SAXParserFactory.newInstance();
 			SAXParser myXMLParser = null;
-			File scriptFile = new File(_script);
 			this.stepQueue = stepQueue;
 			this.prefs = prefs;
 			propertiesMode = true;
 			stepCounter = 0;
-			_consoleLog = consoleLog;
 			
 			try {
 				myXMLParser = newFactory.newSAXParser();
@@ -67,7 +63,7 @@ public class ScriptReader extends DefaultHandler {
 			}
 
 			try {
-				myXMLParser.parse(scriptFile,this);
+				myXMLParser.parse(script,this);
 			} catch (FileNotFoundException e) {
 				consoleLog.fatal("Script file not found.");
 				e.printStackTrace();
@@ -89,9 +85,8 @@ public class ScriptReader extends DefaultHandler {
 
 			if (!propertiesMode) {
 				Attributes newList = new AttributesImpl(attributes);
-				tempStep = new Step(qName,stepCounter,newList,_consoleLog);
-				_consoleLog.debug("Added Step: " + qName + " Value :" + attributes.getValue(0));
-				stepQueue.add(tempStep);
+				consoleLog.debug("Added Step: " + qName + " Value :" + attributes.getValue(0));
+				stepQueue.add(new Step(qName,stepCounter,newList));
 				stepCounter++;
 			}
 		}
@@ -114,29 +109,10 @@ public class ScriptReader extends DefaultHandler {
 					propertiesMode = false;
 					return;
 				}
-				_consoleLog.debug("Added Pref: " + qName + " Value:" + tempString);
+				consoleLog.debug("Added Pref: " + qName + " Value:" + tempString);
 				prefs.put(qName,tempString);
 			}
 
-		}
-		
-		/**
-		 * Main method to test the operation of the ScriptReader. Has no production value.
-		 * @param args Should contain the input XML file and the output file
-		 */
-		public static void main(String[] args) {
-			
-			Logger _consoleLog2 = Logger.getLogger("loadgenerator.consoleLog.ScriptReader");
-			PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
-			HashMap<String,String> prefs = new HashMap<String,String>();
-			Long tempTime = System.currentTimeMillis();
-			new ScriptReader().run(args[0],_consoleLog2, stepQueue, prefs );
-			tempTime = System.currentTimeMillis() - tempTime;
-			System.out.println("Time: " + tempTime);
-			prefs.values().iterator();
-			while ( !stepQueue.isEmpty()) {
-				System.out.println(stepQueue.poll().getName());
-			}
 		}
 
 }

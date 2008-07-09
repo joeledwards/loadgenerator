@@ -24,15 +24,28 @@
 
 	<STEPS>
 		<WAIT length="3000" />
-		<INVOKE path="" ></INVOKE>
-		<VERIFY_TITLE title="CustomerCentrix | We satisfy your business technology needs" ></VERIFY_TITLE>
-		
-		<SET_INPUT_FIELD name="test_user" pass="test_pass" op="Log In"/><POST path=""></POST><VERIFY_TITLE title="user account | CustomerCentrix"></VERIFY_TITLE><WAIT
-			length="3000">
-</WAIT>
-		
-		<FILL_FORM username="test_user" ></FILL_FORM>
+		<INVOKE path=""></INVOKE>
+		<VERIFY_TITLE
+			title="CustomerCentrix | We satisfy your business technology needs">
+		</VERIFY_TITLE>
 		<WAIT length="3000"></WAIT>
+		<INVOKE path="/about_us.htm"></INVOKE>
+		<VERIFY_TITLE title="About CustomerCentrix | CustomerCentrix"></VERIFY_TITLE><WAIT length="3000"></WAIT>
+		<INVOKE path="/contact.htm"></INVOKE><VERIFY_TITLE title="Contact Information | CustomerCentrix"></VERIFY_TITLE>
+		<WAIT length="2000"></WAIT>
+		<INVOKE path="/products.htm"></INVOKE>
+		<VERIFY_TITLE title="Products | CustomerCentrix"></VERIFY_TITLE><WAIT length="1000"></WAIT>
+		<INVOKE path="/training.htm"></INVOKE>
+		<VERIFY_TITLE title="Training | CustomerCentrix"></VERIFY_TITLE><WAIT length="4000"></WAIT>
+		<INVOKE path="/consulting.htm"></INVOKE>
+		<VERIFY_TITLE title="Consulting | CustomerCentrix"></VERIFY_TITLE><WAIT length="2000"></WAIT>
+		<INVOKE path="/testimonials.htm"></INVOKE><VERIFY_TITLE title="Testimonials | CustomerCentrix"></VERIFY_TITLE>
+		<WAIT length="1000"></WAIT>
+
+		<POST path="" name="LoadGenerator" pass="LoadGenerator" op="Log in"></POST>
+		<VERIFY_TITLE title="CustomerCentrix | We satisfy your business technology needs"></VERIFY_TITLE>
+		
+		
 		
 	</STEPS>
 

@@ -206,7 +206,7 @@ public class LoadGenerator {
 				consoleLog.debug("Robot found, trying to kill it...");
 			}
 			if( scriptLocation.equals(tarray[i].getName()) ) {
-				((Robot) tarray[i]).setStop(true);
+				((Robot) tarray[i]).setStopExecuting(true);
 			}
 			i++;
 		}
@@ -229,7 +229,7 @@ public class LoadGenerator {
 			}
 			Robot tempRobot = aliveRobotList.poll();
 			if( tempRobot.isAlive() ) {
-				aliveRobotList.poll().setStop(true);
+				aliveRobotList.poll().setStopExecuting(true);
 			}
 		}
 		

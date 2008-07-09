@@ -1,5 +1,8 @@
 package com.awebstorm.loadgenerator.robot;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.PropertyResourceBundle;
@@ -20,8 +23,6 @@ import org.apache.log4j.PropertyConfigurator;
 public class HTMLRobotBehaviour {
 	
 	private HTMLRobot newRobot;
-	private Logger consoleLog;
-	private Logger resultLog;
 	private String scriptLocation;
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
@@ -29,39 +30,57 @@ public class HTMLRobotBehaviour {
 	
 	public void shouldGenerateGoodResults() {
 		scriptLocation = "Script.xml";
-		newRobot = new HTMLRobot(scriptLocation,consoleLog,resultLog);
+		InputStream newStream = null;
+		try {
+			newStream = new FileInputStream(scriptLocation);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		newRobot = new HTMLRobot(newStream);
 		newRobot.run();
 	}
 
-	public void shouldAppendGoodResultsLog() throws Exception {
+/*	public void shouldAppendGoodResultsLog() {
 		scriptLocation = "Script2.xml";
-		newRobot = new HTMLRobot(scriptLocation,consoleLog,resultLog);
+		InputStream newStream = null;
+		try {
+			newStream = new FileInputStream(scriptLocation);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		newRobot = new HTMLRobot(newStream);
 		newRobot.run();
 	}
 	
 	public void shouldTimeoutSuccessfully() {
 		scriptLocation = "Script3.xml";
-		newRobot = new HTMLRobot(scriptLocation,consoleLog,resultLog);
+		InputStream newStream = null;
+		try {
+			newStream = new FileInputStream(scriptLocation);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		newRobot = new HTMLRobot(newStream);
 		newRobot.run();
 		
 	}
 	
 	public void shouldFailButNotThrowException() {
 		scriptLocation = "Script4.xml";
-		newRobot = new HTMLRobot(scriptLocation,consoleLog,resultLog);
+		InputStream newStream = null;
+		try {
+			newStream = new FileInputStream(scriptLocation);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		newRobot = new HTMLRobot(newStream);
 		newRobot.run();
-	}
+	}*/
 	
 	public void setUp() {
 		
-		consoleLog = Logger.getLogger("loadgenerator.consoleLog");
-		resultLog = Logger.getLogger("loadgenerator.consoleLog.resultLog");
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
 		URL scheduler = null;
-		
-		if( consoleLog.isDebugEnabled()) {
-			consoleLog.debug("Logs configured.");
-		}
 		
 		loadGeneratorProperties = (PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
 
@@ -73,15 +92,9 @@ public class HTMLRobotBehaviour {
 					loadGeneratorProperties.getString("schedulerFile")
 			);
 		} catch (NumberFormatException e) {
-			consoleLog.fatal("Bad Port Number receieved from properties: " + loadGeneratorProperties.getString("schedulerPort"), e);// Bad port number
 			System.exit(3);
 		} catch (MalformedURLException e) {
-			consoleLog.fatal("Bad URL parameters received from properties.", e);// Bad URL parameters
 			System.exit(3);
-		}
-		
-		if( consoleLog.isDebugEnabled()) {
-			consoleLog.debug("Properties configured for: " + scheduler.toExternalForm());
 		}
 		
 	}

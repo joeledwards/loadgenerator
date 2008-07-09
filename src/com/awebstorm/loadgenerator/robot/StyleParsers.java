@@ -15,10 +15,9 @@ public class StyleParsers {
 	 * @param text String to parse
 	 * @return LinkedList holding the string representations of the relative/absolute style resources
 	 */
-	public static LinkedList<String> parseStyleElementText ( String text ) {
+	public static LinkedList<String> grabStyleElementText ( String text ) {
 		
 		LinkedList<String> sheetResources = new LinkedList<String>();
-		
 		StringBuffer parserBuffer = new StringBuffer(text);
 		int start = 0;
 		for ( int i = 0; i < parserBuffer.length(); i++) {
@@ -46,7 +45,7 @@ public class StyleParsers {
 	 * @param text Style sheet
 	 * @return List of url tags
 	 */
-	public static LinkedList<String> parseStyleSheetText ( String text ) {
+	public static LinkedList<String> grabStyleSheetText ( String text ) {
 		
 		LinkedList<String> sheetResources = new LinkedList<String>();
 		StringBuffer parserBuffer = new StringBuffer(text);
@@ -87,13 +86,13 @@ public class StyleParsers {
 	public static void main ( String[] args ) {
 		//Element Test
 		long start = System.currentTimeMillis();
-		LinkedList<String> test = StyleParsers.parseStyleElementText("@import \"found1\" @import avnower[onvaso[vnsdvobasvvaservoin\'found2\'");
+		LinkedList<String> test = StyleParsers.grabStyleElementText("@import \"found1\" @import avnower[onvaso[vnsdvobasvvaservoin\'found2\'");
 		System.out.println("@import \"found1\" @import avnower[onvaso[vnsdvobasvvaservoin\'found2\'");
 		for ( int i = 0; i < test.size(); i++) {
 			System.out.println(test.get(i));
 		}
 		//Sheet Test
-		test = StyleParsers.parseStyleSheetText("url(hello1) ((())) asdiovnaovavuiobnauipvqaviburl(hello2\")");
+		test = StyleParsers.grabStyleSheetText("url(hello1) ((())) asdiovnaovavuiobnauipvqaviburl(hello2\")");
 		for ( int i = 0; i < test.size(); i++) {
 			System.out.println(test.get(i));
 		}
