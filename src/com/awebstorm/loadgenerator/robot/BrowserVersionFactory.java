@@ -19,7 +19,7 @@ public class BrowserVersionFactory {
 	 * Construct a BrowserVersionFactory using a comma-delimited String.
 	 * @param parsedData Data String
 	 */
-	public BrowserVersionFactory (String parsedData) {
+	public BrowserVersionFactory(final String parsedData) {
 		
 		int tempIndex1 = 0;
 		int tempIndex2 = 0;
@@ -39,7 +39,7 @@ public class BrowserVersionFactory {
 	 * Retrieve a new BrowserVersion from this factory.
 	 * @return A new BrowserVersion
 	 */
-	public BrowserVersion getNewBrowserVersion () {
+	public final BrowserVersion getNewBrowserVersion() {
 		
 		return new BrowserVersion(
 				applicationName,

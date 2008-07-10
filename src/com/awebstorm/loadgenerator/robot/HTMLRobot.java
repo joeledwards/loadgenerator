@@ -13,14 +13,15 @@ import org.apache.log4j.Logger;
 public class HTMLRobot extends Robot {
 	
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private BrowserState _currentState = new BrowserState(prefs);
+	private BrowserState currentState = new BrowserState(prefs);
 	
 	/**
 	 * Constructor defines the InputStream to be read.
+	 * @param script script to parse
 	 */
-	public HTMLRobot(InputStream scriptLocation){	
-		super(scriptLocation);
-		if ( consoleLog.isDebugEnabled()) {
+	public HTMLRobot(final InputStream script) {	
+		super(script);
+		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Built an HTMLRobot");
 		}
 	}
@@ -28,19 +29,25 @@ public class HTMLRobot extends Robot {
 	/**
 	 * Configures the robot, then executes the list of Steps.
 	 */
-	public void run() {
+	public final void run() {
 
 		int stepNum = 0;
-		while(!stepQueue.isEmpty()) {
+		while (!stepQueue.isEmpty()) {
+			if (stopExecuting) {
+				return;
+			}
 			Step tempStep = stepQueue.poll();
-				if ( consoleLog.isDebugEnabled()) {
-					consoleLog.debug("Begin Executing Step: " + robotID + ',' + tempStep.getName() + ',' + stepNum );
+				if (consoleLog.isDebugEnabled()) {
+					consoleLog.debug("Begin Executing Step: " 
+							+ robotID + ',' 
+							+ tempStep.getName() 
+							+ ',' + stepNum);
 				}
-				tempStep.execute(robotID, _currentState);
+				tempStep.execute(robotID, currentState);
 				tempStep = null;
 				stepNum++;
 		}
-		if ( consoleLog.isDebugEnabled()) {
+		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Robot is closing: " + this.robotID);
 		}
 		

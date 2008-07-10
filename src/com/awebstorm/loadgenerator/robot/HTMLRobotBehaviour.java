@@ -28,7 +28,10 @@ public class HTMLRobotBehaviour {
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
 	
-	public void shouldGenerateGoodResults() {
+	/**
+	 * Behaviour to test the general use of an HTML robot in a semi long script.
+	 */
+	public final void shouldGenerateGoodResults() {
 		scriptLocation = "Script.xml";
 		InputStream newStream = null;
 		try {
@@ -77,12 +80,16 @@ public class HTMLRobotBehaviour {
 		newRobot.run();
 	}*/
 	
-	public void setUp() {
+	/**
+	 * Setup general operations before each test.
+	 */
+	public final void setUp() {
 		
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
 		URL scheduler = null;
 		
-		loadGeneratorProperties = (PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
+		loadGeneratorProperties = 
+			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
 
 		try {
 			scheduler = new URL (
@@ -99,7 +106,10 @@ public class HTMLRobotBehaviour {
 		
 	}
 	
-	public void tearDown() {
+	/**
+	 * Take down everything after tests.
+	 */
+	public final void tearDown() {
 		LogManager.shutdown();
 		newRobot = null;
 	}

@@ -1,3 +1,4 @@
+
 package com.awebstorm.loadgenerator.robot;
 
 import java.security.GeneralSecurityException;
@@ -25,12 +26,16 @@ public class BrowserState {
 	
 	/**
 	 * Default Constructor ensures no NullPointerExceptions.
+	 * @param preferences Prefs loaded from script
 	 */
-	public BrowserState( HashMap<String,String> preferences ) {
+	public BrowserState(final HashMap<String, String> preferences) {
 		_preferences = preferences;
 		configureState();
 	}
-	//Configure the state using the preferences HashMap
+	
+	/**
+	 * Configure the state of the Robot from the preferences in the script.
+	 */
 	private void configureState() {
 		
 		boolean javaScriptEnabled = Boolean.parseBoolean(_preferences.get("javaScriptEnabled"));
@@ -46,12 +51,16 @@ public class BrowserState {
 		_targetDomain = _preferences.get("domain");
 
 		WebClient client;
-		if ( proxyHost.equalsIgnoreCase("none") && !browVersionString.equals("none")) {
-			BrowserVersionFactory browVerFactory = new BrowserVersionFactory(browVersionString);
+		if (proxyHost.equalsIgnoreCase("none") 
+				&& !browVersionString.equals("none")) {
+			BrowserVersionFactory browVerFactory = 
+				new BrowserVersionFactory(browVersionString);
 			client = new WebClient(browVerFactory.getNewBrowserVersion());
-		} else if (!browVersionString.equals("none")){
-			BrowserVersionFactory browVerFactory = new BrowserVersionFactory(browVersionString);
-			client = new WebClient(browVerFactory.getNewBrowserVersion(),proxyHost,proxyPort);
+		} else if (!browVersionString.equals("none")) {
+			BrowserVersionFactory browVerFactory =
+				new BrowserVersionFactory(browVersionString);
+			client = 
+				new WebClient(browVerFactory.getNewBrowserVersion(), proxyHost, proxyPort);
 		} else {
 			client = new WebClient();
 		}
@@ -74,20 +83,42 @@ public class BrowserState {
 		
 		vUser = client;
 	}
-
-	public String getDomain() {
+	
+	/**
+	 * Get the target Domain.
+	 * @return The target domain
+	 */
+	public final String getDomain() {
 		return _targetDomain;
 	}
-	public void setCurrentPage(HtmlPage invokePage) {
+	/**
+	 * Set the state's current HtmlPage.
+	 * @param invokePage New Page
+	 */
+	public final void setCurrentPage(final HtmlPage invokePage) {
 		currentPage = invokePage;
 	}
-	public WebClient getVUser() {
+	/**
+	 * Get the state's virtual user.
+	 * @return Virtual user
+	 */
+	public final WebClient getVUser() {
 		return vUser;
 	}
-	public HtmlPage getCurrentPage() {
+	/**
+	 * Get the state's current HtmlPage.
+	 * @return Current Page
+	 */
+	public final HtmlPage getCurrentPage() {
 		return currentPage;
 	}
-	public boolean addUrlToHistory(String resource) {
+	/**
+	 * Add a URL to the list of previously obtained resources.
+	 * @param resource New resource to index
+	 * @return True if browser history does not contain the
+	 *  resource, else if browser history already contains the resource
+	 */
+	public final boolean addUrlToHistory(final String resource) {
 		return browserHistory.add(resource);
 	}
 	

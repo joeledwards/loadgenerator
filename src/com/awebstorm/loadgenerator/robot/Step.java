@@ -78,7 +78,7 @@ public class Step implements Comparable<Step> {
 	 * Compare two steps by value
 	 */
 	public int compareTo(Step o) {
-		return _stepNum - o.get_value();
+		return _stepNum - o.getValue();
 	}
 
 	/**
@@ -266,29 +266,32 @@ public class Step implements Comparable<Step> {
 		return collectResources(invokePage);
 	}
 	/**
-	 * Collects local resources from the page passed i.e. images, style sheets, javascript.
+	 * Collects local resources from the page passed 
+	 * i.e. images, style sheets, javascript.
 	 * @param invokePage Page to collect necessary resources for
 	 * @return
 	 */
 	private boolean collectResources(HtmlPage invokePage) {
 		
 		boolean tempStatus = true;
-		if (invokePage.getWebResponse().getStatusCode() < 200 || invokePage.getWebResponse().getStatusCode() > 399 ) {
+		if (invokePage.getWebResponse().getStatusCode() < 200
+				|| invokePage.getWebResponse().getStatusCode() > 399) {
 			tempStatus = false;
 		}
-		Iterable<HtmlElement> tempList = invokePage.getDocumentElement().getAllHtmlChildElements();
+		Iterable<HtmlElement> tempList = 
+			invokePage.getDocumentElement().getAllHtmlChildElements();
 		StringBuffer resourcesCollector = new StringBuffer();
 		String tempAttr;
 		WebResponse temporary;
 		NamedNodeMap tempAttrs;
-		for(HtmlElement temp: tempList) {
+		for (HtmlElement temp : tempList) {
 			try {
 				temporary = null;
 				tempAttrs = temp.getAttributes();
 				tempAttr = temp.getAttribute("src");
-				if ( tempAttrs.getNamedItem("src") != null ) {
-					if ( !tempAttr.startsWith("http") ) {
-						if ( tempAttr.charAt(0) == '/' ) {
+				if (tempAttrs.getNamedItem("src") != null) {
+					if (!tempAttr.startsWith("http")) {
+						if (tempAttr.charAt(0) == '/') {
 							tempAttr = _currentBrowserState.getDomain() + tempAttr;
 						} else {
 							tempAttr = _currentBrowserState.getDomain() + '/' + tempAttr;
@@ -296,44 +299,51 @@ public class Step implements Comparable<Step> {
 					}
 					if (_currentBrowserState.addUrlToHistory(tempAttr)) {
 						temporary = _currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
-						if ( consoleLog.isDebugEnabled() ) {
-							resourcesCollector.append("Resources obtained: " + tempAttr + '\n');
+						if (consoleLog.isDebugEnabled()) {
+							resourcesCollector.append("Resources obtained: " 
+								+ tempAttr + '\n');
 						}
 						loadTime += temporary.getLoadTimeInMilliSeconds();
 						loadAmount += temporary.getResponseBody().length;
-						if ( temporary.getStatusCode() != 200 ) {
+						if (temporary.getStatusCode() != 200) {
 							tempStatus = false;
 						}
 					}
-				} else if (temp.getClass() == HtmlStyle.class ) {
+				} else if (temp.getClass() == HtmlStyle.class) {
 					tempAttrs = ((HtmlStyle) temp).getAttributes();
 					tempAttr = ((HtmlStyle) temp).getTextContent();
-					LinkedList<String> styleResourceList = StyleParsers.grabStyleElementText(tempAttr);
+					LinkedList<String> styleResourceList = 
+						StyleParsers.grabStyleElementText(tempAttr);
 					String aResource;
 					while (!styleResourceList.isEmpty()){
 						aResource = styleResourceList.poll();
-						if ( !aResource.startsWith("http") ) {
-							if ( aResource.charAt(0) == '/' ) {
-								aResource = _currentBrowserState.getDomain() + aResource;
+						if (!aResource.startsWith("http")) {
+							if (aResource.charAt(0) == '/') {
+								aResource = _currentBrowserState.getDomain() 
+								+ aResource;
 							} else {
-								aResource = _currentBrowserState.getDomain() + '/' + aResource;
+								aResource = _currentBrowserState.getDomain() 
+								+ '/' + aResource;
 							}
 						}
 						if (_currentBrowserState.addUrlToHistory(aResource)) {
 							temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
-							if ( consoleLog.isDebugEnabled() ) {
-								resourcesCollector.append("Import resources obtained: " + aResource + '\n');
+							if (consoleLog.isDebugEnabled()) {
+								resourcesCollector.append("Import resources obtained: "
+									+ aResource + '\n');
 							}
 							loadTime += temporary.getLoadTimeInMilliSeconds();
 							loadAmount += temporary.getResponseBody().length;
-							if ( temporary.getStatusCode() != 200 ) {
+							if (temporary.getStatusCode() != 200 ) {
 								tempStatus = false;
 							}
-							if(aResource.endsWith(".css")) {
-								LinkedList<String> tempHolder = StyleParsers.grabStyleSheetText(temporary.getContentAsString());
-								String path = StyleParsers.subDirBuilder(temporary.getUrl());
+							if (aResource.endsWith(".css")) {
+								LinkedList<String> tempHolder = 
+									StyleParsers.grabStyleSheetText(temporary.getContentAsString());
+								String path = 
+									StyleParsers.subDirBuilder(temporary.getUrl());
 								while (!tempHolder.isEmpty()) {
-									if ( consoleLog.isDebugEnabled() ) {
+									if (consoleLog.isDebugEnabled()) {
 										consoleLog.debug(tempHolder.peek());
 									}
 									styleResourceList.add(path + tempHolder.poll());
@@ -341,14 +351,14 @@ public class Step implements Comparable<Step> {
 							}
 						}
 					}
-				} else if (temp.getClass() == HtmlLink.class ) {
+				} else if (temp.getClass() == HtmlLink.class) {
 					String aResource;
 					tempAttrs = ((HtmlLink) temp).getAttributes();
-					for ( int i = 0; i < tempAttrs.getLength(); i++ ) {
-						if ( tempAttrs.getNamedItem("rel").getNodeValue().equals("stylesheet") ) {
+					for (int i = 0; i < tempAttrs.getLength(); i++) {
+						if (tempAttrs.getNamedItem("rel").getNodeValue().equals("stylesheet")) {
 							aResource = tempAttrs.getNamedItem("href").getNodeValue();
-							if ( !aResource.startsWith("http") ) {
-								if ( aResource.charAt(0) == '/' ) {
+							if (!aResource.startsWith("http")) {
+								if (aResource.charAt(0) == '/') {
 									aResource = _currentBrowserState.getDomain() + aResource;
 								} else {
 									aResource = _currentBrowserState.getDomain() + '/' + aResource;
@@ -356,19 +366,19 @@ public class Step implements Comparable<Step> {
 							}
 							if (_currentBrowserState.addUrlToHistory(aResource)) {
 								temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
-								if ( consoleLog.isDebugEnabled() ) {
+								if (consoleLog.isDebugEnabled()) {
 									resourcesCollector.append("Link Resources obtained: " + aResource + '\n');
 								}
 								loadTime += temporary.getLoadTimeInMilliSeconds();
 								loadAmount += temporary.getResponseBody().length;
-								if ( temporary.getStatusCode() != 200 ) {
+								if (temporary.getStatusCode() != 200) {
 									tempStatus = false;
 								}
 								LinkedList<String> styleResourceList = StyleParsers.grabStyleSheetText(temporary.getContentAsString());
-								while (!styleResourceList.isEmpty()){
+								while (!styleResourceList.isEmpty()) {
 									aResource = StyleParsers.subDirBuilder(temporary.getUrl()) + styleResourceList.poll();
-									if ( !aResource.startsWith("http") ) {
-										if ( aResource.charAt(0) == '/' ) {
+									if (!aResource.startsWith("http")) {
+										if (aResource.charAt(0) == '/') {
 											aResource = _currentBrowserState.getDomain() + aResource;
 										} else {
 											aResource = _currentBrowserState.getDomain() + '/' + aResource;
@@ -376,12 +386,12 @@ public class Step implements Comparable<Step> {
 									}
 									if (_currentBrowserState.addUrlToHistory(aResource)) {
 										temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
-										if ( consoleLog.isDebugEnabled() ) {
+										if (consoleLog.isDebugEnabled()) {
 											resourcesCollector.append("Style Sheet Pic Resources obtained: " + aResource + '\n');
 										}
 										loadTime += temporary.getLoadTimeInMilliSeconds();
 										loadAmount += temporary.getResponseBody().length;
-										if ( temporary.getStatusCode() != 200 ) {
+										if (temporary.getStatusCode() != 200) {
 											tempStatus = false;
 										}
 									}
@@ -391,17 +401,17 @@ public class Step implements Comparable<Step> {
 					}
 				}
 			} catch (FailingHttpStatusCodeException e) {
-				consoleLog.error("Bad Status Code.",e);
+				consoleLog.error("Bad Status Code.", e);
 				tempStatus = false;
 			} catch (MalformedURLException e) {
-				consoleLog.error("Bad URL Entered during resource retrieval.",e);
+				consoleLog.error("Bad URL Entered during resource retrieval.", e);
 				tempStatus = false;
 			} catch (IOException e) {
-				consoleLog.error("IO Error Occured during resource retrieval.",e);
+				consoleLog.error("IO Error Occured during resource retrieval.", e);
 				tempStatus = false;
 			}
 		}
-		if ( consoleLog.isDebugEnabled() ) {
+		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug(resourcesCollector.toString());
 		}
 		return tempStatus;
@@ -409,14 +419,15 @@ public class Step implements Comparable<Step> {
 
 	/**
 	 * Verify the currentpage title with an Attribute value.
-	 * @return
+	 * @return True if title is correct, else false
 	 */
 	private boolean verifyTitle() {
-		if( consoleLog.isDebugEnabled()) {
+		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug(_currentBrowserState.getCurrentPage().getTitleText());
 		}
-		if ( _currentBrowserState.getCurrentPage() != null )
+		if (_currentBrowserState.getCurrentPage() != null) {
 			return _currentBrowserState.getCurrentPage().getTitleText().equals(_stepAttributeList.getValue(0));
+		}
 		return false;
 	}
 
@@ -470,10 +481,10 @@ public class Step implements Comparable<Step> {
 		tempResult.append(',');
 		tempResult.append(loadAmount);
 		tempResult.append(',');
-		if ( loadTime == 0 ) {
+		if (loadTime == 0) {
 			loadTime = 1;
 		}
-		tempResult.append(loadAmount/loadTime);
+		tempResult.append(loadAmount / loadTime);
 		tempResult.append(',');
 		if (stepStatus) {
 			tempResult.append("success");
@@ -484,19 +495,19 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Retrieve the value of a Step.
-	 * @return
+	 * Retrieve the number of a Step.
+	 * @return The number of this Step
 	 */
-	public int get_value() {
+	public final int getValue() {
 		return _stepNum;
 	}
 
 	/**
 	 * Set the browser state of a Step.
-	 * @param _state
+	 * @param newState The new state of the Browser
 	 */
-	public void set_state(BrowserState _state) {
-		this._currentBrowserState = _state;
+	public final void setState(BrowserState newState) {
+		this._currentBrowserState = newState;
 	}
 
 }
