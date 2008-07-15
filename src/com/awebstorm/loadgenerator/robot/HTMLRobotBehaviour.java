@@ -9,7 +9,6 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 
@@ -32,7 +31,7 @@ public class HTMLRobotBehaviour {
 	 * Behaviour to test the general use of an HTML robot in a semi long script.
 	 */
 	public final void shouldGenerateGoodResults() {
-		scriptLocation = "Script.xml";
+		scriptLocation = "Script2.xml";
 		InputStream newStream = null;
 		try {
 			newStream = new FileInputStream(scriptLocation);

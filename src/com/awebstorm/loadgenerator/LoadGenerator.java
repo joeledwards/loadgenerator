@@ -7,9 +7,7 @@ import java.net.URL;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.PriorityBlockingQueue;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import com.awebstorm.loadgenerator.robot.HTMLRobot;
 import com.awebstorm.loadgenerator.robot.Robot;

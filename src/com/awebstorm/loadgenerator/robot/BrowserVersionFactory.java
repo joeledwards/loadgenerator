@@ -13,7 +13,7 @@ public class BrowserVersionFactory {
 	private String applicationVersion;
 	private String userAgent;
 	private String applicationJavaVersion;
-	private float  applicationVersionFloat;
+	private float  applicationVersionFloat;    
 	
 	/**
 	 * Construct a BrowserVersionFactory using a comma-delimited String.

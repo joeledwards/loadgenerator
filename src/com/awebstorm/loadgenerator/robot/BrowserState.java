@@ -1,4 +1,3 @@
-
 package com.awebstorm.loadgenerator.robot;
 
 import java.security.GeneralSecurityException;

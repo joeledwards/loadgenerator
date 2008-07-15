@@ -13,7 +13,7 @@ public final class StyleParsers {
 	/**
 	 * Hidden Constructor for Utility class.
 	 */
-	private StyleParsers() {
+	private StyleParsers() {  
 		
 	}
 	
