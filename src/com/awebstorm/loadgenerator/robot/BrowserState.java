@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import org.apache.log4j.Logger;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.Cache;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -22,12 +23,14 @@ public class BrowserState {
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> _preferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
+	private int proxyPort;
 	
 	/**
 	 * Default Constructor ensures no NullPointerExceptions.
 	 * @param preferences Prefs loaded from script
 	 */
-	public BrowserState(final HashMap<String, String> preferences) {
+	public BrowserState(final HashMap<String, String> preferences, int proxyPort) {
+		this.proxyPort=proxyPort;
 		_preferences = preferences;
 		configureState();
 	}
@@ -46,7 +49,6 @@ public class BrowserState {
 		boolean printContentOnFailingStatusCode = Boolean.parseBoolean(_preferences.get("printContentOnFailingStatusCode"));
 		String browVersionString = _preferences.get("htmlRobotBrowserVersion");
 		String proxyHost = _preferences.get("proxyHost");
-		int proxyPort = Integer.parseInt(_preferences.get("proxyPort"));
 		_targetDomain = _preferences.get("domain");
 
 		WebClient client;
@@ -55,11 +57,13 @@ public class BrowserState {
 			BrowserVersionFactory browVerFactory = 
 				new BrowserVersionFactory(browVersionString);
 			client = new WebClient(browVerFactory.getNewBrowserVersion());
-		} else if (!browVersionString.equals("none")) {
+		} else if (!browVersionString.equals("none") && !proxyHost.equalsIgnoreCase("none")) {
 			BrowserVersionFactory browVerFactory =
 				new BrowserVersionFactory(browVersionString);
 			client = 
 				new WebClient(browVerFactory.getNewBrowserVersion(), proxyHost, proxyPort);
+		} else if (browVersionString.equals("none")){
+			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, proxyPort);
 		} else {
 			client = new WebClient();
 		}
