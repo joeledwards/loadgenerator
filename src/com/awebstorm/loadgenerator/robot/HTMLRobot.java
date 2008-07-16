@@ -13,14 +13,15 @@ import org.apache.log4j.Logger;
 public class HTMLRobot extends Robot {
 	
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private BrowserState currentState = new BrowserState(prefs);
+	private BrowserState currentState;
 	
 	/**
 	 * Constructor defines the InputStream to be read.
 	 * @param script script to parse
 	 */
-	public HTMLRobot(final InputStream script) {	
+	public HTMLRobot(final InputStream script, final int proxyPort) {
 		super(script);
+		currentState = new BrowserState(prefs,proxyPort);
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Built an HTMLRobot");
 		}
@@ -43,8 +44,8 @@ public class HTMLRobot extends Robot {
 							+ tempStep.getName() 
 							+ ',' + stepNum);
 				}
+				this.currentStep=tempStep;
 				tempStep.execute(robotID, currentState);
-				tempStep = null;
 				stepNum++;
 		}
 		if (consoleLog.isDebugEnabled()) {
