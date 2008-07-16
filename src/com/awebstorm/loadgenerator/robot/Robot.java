@@ -2,8 +2,6 @@ package com.awebstorm.loadgenerator.robot;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import org.apache.log4j.Logger;
-
 
 /**
  * Generic Robot operations include Script parsing, general preferences, and stop boolean.
@@ -19,9 +17,17 @@ public abstract class Robot implements Runnable {
 	private int defaultWaitStep;
 	//Robot ID vars
 	protected String robotID;
-	protected int currentStep;
+	protected Step currentStep;
 	protected long timeLastStepFinished;
 	protected boolean stopExecuting;
+	protected Thread t;
+	
+	public void init()	
+	{	    	
+
+		t=new Thread(this);
+		t.start();
+	}
 	
 	/**
 	 * Default robot Constructor.
@@ -72,16 +78,8 @@ public abstract class Robot implements Runnable {
 	 * Get the current Step of the Robot.
 	 * @return The current Step of the Robot
 	 */
-	public final int getCurrentStep() {
+	public final Step getCurrentStep() {
 		return currentStep;
-	}
-
-	/**
-	 * Set the current Step of the Robot.
-	 * @param newCurrentStep The new current Step of the Robot
-	 */
-	public final void setCurrentStep(final int newCurrentStep) {
-		this.currentStep = newCurrentStep;
 	}
 
 	/**
