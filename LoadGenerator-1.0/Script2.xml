@@ -1,0 +1,28 @@
+<MyScript>
+
+
+
+
+
+	<Properties>
+		<cacheSize>50</cacheSize>
+		<domain>file://C:\doctemp\cr552\adapter.jpg</domain>
+		<jobID>0002</jobID>
+		<timeout>5000</timeout>
+		<waitstep>1000</waitstep>
+		<iteration>1</iteration>
+		<duration>60000</duration>
+		<proxyPort>8099</proxyPort>
+		<proxyHost>none</proxyHost>
+		<javaScriptEnabled>false</javaScriptEnabled>
+		<redirectEnabled>true</redirectEnabled>
+		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
+		<useInsecureSSL>false</useInsecureSSL>
+		<popupBlockerEnabled>true</popupBlockerEnabled>
+		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
+	</Properties>
+
+	<STEPS>
+		<INVOKE path="" /></STEPS>
+
+</MyScript>
