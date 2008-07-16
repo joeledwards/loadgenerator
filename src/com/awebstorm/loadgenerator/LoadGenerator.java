@@ -153,7 +153,7 @@ public class LoadGenerator {
 	 * @return
 	 */
 	private Robot selectRobotType(InputStream script) {
-			return new HTMLRobot(script);
+			return new HTMLRobot(script,10000);
 	}
 	
 	/**
