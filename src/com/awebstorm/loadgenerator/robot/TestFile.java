@@ -48,7 +48,7 @@ public class TestFile {
 				put("popupBlockerEnabled", "true");
 				put("htmlRobotBrowserVersion", "none");
 			}};
-			tempArray.add(i, new BrowserState(prefs));
+			tempArray.add(i, new BrowserState(prefs,10000));
 			try {
 				tempArray.get(i).getVUser().getPage(new URL("file","127.0.0.1","C:\\Users\\Cromano\\Desktop\\OpenOffice.org 2.4 (en-US) Installation Files\\licenses\\license_en-US.html"));
 			} catch (FailingHttpStatusCodeException e) {

@@ -1,6 +1,7 @@
 package com.awebstorm.loadgenerator.robot;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,8 +16,10 @@ import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.SimpleLog;
+import org.apache.log4j.Appender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.WriterAppender;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
@@ -33,6 +36,10 @@ public class TestSpeed {
 		PropertyConfigurator.configureAndWatch("log4j.properties");
 		
 		Logger testLog = Logger.getLogger("com.awebstorm.loadgenerator.robot.Step.resultLog");
+		Logger wireLog = Logger.getLogger("httpclient.wire.header");
+		//OutputStream out = new OutputStream();
+		Appender streamer = new WriterAppender();
+		wireLog.addAppender(streamer);
 		
 		testLog.info("Max Memory:   " + Runtime.getRuntime().maxMemory() / ( 1024.0 * 1024.0));
 		testLog.info("Free Memory:  " + Runtime.getRuntime().freeMemory() / ( 1024.0 * 1024.0));
@@ -54,7 +61,7 @@ public class TestSpeed {
 			put("popupBlockerEnabled", "true");
 			put("htmlRobotBrowserVersion", "none");
 		}};
-		BrowserState testRobot = new BrowserState(prefs);
+		BrowserState testRobot = new BrowserState(prefs,10000);
 		URL latencyURL = null;
 		try {
 			latencyURL = new URL("http","www.math.unm.edu","/images/rowan.fla");
