@@ -11,8 +11,7 @@ import java.util.ResourceBundle;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 
-
-
+import com.awebstorm.loadgenerator.proxy;
 
 /**
  * Test the behaviour of the HTMLRobot class.
@@ -26,58 +25,43 @@ public class HTMLRobotBehaviour {
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
+	public proxy[] loadGenProxyArray = new proxy[100];
+	public boolean[] loadGenProxyBooleanArray = new boolean[100];
+	private int localPort;
+	private String remotehost;
+	private int remoteport;
 	
 	/**
 	 * Behaviour to test the general use of an HTML robot in a semi long script.
 	 */
 	public final void shouldGenerateGoodResults() {
-		scriptLocation = "Script2.xml";
+		scriptLocation = "Script.xml";
 		InputStream newStream = null;
 		try {
 			newStream = new FileInputStream(scriptLocation);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		newRobot = new HTMLRobot(newStream);
-		newRobot.run();
+/*		newRobot = new HTMLRobot(newStream);
+		newRobot.run();*/
+		for (int i = 0; i < loadGenProxyBooleanArray.length; i++) {
+			if (loadGenProxyArray[i].getMyRobotOwner() == null) {
+				loadGenProxyBooleanArray[i] = true;
+			}
+			if (loadGenProxyBooleanArray[i]) {
+				newRobot = new HTMLRobot(newStream,localPort+i);
+				loadGenProxyArray[i].setMyRobotOwner(newRobot);
+				loadGenProxyBooleanArray[i] = false;
+				break;
+			}
+		}
+		//loadGenProxyArray.put(proxy9000, newRobot.robotID);
+		//proxy9000.init();
+		newRobot.init();
+		while (newRobot.t.isAlive()) {
+			
+		}
 	}
-
-/*	public void shouldAppendGoodResultsLog() {
-		scriptLocation = "Script2.xml";
-		InputStream newStream = null;
-		try {
-			newStream = new FileInputStream(scriptLocation);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		newRobot = new HTMLRobot(newStream);
-		newRobot.run();
-	}
-	
-	public void shouldTimeoutSuccessfully() {
-		scriptLocation = "Script3.xml";
-		InputStream newStream = null;
-		try {
-			newStream = new FileInputStream(scriptLocation);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		newRobot = new HTMLRobot(newStream);
-		newRobot.run();
-		
-	}
-	
-	public void shouldFailButNotThrowException() {
-		scriptLocation = "Script4.xml";
-		InputStream newStream = null;
-		try {
-			newStream = new FileInputStream(scriptLocation);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		newRobot = new HTMLRobot(newStream);
-		newRobot.run();
-	}*/
 	
 	/**
 	 * Setup general operations before each test.
@@ -90,6 +74,15 @@ public class HTMLRobotBehaviour {
 		loadGeneratorProperties = 
 			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
 
+		localPort = Integer.parseInt(loadGeneratorProperties.getString("proxyLocalPortRange"));
+		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
+		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
+		for ( int i = 0; i < loadGenProxyArray.length; i++ ) {
+			loadGenProxyArray[i] = new proxy(localPort+i,remotehost,remoteport);
+			loadGenProxyArray[i].init();
+			loadGenProxyBooleanArray[i] = true;
+		}
+		
 		try {
 			scheduler = new URL (
 					loadGeneratorProperties.getString("schedulerProtocol"),
