@@ -20,8 +20,13 @@
 
     <target name="compile">
     	<mkdir dir="${build.dir}"/>
+    	<mkdir dir="${bin.dir}"/>
         <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="classpath"/>
+    	<javac srcdir="${src.dir}" destdir="${bin.dir}" classpathref="classpath"/>
         <copy todir="${build.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+        <copy todir="${bin.dir}">
             <fileset dir="${src.dir}" excludes="**/*.java"/>
         </copy>
     </target>
