@@ -12,8 +12,8 @@
 		<waitstep>1000</waitstep>
 		<iteration>1</iteration>
 		<duration>60000</duration>
-		<proxyPort>8099</proxyPort>
-		<proxyHost>none</proxyHost>
+		<proxyPort>10000</proxyPort>
+		<proxyHost>localhost</proxyHost>
 		<javaScriptEnabled>false</javaScriptEnabled>
 		<redirectEnabled>true</redirectEnabled>
 		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
@@ -24,29 +24,37 @@
 
 	<STEPS>
 		<WAIT length="3000" />
-		<INVOKE path=""></INVOKE>
+		<INVOKE path="" />
 		<VERIFY_TITLE
-			title="CustomerCentrix | We satisfy your business technology needs">
-		</VERIFY_TITLE>
-		<WAIT length="3000"></WAIT>
-		<INVOKE path="/about_us.htm"></INVOKE>
-		<VERIFY_TITLE title="About CustomerCentrix | CustomerCentrix"></VERIFY_TITLE><WAIT length="3000"></WAIT>
-		<INVOKE path="/contact.htm"></INVOKE><VERIFY_TITLE title="Contact Information | CustomerCentrix"></VERIFY_TITLE>
-		<WAIT length="2000"></WAIT>
-		<INVOKE path="/products.htm"></INVOKE>
-		<VERIFY_TITLE title="Products | CustomerCentrix"></VERIFY_TITLE><WAIT length="1000"></WAIT>
-		<INVOKE path="/training.htm"></INVOKE>
-		<VERIFY_TITLE title="Training | CustomerCentrix"></VERIFY_TITLE><WAIT length="4000"></WAIT>
-		<INVOKE path="/consulting.htm"></INVOKE>
-		<VERIFY_TITLE title="Consulting | CustomerCentrix"></VERIFY_TITLE><WAIT length="2000"></WAIT>
-		<INVOKE path="/testimonials.htm"></INVOKE><VERIFY_TITLE title="Testimonials | CustomerCentrix"></VERIFY_TITLE>
-		<WAIT length="1000"></WAIT>
+			title="CustomerCentrix | We satisfy your business technology needs" />
 
-		<POST path="" name="LoadGenerator" pass="LoadGenerator" op="Log in"></POST>
-		<VERIFY_TITLE title="CustomerCentrix | We satisfy your business technology needs"></VERIFY_TITLE>
-		
-		
-		
+		<WAIT length="3000" />
+		<INVOKE path="/about_us.htm" />
+		<VERIFY_TITLE title="About CustomerCentrix | CustomerCentrix" />
+		<WAIT length="3000" />
+		<INVOKE path="/contact.htm" />
+		<VERIFY_TITLE title="Contact Information | CustomerCentrix" />
+		<WAIT length="2000" />
+		<INVOKE path="/products.htm" />
+		<VERIFY_TITLE title="Products | CustomerCentrix" />
+		<WAIT length="1000" />
+		<INVOKE path="/training.htm" />
+		<VERIFY_TITLE title="Training | CustomerCentrix" />
+		<WAIT length="4000" />
+		<INVOKE path="/consulting.htm" />
+		<VERIFY_TITLE title="Consulting | CustomerCentrix" />
+		<WAIT length="2000" />
+		<INVOKE path="/testimonials.htm" />
+		<VERIFY_TITLE title="Testimonials | CustomerCentrix" />
+		<WAIT length="1000" />
+
+		<POST path="" name="LoadGenerator" pass="LoadGenerator"
+			op="Log in" />
+		<VERIFY_TITLE
+			title="CustomerCentrix | We satisfy your business technology needs" />
+
+
+
 	</STEPS>
 
 </MyScript>
