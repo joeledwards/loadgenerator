@@ -2,5 +2,6 @@
 *.class
 *.log
 *.log.*
+*LoadGenerator-1.0/*
 # Mac system files
 .DS_Store
