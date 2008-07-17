@@ -51,7 +51,8 @@ public class Step implements Comparable<Step> {
 	private Logger resultLog = Logger.getLogger("com.awebstorm.loadgenerator.robot.Step.resultLog");
 	private long loadTime;
 	private int loadAmount; 
-	private int proxyLoadAmount = 0;
+	private int proxyReceiveAmount = 0;
+	private int proxySentAmount;
 
 	public Step(String name, int value, Attributes list) {
 		_stepName = name;
@@ -485,7 +486,9 @@ public class Step implements Comparable<Step> {
 		if (loadTime == 0) {
 			loadTime = 1;
 		}
-		tempResult.append(proxyLoadAmount);
+		tempResult.append(proxyReceiveAmount);
+		tempResult.append(',');
+		tempResult.append(proxySentAmount);
 		tempResult.append(',');
 		tempResult.append(loadAmount / loadTime);
 		tempResult.append(',');
@@ -513,8 +516,12 @@ public class Step implements Comparable<Step> {
 		this._currentBrowserState = newState;
 	}
 
-	public void addProxyLoadAmount(int loadAmount) {
-		this.proxyLoadAmount += loadAmount;
+	public void addProxyReceiveAmount(int loadAmount) {
+		this.proxyReceiveAmount += loadAmount;
+	}
+	
+	public void addProxySentAmount(int loadAmount) {
+		this.proxySentAmount += loadAmount;
 	}
 
 }

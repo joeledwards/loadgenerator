@@ -4,12 +4,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.awebstorm.loadgenerator.proxyThread;
+import com.awebstorm.loadgenerator.ProxyThread;
 import com.awebstorm.loadgenerator.robot.Robot;
 
 import org.apache.log4j.Logger;
 
-public class proxy implements Runnable {
+public class Proxy implements Runnable {
 	
 	private int localport;
 	private String remotehost;
@@ -29,7 +29,7 @@ public class proxy implements Runnable {
 		
 	}
 	
-    public proxy (int localport, String remotehost, int remoteport) {
+    public Proxy (int localport, String remotehost, int remoteport) {
 		this.localport=localport;
 		this.remotehost=remotehost;
 		this.remoteport=remoteport;
@@ -42,7 +42,7 @@ public class proxy implements Runnable {
     	ServerSocket Server = null;
 
     	// Check for valid local and remote port, hostname not null
-    	consoleLog.info("Checking: Port" + localport + " to " + remotehost + " Port " + remoteport);
+    	consoleLog.info("Checking: Port " + localport + " to " + remotehost + " Port " + remoteport);
     	if(localport <= 0){
     		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
     		error = true;
@@ -60,7 +60,7 @@ public class proxy implements Runnable {
     	if(error)
     		System.exit(-1);
 
-    	//Test and create a listening socket at proxy
+    	//Test and create a listening socket at Proxy
     	try{
     		Server = new ServerSocket(localport);
     	}
@@ -73,13 +73,13 @@ public class proxy implements Runnable {
     	{
     		try{
     			incoming = Server.accept();
-    			//Create the 2 threads for the incoming and outgoing traffic of proxy server
+    			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			outgoing = new Socket(remotehost, remoteport); 
 
-    			proxyThread thread1 = new proxyThread(incoming, outgoing, myRobotOwner);
+    			ProxyThread thread1 = new ProxyThread(incoming, outgoing, myRobotOwner);
     			thread1.start();
 
-    			proxyThread thread2 = new proxyThread(outgoing, incoming, myRobotOwner);
+    			ProxyThread thread2 = new ProxyThread(outgoing, incoming, myRobotOwner);
     			thread2.start();
     		} 
     		catch (UnknownHostException e) {

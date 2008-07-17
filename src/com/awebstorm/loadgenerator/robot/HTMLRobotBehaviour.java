@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 
-import com.awebstorm.loadgenerator.proxy;
+import com.awebstorm.loadgenerator.Proxy;
 
 /**
  * Test the behaviour of the HTMLRobot class.
@@ -25,7 +25,7 @@ public class HTMLRobotBehaviour {
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	public proxy[] loadGenProxyArray = new proxy[100];
+	public Proxy[] loadGenProxyArray = new Proxy[100];
 	public boolean[] loadGenProxyBooleanArray = new boolean[100];
 	private int localPort;
 	private String remotehost;
@@ -78,7 +78,7 @@ public class HTMLRobotBehaviour {
 		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
 		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
 		for ( int i = 0; i < loadGenProxyArray.length; i++ ) {
-			loadGenProxyArray[i] = new proxy(localPort+i,remotehost,remoteport);
+			loadGenProxyArray[i] = new Proxy(localPort+i,remotehost,remoteport);
 			loadGenProxyArray[i].init();
 			loadGenProxyBooleanArray[i] = true;
 		}
