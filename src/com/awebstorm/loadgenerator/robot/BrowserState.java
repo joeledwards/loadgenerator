@@ -125,5 +125,13 @@ public class BrowserState {
 	public final boolean addUrlToHistory(final String resource) {
 		return browserHistory.add(resource);
 	}
+
+	/**
+	 * Get the proxyPort of this state
+	 * @return Proxy port of this state
+	 */
+	public int getProxyPort() {
+		return _proxyPort;
+	}
 	
 }

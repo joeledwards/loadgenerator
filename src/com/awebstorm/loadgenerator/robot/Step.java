@@ -53,10 +53,12 @@ public class Step implements Comparable<Step> {
 	private Attributes _stepAttributeList;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Logger resultLog = Logger.getLogger("com.awebstorm.loadgenerator.robot.Step.resultLog");
-	private long replyTime;
-	private long BodyByteAmount; 
+	private long replyTime = 0;
+	private long BodyByteAmount = 0; 
 	private long proxyReceiveAmount = 0;
-	private long proxySentAmount;
+	private long proxySentAmount = 0;
+	private long stepProxyTimeStarted = 0;
+	private long stepProxyTimeEnded = 0;
 
 	public Step(String name, int value, Attributes list) {
 		_stepName = name;
@@ -518,15 +520,19 @@ public class Step implements Comparable<Step> {
 		tempResult.append(',');
 		tempResult.append(replyTime);
 		tempResult.append(',');
+		tempResult.append(stepProxyTimeStarted);
+		tempResult.append(',');
+		tempResult.append(stepProxyTimeEnded);
+		tempResult.append(',');
 		tempResult.append(BodyByteAmount);
 		tempResult.append(',');
-		if (replyTime == 0) {
-			replyTime = 1;
-		}
 		tempResult.append(proxyReceiveAmount);
 		tempResult.append(',');
 		tempResult.append(proxySentAmount);
 		tempResult.append(',');
+		if (replyTime == 0) {
+			replyTime = 1;
+		}
 		tempResult.append(BodyByteAmount / replyTime);
 		tempResult.append(',');
 		if (stepStatus) {
@@ -567,6 +573,15 @@ public class Step implements Comparable<Step> {
 	 */
 	public void addProxySentAmount(int loadAmount) {
 		this.proxySentAmount += loadAmount;
+	}
+	public void setStepTimeEnded(long currentTimeMillis) {
+		stepProxyTimeEnded = currentTimeMillis;
+	}
+	public void setStepTimeStarted(long stepTimeStarted) {
+		this.stepProxyTimeStarted = stepTimeStarted;
+	}
+	public long getStepTimeStarted() {
+		return stepProxyTimeStarted;
 	}
 
 }

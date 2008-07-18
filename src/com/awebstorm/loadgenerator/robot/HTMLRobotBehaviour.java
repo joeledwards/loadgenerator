@@ -23,7 +23,8 @@ public class HTMLRobotBehaviour {
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	private Proxy[] loadGenProxyArray = new Proxy[100];
+	private static int numberOfProxies = 100;
+	private Proxy[] loadGenProxyArray = new Proxy[numberOfProxies];
 	private int localPort;
 	private String remotehost;
 	private int remoteport;
@@ -187,6 +188,17 @@ public class HTMLRobotBehaviour {
 	public final void tearDown() {
 		LogManager.shutdown();
 	}
+	
+	/**
+	 * Retrieves the number of proxies created.
+	 * @return The number of proxies created
+	 */
+	public final int getNumberOfProxies() {
+		return numberOfProxies;
+	}
+
+	public int getLocalPort() {
+		return localPort;
+	}
 
 }
-

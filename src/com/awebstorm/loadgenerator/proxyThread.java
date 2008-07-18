@@ -47,10 +47,17 @@ public class ProxyThread extends Thread {
 			while (true) {
 				numberRead = FromClient.read(buffer, 0, 50);
 				if(numberRead == -1){
-					System.out.println("Socket closing: " + myRobotOwner.getMyThread());
+					if (consoleLog.isDebugEnabled())
+						System.out.println("Socket closing: " + myRobotOwner.getMyThread());
+					if(incoming.getPort() == 80) {
+						myRobotOwner.getCurrentStep().setStepTimeEnded(System.currentTimeMillis());
+					} else {
+						if ( myRobotOwner.getCurrentStep().getStepTimeStarted() == 0 )
+							myRobotOwner.getCurrentStep().setStepTimeStarted(System.currentTimeMillis());
+					}
 					break;
 				} else {
-					if ( outgoing.getLocalPort() > 9000 ) {
+					if (incoming.getPort() == 80) {
 						myRobotOwner.getCurrentStep().addProxyReceiveAmount(numberRead);
 					} else {
 						myRobotOwner.getCurrentStep().addProxySentAmount(numberRead);

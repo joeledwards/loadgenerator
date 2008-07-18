@@ -27,6 +27,14 @@ public class HTMLRobot extends Robot {
 			consoleLog.debug("Built an HTMLRobot");
 		}
 	}
+	
+	/**
+	 * Get the port on which this Robot speaks.
+	 * @return Port on which this Robot speaks to its proxy
+	 */
+	public int getProxyPort() {
+		return currentState.getProxyPort();
+	}
 
 	/**
 	 * Configures the robot, then executes the list of Steps.
