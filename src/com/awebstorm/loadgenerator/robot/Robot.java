@@ -11,10 +11,10 @@ import java.util.PriorityQueue;
  */
 public abstract class Robot implements Runnable {
 
-	protected HashMap<String,String> prefs = new HashMap<String, String>();
+	protected HashMap<String, String> prefs = new HashMap<String, String>();
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
 	protected int httpRequestTimeout;
-	private int defaultWaitStep;
+	private static int defaultWaitStep = 1000;
 	//Robot ID vars
 	protected String robotID;
 	protected Step currentStep;
@@ -22,10 +22,11 @@ public abstract class Robot implements Runnable {
 	protected boolean stopExecuting;
 	protected Thread t;
 	
-	public void init()	
-	{	    	
-
-		t=new Thread(this);
+	/**
+	 * Initialize a Robot in its own Thread.
+	 */
+	public final void init() {	
+		t = new Thread(this);
 		t.start();
 	}
 	
@@ -38,7 +39,7 @@ public abstract class Robot implements Runnable {
 	 */
 	protected Robot(final InputStream script) {
 		this.stopExecuting = false;
-		new ScriptReader().run(script,stepQueue,prefs);
+		new ScriptReader().run(script, stepQueue, prefs);
 		this.setDefaultRobotPreferences();
 	}
 
@@ -96,6 +97,21 @@ public abstract class Robot implements Runnable {
 	 */
 	public final void setTimeLastStepFinished(final long newTimeLastStepFinished) {
 		this.timeLastStepFinished = newTimeLastStepFinished;
+	}
+	/**
+	 * Retrieve my Thread.
+	 * @return My Thread
+	 */
+	public final Thread getMyThread() {
+		return t;
+	}
+	
+	/**
+	 * Retrieve the value of the defaultWaitStep.
+	 * @return Length of the default WAIT step
+	 */
+	public static int getDefaultWaitStep() {
+		return defaultWaitStep;
 	}
 
 }

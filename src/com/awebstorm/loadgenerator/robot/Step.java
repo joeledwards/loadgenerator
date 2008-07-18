@@ -13,6 +13,7 @@ import org.xml.sax.Attributes;
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.SubmitMethod;
 import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.WebResponse;
@@ -30,8 +31,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlStyle;
  */
 public class Step implements Comparable<Step> {
 	
+	/**
+	 * The standard HTML steps to be supported.
+	 * @author Cromano
+	 *
+	 */
 	public static enum ActionTypes {
-		
 		STEPS,
 		INVOKE,
 		VERIFY_TITLE,
@@ -40,7 +45,6 @@ public class Step implements Comparable<Step> {
 		POST,
 		FILL_FORM,
 		CLICK_LINK
-		
 	}
 	
 	private BrowserState _currentBrowserState;
@@ -49,10 +53,10 @@ public class Step implements Comparable<Step> {
 	private Attributes _stepAttributeList;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Logger resultLog = Logger.getLogger("com.awebstorm.loadgenerator.robot.Step.resultLog");
-	private long loadTime;
-	private int loadAmount; 
-	private int proxyReceiveAmount = 0;
-	private int proxySentAmount;
+	private long replyTime;
+	private long BodyByteAmount; 
+	private long proxyReceiveAmount = 0;
+	private long proxySentAmount;
 
 	public Step(String name, int value, Attributes list) {
 		_stepName = name;
@@ -89,8 +93,8 @@ public class Step implements Comparable<Step> {
 	 * @param browserState currentState of the robot's browser
 	 */
 	public void execute(String jobID, BrowserState browserState) {
-		loadTime = 0;
-		loadAmount = 0;
+		replyTime = 0;
+		BodyByteAmount = 0;
 		_currentBrowserState = browserState;
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
@@ -135,23 +139,19 @@ public class Step implements Comparable<Step> {
 		}
 		
 		report(stepReturnStatus, jobID);
-		
 	}
 	
 	/**
-	 * Click a link on a webpage.
+	 * Click a link on a webpage. CLICK_LINK STEP
 	 * Not Yet Implemented
 	 * @return
 	 */
 	private boolean clickLink() {
-		
-		
-		
 		return false;
 	}
 
 	/**
-	 * Standard POST operation using the parameters stored in the postList
+	 * Standard POST STEP using the parameters stored in the postList
 	 * @return Success?
 	 */
 	private boolean post() {
@@ -170,8 +170,9 @@ public class Step implements Comparable<Step> {
 			return false;
 		}
 		newSettings.setRequestParameters(postList);
+		Page tempResponsePage;
 		try {
-			postPage = (HtmlPage) _currentBrowserState.getVUser().getPage(newSettings);
+			tempResponsePage = _currentBrowserState.getVUser().getPage(newSettings);
 		} catch (FailingHttpStatusCodeException e) {
 			consoleLog.error("POST operation, " + _stepName + " has a bad status message.",e);
 			return false;
@@ -179,16 +180,32 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("IOException thrown during a POST operation.",e);
 			return false;
 		}
-		_currentBrowserState.setCurrentPage(postPage);
-		postList.clear();
-		loadTime = postPage.getWebResponse().getLoadTimeInMilliSeconds();
-		try {
-			loadAmount = postPage.getWebResponse().getContentAsStream().available();
-		} catch (IOException e1) {
-			consoleLog.error("IOException while reading content as from post stream to count loadAmount.", e1);
-		}
 		
-		return collectResources(postPage);
+		if ( tempResponsePage.getClass() == HtmlPage.class ) {
+			postPage = (HtmlPage) tempResponsePage;
+			_currentBrowserState.setCurrentPage(postPage);
+			postList.clear();
+			replyTime = postPage.getWebResponse().getLoadTimeInMilliSeconds();
+			try {
+				BodyByteAmount = postPage.getWebResponse().getContentAsStream().available();
+			} catch (IOException e1) {
+				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
+			}
+			return collectResources(postPage);
+		} else {
+			replyTime = tempResponsePage.getWebResponse().getLoadTimeInMilliSeconds();
+			try {
+				BodyByteAmount = tempResponsePage.getWebResponse().getContentAsStream().available();
+			} catch (IOException e1) {
+				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
+			}
+			if (tempResponsePage.getWebResponse().getStatusCode() < 200
+					|| tempResponsePage.getWebResponse().getStatusCode() > 399) {
+				return false;
+			}
+			return true;
+		}
+
 	}
 	
 	/**
@@ -198,8 +215,6 @@ public class Step implements Comparable<Step> {
 	 */
 	private boolean fillForm() {
 		boolean tempStatus = true;
-		
-		
 		return tempStatus;
 	}
 
@@ -240,15 +255,16 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Standard GET operation
+	 * Standard GET STEP
 	 * @return
 	 */
 	private boolean invoke() {
 		String currentPath = _stepAttributeList.getValue(0);
 		currentPath = _currentBrowserState.getDomain() + currentPath;
 		HtmlPage invokePage = null;
+		Page tempPage;
 		try {
-			invokePage = (HtmlPage) _currentBrowserState.getVUser().getPage(currentPath);
+			tempPage = _currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
 			consoleLog.error("Bad Status Code.",e);
 			return false;
@@ -262,16 +278,37 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("IO Error during Invoke.",e);
 			return false;
 		}
-		_currentBrowserState.setCurrentPage(invokePage);
-		loadTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
-		loadAmount = invokePage.getWebResponse().getResponseBody().length;
-		return collectResources(invokePage);
+		
+		if ( tempPage.getClass() == HtmlPage.class ) {
+			invokePage = (HtmlPage) tempPage;
+			_currentBrowserState.setCurrentPage(invokePage);
+			replyTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
+			try {
+				BodyByteAmount = invokePage.getWebResponse().getContentAsStream().available();
+			} catch (IOException e1) {
+				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
+			}
+			return collectResources(invokePage);
+		} else {
+			replyTime = tempPage.getWebResponse().getLoadTimeInMilliSeconds();
+			try {
+				BodyByteAmount = tempPage.getWebResponse().getContentAsStream().available();
+			} catch (IOException e1) {
+				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
+			}
+			if (tempPage.getWebResponse().getStatusCode() < 200
+					|| tempPage.getWebResponse().getStatusCode() > 399) {
+				return false;
+			}
+			return true;
+		}
 	}
+	
 	/**
 	 * Collects local resources from the page passed 
 	 * i.e. images, style sheets, javascript.
 	 * @param invokePage Page to collect necessary resources for
-	 * @return
+	 * @return True if no resource retrieval failed, else false
 	 */
 	private boolean collectResources(HtmlPage invokePage) {
 		
@@ -305,8 +342,8 @@ public class Step implements Comparable<Step> {
 							resourcesCollector.append("Resources obtained: " 
 								+ tempAttr + '\n');
 						}
-						loadTime += temporary.getLoadTimeInMilliSeconds();
-						loadAmount += temporary.getResponseBody().length;
+						replyTime += temporary.getLoadTimeInMilliSeconds();
+						BodyByteAmount += temporary.getResponseBody().length;
 						if (temporary.getStatusCode() != 200) {
 							tempStatus = false;
 						}
@@ -334,8 +371,8 @@ public class Step implements Comparable<Step> {
 								resourcesCollector.append("Import resources obtained: "
 									+ aResource + '\n');
 							}
-							loadTime += temporary.getLoadTimeInMilliSeconds();
-							loadAmount += temporary.getResponseBody().length;
+							replyTime += temporary.getLoadTimeInMilliSeconds();
+							BodyByteAmount += temporary.getResponseBody().length;
 							if (temporary.getStatusCode() != 200 ) {
 								tempStatus = false;
 							}
@@ -371,8 +408,8 @@ public class Step implements Comparable<Step> {
 								if (consoleLog.isDebugEnabled()) {
 									resourcesCollector.append("Link Resources obtained: " + aResource + '\n');
 								}
-								loadTime += temporary.getLoadTimeInMilliSeconds();
-								loadAmount += temporary.getResponseBody().length;
+								replyTime += temporary.getLoadTimeInMilliSeconds();
+								BodyByteAmount += temporary.getResponseBody().length;
 								if (temporary.getStatusCode() != 200) {
 									tempStatus = false;
 								}
@@ -391,8 +428,8 @@ public class Step implements Comparable<Step> {
 										if (consoleLog.isDebugEnabled()) {
 											resourcesCollector.append("Style Sheet Pic Resources obtained: " + aResource + '\n');
 										}
-										loadTime += temporary.getLoadTimeInMilliSeconds();
-										loadAmount += temporary.getResponseBody().length;
+										replyTime += temporary.getLoadTimeInMilliSeconds();
+										BodyByteAmount += temporary.getResponseBody().length;
 										if (temporary.getStatusCode() != 200) {
 											tempStatus = false;
 										}
@@ -434,23 +471,23 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Instruct this thread to wait for a given period of time.
+	 * Instruct this thread to wait for a given period of time as this is a WAIT STEP.
 	 */
 	private void waitStep() {
 		if (_stepAttributeList.getValue(0).equals("")) {
-/*			try {
-				this.wait(Robot.DEFAULT_WAIT_STEP);
+			try {
+				Thread.sleep(Robot.getDefaultWaitStep());
 			} catch (InterruptedException e) {
 				consoleLog.error("Interrupted Exception during a default WAIT step", e);
 				e.printStackTrace();
-			}*/
+			}
 		} else {
-/*			try {
-				this.wait(Integer.parseInt(_list.getValue(0)));
+			try {
+				Thread.sleep(Integer.parseInt(_stepAttributeList.getValue(0)));
 			} catch (NumberFormatException e) {
 				consoleLog.error("Could not determine the wait length during a WAIT Step", e);
 				try {
-					this.wait(Robot.DEFAULT_WAIT_STEP);
+					Thread.sleep(Robot.getDefaultWaitStep());
 				} catch (InterruptedException e1) {
 					consoleLog.error("Interrupted Exception during a WAIT step", e);
 					e1.printStackTrace();
@@ -459,7 +496,7 @@ public class Step implements Comparable<Step> {
 			} catch (InterruptedException e) {
 				consoleLog.error("Interrupted Exception during a WAIT step", e);
 				e.printStackTrace();
-			}*/
+			}
 		}
 	}
 	
@@ -479,18 +516,18 @@ public class Step implements Comparable<Step> {
 		tempResult.append(',');
 		tempResult.append(System.currentTimeMillis());
 		tempResult.append(',');
-		tempResult.append(loadTime);
+		tempResult.append(replyTime);
 		tempResult.append(',');
-		tempResult.append(loadAmount);
+		tempResult.append(BodyByteAmount);
 		tempResult.append(',');
-		if (loadTime == 0) {
-			loadTime = 1;
+		if (replyTime == 0) {
+			replyTime = 1;
 		}
 		tempResult.append(proxyReceiveAmount);
 		tempResult.append(',');
 		tempResult.append(proxySentAmount);
 		tempResult.append(',');
-		tempResult.append(loadAmount / loadTime);
+		tempResult.append(BodyByteAmount / replyTime);
 		tempResult.append(',');
 		if (stepStatus) {
 			tempResult.append("success");
@@ -516,10 +553,18 @@ public class Step implements Comparable<Step> {
 		this._currentBrowserState = newState;
 	}
 
+	/**
+	 * Add the loadAmount to the current proxyReceiveAmount accumulator to keep track for this Step
+	 * @param loadAmount The amount of bytes received recorded by the proxy
+	 */
 	public void addProxyReceiveAmount(int loadAmount) {
 		this.proxyReceiveAmount += loadAmount;
 	}
 	
+	/**
+	 * Add the loadAmount to the current proxySentAmount accumulator to keep track for this Step
+	 * @param loadAmount The amount of bytes sent recorded by the proxy
+	 */
 	public void addProxySentAmount(int loadAmount) {
 		this.proxySentAmount += loadAmount;
 	}

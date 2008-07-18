@@ -18,10 +18,11 @@ public class HTMLRobot extends Robot {
 	/**
 	 * Constructor defines the InputStream to be read.
 	 * @param script script to parse
+	 * @param proxyPort Port on which to contact the local proxy
 	 */
 	public HTMLRobot(final InputStream script, final int proxyPort) {
 		super(script);
-		currentState = new BrowserState(prefs,proxyPort);
+		currentState = new BrowserState(prefs, proxyPort);
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Built an HTMLRobot");
 		}
@@ -31,7 +32,6 @@ public class HTMLRobot extends Robot {
 	 * Configures the robot, then executes the list of Steps.
 	 */
 	public final void run() {
-
 		int stepNum = 0;
 		while (!stepQueue.isEmpty()) {
 			if (stopExecuting) {
@@ -44,14 +44,13 @@ public class HTMLRobot extends Robot {
 							+ tempStep.getName() 
 							+ ',' + stepNum);
 				}
-				this.currentStep=tempStep;
+				this.currentStep = tempStep;
 				tempStep.execute(robotID, currentState);
 				stepNum++;
 		}
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Robot is closing: " + this.robotID);
-		}
-		
+		}		
 	}
 	
 }

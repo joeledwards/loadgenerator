@@ -9,6 +9,11 @@ import com.awebstorm.loadgenerator.robot.Robot;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Proxy server to count bytes coming through.
+ * @author Cromano
+ *
+ */
 public class Proxy implements Runnable {
 	
 	private int localport;
@@ -18,23 +23,30 @@ public class Proxy implements Runnable {
 	private Robot myRobotOwner;
 	private Thread t;
 
-	public void init()	
-	{	    	
-
+	/**
+	 * Initialize a new Proxy in its own Daemon thread.
+	 */
+	public void init() {	    	
 		t=new Thread(this);
+		t.setDaemon(true);
 		t.start();
 	}
 	
-	public void start() {
-		
-	}
-	
+	/**
+	 * Proxy Constructor.
+	 * @param localport Local port to talk to the Robot
+	 * @param remotehost Remote host to make requests on
+	 * @param remoteport Remote Port to talk on
+	 */
     public Proxy (int localport, String remotehost, int remoteport) {
 		this.localport=localport;
 		this.remotehost=remotehost;
 		this.remoteport=remoteport;
     }
     
+    /**
+     * Run the proxy.
+     */
     public void run () {
 
     	boolean error = false;
@@ -43,20 +55,18 @@ public class Proxy implements Runnable {
 
     	// Check for valid local and remote port, hostname not null
     	consoleLog.info("Checking: Port " + localport + " to " + remotehost + " Port " + remoteport);
-    	if(localport <= 0){
+    	if(localport <= 0) {
     		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
     		error = true;
     	}
-    	if(remoteport <=0){
+    	if(remoteport <=0) {
     		consoleLog.fatal("Error: Invalid Remote Port Specification " + "\n");
     		error = true;
     	}
-    	if(remotehost == null){
+    	if(remotehost == null) {
     		consoleLog.fatal("Error: Invalid Remote Host Specification " + "\n");
     		error = true;
     	}
-
-    	//If any errors so far, exit program
     	if(error)
     		System.exit(-1);
 
@@ -77,19 +87,20 @@ public class Proxy implements Runnable {
     			outgoing = new Socket(remotehost, remoteport); 
 
     			ProxyThread thread1 = new ProxyThread(incoming, outgoing, myRobotOwner);
+    			thread1.setDaemon(true);
     			thread1.start();
 
     			ProxyThread thread2 = new ProxyThread(outgoing, incoming, myRobotOwner);
+    			thread2.setDaemon(true);
     			thread2.start();
     		} 
     		catch (UnknownHostException e) {
-    			//Test and make connection to remote host
     			consoleLog.fatal("Error: Unknown Host " + remotehost, e);
     			System.exit(-1);
     		} 
     		catch(IOException e){
     			consoleLog.fatal("IOException when accepting new connection.", e);
-    			System.exit(-2);//continue;
+    			System.exit(-2);
     		}
 
     	}
@@ -108,11 +119,9 @@ public class Proxy implements Runnable {
 	public void setRemoteport(int remoteport) {
 		this.remoteport = remoteport;
 	}
-
 	public void setMyRobotOwner(Robot myRobotOwner) {
 		this.myRobotOwner = myRobotOwner;
 	}
-
 	public Robot getMyRobotOwner() {
 		return myRobotOwner;
 	}

@@ -3,9 +3,9 @@ package com.awebstorm.loadgenerator.robot;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.LinkedList;
 import java.util.PropertyResourceBundle;
+import java.util.Queue;
 import java.util.ResourceBundle;
 
 import org.apache.log4j.LogManager;
@@ -20,69 +20,153 @@ import com.awebstorm.loadgenerator.Proxy;
  */
 public class HTMLRobotBehaviour {
 	
-	private HTMLRobot newRobot;
-	private String scriptLocation;
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	public Proxy[] loadGenProxyArray = new Proxy[100];
-	public boolean[] loadGenProxyBooleanArray = new boolean[100];
+	private Proxy[] loadGenProxyArray = new Proxy[100];
 	private int localPort;
 	private String remotehost;
 	private int remoteport;
 	
 	/**
-	 * Behaviour to test the general use of an HTML robot in a semi long script.
+	 * Test 1 Threaded Robots on 1 Threaded proxy.
 	 */
-	public final void shouldGenerateGoodResults() {
-		scriptLocation = "Script.xml";
-		InputStream newStream = null;
+	public final void shouldGenARobotOnProxy() {
+
+		int size = 1;
+		Queue<InputStream> newStreams = new LinkedList<InputStream>();
+		boolean robotsAlive = true;
+		
 		try {
-			newStream = new FileInputStream(scriptLocation);
+			while (newStreams.size() < size) {
+				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-/*		newRobot = new HTMLRobot(newStream);
-		newRobot.run();*/
-		for (int i = 0; i < loadGenProxyBooleanArray.length; i++) {
+		for (int i = 0; i < loadGenProxyArray.length && !newStreams.isEmpty(); i++) {
 			if (loadGenProxyArray[i].getMyRobotOwner() == null) {
-				loadGenProxyBooleanArray[i] = true;
-			}
-			if (loadGenProxyBooleanArray[i]) {
-				newRobot = new HTMLRobot(newStream,localPort+i);
+				HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i);
 				loadGenProxyArray[i].setMyRobotOwner(newRobot);
-				loadGenProxyBooleanArray[i] = false;
-				break;
+				newRobot.init();
 			}
 		}
-		//loadGenProxyArray.put(proxy9000, newRobot.robotID);
-		//proxy9000.init();
-		newRobot.init();
-		while (newRobot.t.isAlive()) {
-			
+		
+		while (robotsAlive) {
+			robotsAlive = false;
+			for (int i = 0; i < loadGenProxyArray.length; i++) {
+				if (loadGenProxyArray[i].getMyRobotOwner() != null) {
+					if (loadGenProxyArray[i].getMyRobotOwner().t.isAlive()) {
+						robotsAlive = true;
+						break;
+					} else {
+						loadGenProxyArray[i].setMyRobotOwner(null);
+						break;
+					}
+				}
+			}
 		}
 	}
 	
+	/*
+	*//**
+	 * Test 5 Threaded Robots on 5 Threaded proxies with only 1 GET or 1 POST step per robot.
+	 *//*
+	public final void shouldGen5RobotsOn5Proxies() {
+
+		int size = 5;
+		Queue<InputStream> newStreams = new LinkedList<InputStream>();
+		boolean robotsAlive = true;
+		
+		try {
+			while (newStreams.size() != size) {
+				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < loadGenProxyArray.length && !newStreams.isEmpty(); i++) {
+			if (loadGenProxyArray[i].getMyRobotOwner() == null) {
+				HTMLRobot newRobot = new HTMLRobot(newStreams.poll(),localPort+i);
+				loadGenProxyArray[i].setMyRobotOwner(newRobot);
+				newRobot.init();
+			}
+		}
+		
+		while (robotsAlive) {
+			robotsAlive = false;
+			for(int i = 0; i < loadGenProxyArray.length; i++) {
+				if (loadGenProxyArray[i].getMyRobotOwner() != null) {
+					if (loadGenProxyArray[i].getMyRobotOwner().t.isAlive()) {
+						robotsAlive = true;
+						break;
+					} else {
+						loadGenProxyArray[i].setMyRobotOwner(null);
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	*//**
+	 * Test 5 Threaded Robots on 5 Threaded proxies with multiple steps per Robot.
+	 *//*
+	public final void shouldGen5RobotsOn5ProxiesMultiStep() {
+
+		int size = 5;
+		Queue<InputStream> newStreams = new LinkedList<InputStream>();
+		boolean robotsAlive = true;
+		
+		try {
+			while (newStreams.size() != size) {
+				newStreams.add(new FileInputStream("Script2Thread" + (newStreams.size() + 1) + ".xml"));
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < loadGenProxyArray.length && !newStreams.isEmpty(); i++) {
+			if (loadGenProxyArray[i].getMyRobotOwner() == null) {
+				HTMLRobot newRobot = new HTMLRobot(newStreams.poll(),localPort+i);
+				loadGenProxyArray[i].setMyRobotOwner(newRobot);
+				newRobot.init();
+			}
+		}
+		
+		while (robotsAlive) {
+			robotsAlive = false;
+			for(int i = 0; i < loadGenProxyArray.length; i++) {
+				if (loadGenProxyArray[i].getMyRobotOwner() != null) {
+					if (loadGenProxyArray[i].getMyRobotOwner().t.isAlive()) {
+						robotsAlive = true;
+						break;
+					} else {
+						loadGenProxyArray[i].setMyRobotOwner(null);
+						break;
+					}
+				}
+			}
+		}
+	}*/
+
 	/**
 	 * Setup general operations before each test.
 	 */
 	public final void setUp() {
 		
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
-		URL scheduler = null;
-		
 		loadGeneratorProperties = 
 			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
 
 		localPort = Integer.parseInt(loadGeneratorProperties.getString("proxyLocalPortRange"));
 		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
 		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
-		for ( int i = 0; i < loadGenProxyArray.length; i++ ) {
-			loadGenProxyArray[i] = new Proxy(localPort+i,remotehost,remoteport);
+		for (int i = 0; i < loadGenProxyArray.length; i++) {
+			loadGenProxyArray[i] = new Proxy(localPort + i, remotehost, remoteport);
 			loadGenProxyArray[i].init();
-			loadGenProxyBooleanArray[i] = true;
 		}
 		
+/*		URL scheduler = null;
 		try {
 			scheduler = new URL (
 					loadGeneratorProperties.getString("schedulerProtocol"),
@@ -94,8 +178,7 @@ public class HTMLRobotBehaviour {
 			System.exit(3);
 		} catch (MalformedURLException e) {
 			System.exit(3);
-		}
-		
+		}*/
 	}
 	
 	/**
@@ -103,7 +186,6 @@ public class HTMLRobotBehaviour {
 	 */
 	public final void tearDown() {
 		LogManager.shutdown();
-		newRobot = null;
 	}
 
 }

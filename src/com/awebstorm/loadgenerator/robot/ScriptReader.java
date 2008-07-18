@@ -81,9 +81,10 @@ public class ScriptReader extends DefaultHandler {
 		 * @param localName of the element
 		 * @param qName Qualified name of the element
 		 * @param attributes Attributes of the element
+		 * @throws SAXException Thrown if the SAX parser encounters an error
 		 */
-		public void startElement(String uri, String localName, String qName,
-			Attributes attributes) throws SAXException {
+		public final void startElement(final String uri, final String localName, final String qName,
+			final Attributes attributes) throws SAXException {
 
 			if (!propertiesMode) {
 				Attributes newList = new AttributesImpl(attributes);
@@ -96,16 +97,24 @@ public class ScriptReader extends DefaultHandler {
 
 		/**
 		 * Collect characters between elements to be used.
+		 * @param ch Char array collected from the SAX element
+		 * @param start Location to begin parsing chars
+		 * @param length Location from start to end parsing the chars
+		 * @throws SAXException Thrown if the SAX parser encounters an error
 		 */
-		public void characters(char[] ch, int start, int length) throws SAXException {
-			tempString = new String(ch,start,length);
+		public final void characters(final char[] ch, final int start, final int length) throws SAXException {
+			tempString = new String(ch, start, length);
 		}
 
 		/**
 		 * Create a new preference for every non-Step element.
+		 * @param uri Resource Indicator of the end Element
+		 * @param localName Local name of the Element
+		 * @param qName Qualified name of the element
+		 * @throws SAXException Thrown if the SAX parser encounters an error
 		 */
-		public void endElement(String uri, String localName,
-				String qName) throws SAXException {
+		public final void endElement(final String uri, final String localName,
+				final String qName) throws SAXException {
 
 			if (propertiesMode) {
 				if (qName.equals("Properties")) {

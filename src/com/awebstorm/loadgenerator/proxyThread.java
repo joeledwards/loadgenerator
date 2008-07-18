@@ -8,21 +8,33 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-import com.awebstorm.loadgenerator.robot.HTMLRobot;
 import com.awebstorm.loadgenerator.robot.Robot;
 
+/**
+ * Listens to the proxy Socket and counts the bytes received and sent to the Robot.
+ * @author Cromano
+ *
+ */
 public class ProxyThread extends Thread {
 	private Socket incoming, outgoing;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private long byteCounter = 0;
-	private HTMLRobot myRobotOwner;
+	private Robot myRobotOwner;
 
+	/**
+	 * Creates a new ProxyThread to listen on this Socket with the specified Robot owner and pass on any info on in.
+	 * @param in Socket to listen on
+	 * @param out Socket to write on
+	 * @param myRobotOwner Robot that owns this listener
+	 */
 	ProxyThread(Socket in, Socket out, Robot myRobotOwner){
 		incoming = in;
 		outgoing = out;
-		this.myRobotOwner=(HTMLRobot)myRobotOwner;
+		this.myRobotOwner=myRobotOwner;
 	}
 
+	/**
+	 * Run this ProxyThread
+	 */
 	public void run(){
 		byte[] buffer = new byte[60];
 		int numberRead = 0;
@@ -32,12 +44,11 @@ public class ProxyThread extends Thread {
 		try{
 			ToClient = outgoing.getOutputStream();      
 			FromClient = incoming.getInputStream();
-			while( true){
+			while (true) {
 				numberRead = FromClient.read(buffer, 0, 50);
-				//System.out.println("read " + numberRead);
 				if(numberRead == -1){
-					incoming.close();
-					outgoing.close();
+					System.out.println("Socket closing: " + myRobotOwner.getMyThread());
+					break;
 				} else {
 					if ( outgoing.getLocalPort() > 9000 ) {
 						myRobotOwner.getCurrentStep().addProxyReceiveAmount(numberRead);
@@ -45,23 +56,15 @@ public class ProxyThread extends Thread {
 						myRobotOwner.getCurrentStep().addProxySentAmount(numberRead);
 					}
 				}
-				ToClient.write(buffer, 0, numberRead);
+				if(!incoming.isClosed()) {
+					ToClient.write(buffer, 0, numberRead);
+				}
+
 			}
-
 		} catch(IOException e) {
-			consoleLog.warn("Could not accept a connection.",e);
+			consoleLog.error("Could not accept a connection on: " + myRobotOwner.getMyThread(),e);
 		} catch(ArrayIndexOutOfBoundsException e) {
-			consoleLog.warn("Buffer Overflow.",e);
+			consoleLog.error("Buffer Overflow on " + numberRead,e);
 		}
-
 	}
-
-	/**Getters and Setters*/
-	public long getByteCounter() {
-		return byteCounter;
-	}
-	public void setByteCounter(long byteCounter) {
-		this.byteCounter = byteCounter;
-	}
-    
 }

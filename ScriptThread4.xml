@@ -1,0 +1,30 @@
+<MyScript>
+
+
+
+
+
+	<Properties>
+		<cacheSize>50</cacheSize>
+		<domain>http://www.customercentrix.com</domain>
+		<jobID>0004</jobID>
+		<timeout>5000</timeout>
+		<waitstep>1000</waitstep>
+		<proxyPort>10000</proxyPort>
+		<proxyHost>localhost</proxyHost>
+		<javaScriptEnabled>false</javaScriptEnabled>
+		<redirectEnabled>true</redirectEnabled>
+		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
+		<useInsecureSSL>false</useInsecureSSL>
+		<popupBlockerEnabled>true</popupBlockerEnabled>
+		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
+	</Properties>
+
+	<STEPS>
+		<INVOKE path="" />
+
+
+
+	</STEPS>
+
+</MyScript>

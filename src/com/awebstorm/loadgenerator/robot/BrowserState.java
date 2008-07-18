@@ -23,14 +23,15 @@ public class BrowserState {
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> _preferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private int proxyPort;
+	private int _proxyPort;
 	
 	/**
 	 * Default Constructor ensures no NullPointerExceptions.
 	 * @param preferences Prefs loaded from script
+	 * @param proxyPort Port on which to contact the local proxy
 	 */
-	public BrowserState(final HashMap<String, String> preferences, int proxyPort) {
-		this.proxyPort=proxyPort;
+	public BrowserState(final HashMap<String, String> preferences, final int proxyPort) {
+		this._proxyPort=proxyPort;
 		_preferences = preferences;
 		configureState();
 	}
@@ -61,9 +62,9 @@ public class BrowserState {
 			BrowserVersionFactory browVerFactory =
 				new BrowserVersionFactory(browVersionString);
 			client = 
-				new WebClient(browVerFactory.getNewBrowserVersion(), proxyHost, proxyPort);
-		} else if (browVersionString.equals("none")){
-			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, proxyPort);
+				new WebClient(browVerFactory.getNewBrowserVersion(), proxyHost, _proxyPort);
+		} else if (browVersionString.equals("none")) {
+			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, _proxyPort);
 		} else {
 			client = new WebClient();
 		}

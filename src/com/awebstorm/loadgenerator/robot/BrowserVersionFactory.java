@@ -40,7 +40,6 @@ public class BrowserVersionFactory {
 	 * @return A new BrowserVersion
 	 */
 	public final BrowserVersion getNewBrowserVersion() {
-		
 		return new BrowserVersion(
 				applicationName,
 				applicationVersion,
@@ -48,7 +47,6 @@ public class BrowserVersionFactory {
 				applicationJavaVersion,
 				applicationVersionFloat
 		);
-		
 	}
 	
 }
