@@ -21,11 +21,10 @@
 	</Properties>
 
 	<STEPS>
-		<WAIT length="3000"></WAIT><INVOKE path="" /><INVOKE path="/testimonials.htm"></INVOKE>
-		<INVOKE path="/products.htm"></INVOKE>
+		<WAIT length="1000"></WAIT>
 
 
 
-	</STEPS>
+		<INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE></STEPS>
 
 </MyScript>

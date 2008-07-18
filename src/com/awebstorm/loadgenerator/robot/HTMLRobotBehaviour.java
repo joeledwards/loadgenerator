@@ -24,6 +24,7 @@ public class HTMLRobotBehaviour {
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
 	private static int numberOfProxies = 100;
+	private static int numberOfRobots = 1;
 	private Proxy[] loadGenProxyArray = new Proxy[numberOfProxies];
 	private int localPort;
 	private String remotehost;
@@ -32,7 +33,7 @@ public class HTMLRobotBehaviour {
 	/**
 	 * Test 1 Threaded Robots on 1 Threaded proxy.
 	 */
-	public final void shouldGenARobotOnProxy() {
+/*	public final void shouldGenARobotOnProxy() {
 
 		int size = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
@@ -40,6 +41,46 @@ public class HTMLRobotBehaviour {
 		
 		try {
 			while (newStreams.size() < size) {
+				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < loadGenProxyArray.length && !newStreams.isEmpty(); i++) {
+			if (loadGenProxyArray[i].getMyRobotOwner() == null) {
+				HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i);
+				loadGenProxyArray[i].setMyRobotOwner(newRobot);
+				newRobot.init();
+			}
+		}
+		
+		while (robotsAlive) {
+			robotsAlive = false;
+			for (int i = 0; i < loadGenProxyArray.length; i++) {
+				if (loadGenProxyArray[i].getMyRobotOwner() != null) {
+					if (loadGenProxyArray[i].getMyRobotOwner().t.isAlive()) {
+						robotsAlive = true;
+						break;
+					} else {
+						loadGenProxyArray[i].setMyRobotOwner(null);
+						break;
+					}
+				}
+			}
+		}
+	}*/
+	
+	/**
+	 * Test 5 Threaded Robots on 1 Threaded proxy from 1 location.
+	 */
+	public final void shouldGen5RobotsOnProxy() {
+
+		numberOfRobots = 5;
+		Queue<InputStream> newStreams = new LinkedList<InputStream>();
+		boolean robotsAlive = true;
+		
+		try {
+			while (newStreams.size() < numberOfRobots) {
 				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
 			}
 		} catch (FileNotFoundException e) {

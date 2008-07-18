@@ -85,6 +85,8 @@ public class Proxy implements Runnable {
     			incoming = Server.accept();
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			outgoing = new Socket(remotehost, remoteport); 
+				if ( myRobotOwner.getCurrentStep().getStepTimeStarted() == 0 )
+					myRobotOwner.getCurrentStep().setStepTimeStarted(System.currentTimeMillis());
 
     			ProxyThread thread1 = new ProxyThread(incoming, outgoing, myRobotOwner);
     			thread1.setDaemon(true);

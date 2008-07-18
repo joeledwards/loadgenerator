@@ -21,12 +21,10 @@
 	</Properties>
 
 	<STEPS>
-
-		<POST path="" name="LoadGenerator" pass="LoadGenerator"
-			op="Log in" />
+		<WAIT length="1000"></WAIT>
 
 
 
-		<WAIT length="1000"></WAIT></STEPS>
+		<INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE></STEPS>
 
 </MyScript>

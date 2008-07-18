@@ -58,6 +58,7 @@ public class Step implements Comparable<Step> {
 	private long proxyReceiveAmount = 0;
 	private long proxySentAmount = 0;
 	private long stepProxyTimeStarted = 0;
+	private long stepProxyTimeResponse = 0;
 	private long stepProxyTimeEnded = 0;
 
 	public Step(String name, int value, Attributes list) {
@@ -96,7 +97,12 @@ public class Step implements Comparable<Step> {
 	 */
 	public void execute(String jobID, BrowserState browserState) {
 		replyTime = 0;
-		BodyByteAmount = 0;
+		BodyByteAmount = 0; 
+		proxyReceiveAmount = 0;
+		proxySentAmount = 0;
+		stepProxyTimeStarted = 0;
+		stepProxyTimeResponse = 0;
+		stepProxyTimeEnded = 0;
 		_currentBrowserState = browserState;
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
@@ -507,7 +513,7 @@ public class Step implements Comparable<Step> {
 	 * @param stepStatus Success if true, Failure if false
 	 * @param jobID Current job ID
 	 */
-	private void report(boolean stepStatus, String jobID) {
+	private synchronized void report(boolean stepStatus, String jobID) {
 		
 		StringBuffer tempResult = new StringBuffer();
 		tempResult.append(jobID);
@@ -523,6 +529,10 @@ public class Step implements Comparable<Step> {
 		tempResult.append(stepProxyTimeStarted);
 		tempResult.append(',');
 		tempResult.append(stepProxyTimeEnded);
+		tempResult.append(',');
+		tempResult.append(stepProxyTimeResponse);
+		tempResult.append(',');
+		tempResult.append((stepProxyTimeResponse-stepProxyTimeStarted));
 		tempResult.append(',');
 		tempResult.append(BodyByteAmount);
 		tempResult.append(',');
@@ -583,5 +593,10 @@ public class Step implements Comparable<Step> {
 	public long getStepTimeStarted() {
 		return stepProxyTimeStarted;
 	}
-
+	public long getStepProxyTimeResponse() {
+		return stepProxyTimeResponse;
+	}
+	public void setStepProxyTimeResponse(long stepProxyTimeResponse) {
+		this.stepProxyTimeResponse = stepProxyTimeResponse;
+	}
 }
