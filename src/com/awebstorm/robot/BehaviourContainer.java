@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import org.jbehave.core.behaviour.Behaviours;
 

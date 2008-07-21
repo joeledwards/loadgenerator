@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator;
+package com.awebstorm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 
-import com.awebstorm.loadgenerator.robot.HTMLRobot;
-import com.awebstorm.loadgenerator.robot.Robot;
+import com.awebstorm.robot.HTMLRobot;
+import com.awebstorm.robot.Robot;
 
 
 /**
@@ -27,6 +27,7 @@ public class LoadGenerator {
 
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private static URL scheduler;
+	private static int numberOfRobots = 1;
 	private static int numberOfProxies = 100;
 	private static PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator.properties";
@@ -53,7 +54,6 @@ public class LoadGenerator {
 		
 		//Load Properties
 		loadGeneratorProperties = (PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
-
 		try {
 			scheduler = new URL (
 					loadGeneratorProperties.getString("schedulerProtocol"),
@@ -62,20 +62,15 @@ public class LoadGenerator {
 					loadGeneratorProperties.getString("schedulerFile")
 			);
 		} catch (NumberFormatException e) {
-			// Bad port number
 			consoleLog.fatal("Bad Port Number receieved from properties.", e);
 			System.exit(3);
 		} catch (MalformedURLException e) {
-			// Bad URL parameters
 			consoleLog.fatal("Bad URL parameters received from properties.", e);
 			System.exit(3);
 		}
-		
 		if( consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Properties configured.");
 		}
-		
-		
 	}
 
 	/**
@@ -158,11 +153,11 @@ public class LoadGenerator {
 	}
 	
 	/**
-	 * Kill the robot using the specified thread name / Script location
-	 * @param scriptLocation The name of the robot's thread
+	 * Kill the robot using the specified name
+	 * @param jobID The name of the robot's thread
 	 * @return True if the robot was asked to die, false if the robot was not found or otherwise unable to be stopped
 	 */
-	private boolean killRobot (String scriptLocation) {
+	private boolean killRobot (String jobID) {
 		
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Attempting to kill: " );

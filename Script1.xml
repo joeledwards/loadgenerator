@@ -10,8 +10,6 @@
 		<jobID>0001</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
-		<iteration>1</iteration>
-		<duration>60000</duration>
 		<proxyPort>10000</proxyPort>
 		<proxyHost>localhost</proxyHost>
 		<javaScriptEnabled>false</javaScriptEnabled>

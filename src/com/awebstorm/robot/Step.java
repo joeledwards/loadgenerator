@@ -1,9 +1,10 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.httpclient.NameValuePair;
@@ -48,11 +49,12 @@ public class Step implements Comparable<Step> {
 	}
 	
 	private BrowserState _currentBrowserState;
+	private Robot _myRobotOwner;
 	private String _stepName;
 	private int _stepNum;
 	private Attributes _stepAttributeList;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private Logger resultLog = Logger.getLogger("com.awebstorm.loadgenerator.robot.Step.resultLog");
+	private Logger resultLog = Logger.getLogger("com.awebstorm.robot.Step.resultLog");
 	private long replyTime = 0;
 	private long BodyByteAmount = 0; 
 	private long proxyReceiveAmount = 0;
@@ -60,11 +62,20 @@ public class Step implements Comparable<Step> {
 	private long stepProxyTimeStarted = 0;
 	private long stepProxyTimeResponse = 0;
 	private long stepProxyTimeEnded = 0;
+	private String _targetDomain;
 
-	public Step(String name, int value, Attributes list) {
+	/**
+	 * Creates a new Step.
+	 * @param name Name of the Step
+	 * @param value Step Number
+	 * @param list Attributes of the step
+	 * @param myRobotOwner Robot that owns this step
+	 */
+	public Step(String name, int value, Attributes list, Robot myRobotOwner) {
 		_stepName = name;
 		_stepNum = value;
 		_stepAttributeList = list;
+		_myRobotOwner = myRobotOwner;
 	}
 	
 	/**
@@ -104,6 +115,7 @@ public class Step implements Comparable<Step> {
 		stepProxyTimeResponse = 0;
 		stepProxyTimeEnded = 0;
 		_currentBrowserState = browserState;
+		_targetDomain = "http://" + _myRobotOwner.getTargetDomain();
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
 		try {
@@ -170,7 +182,7 @@ public class Step implements Comparable<Step> {
 		}
 		WebRequestSettings newSettings = null;
 		HtmlPage postPage = null;
-		String currentPath = _currentBrowserState.getDomain() + _stepAttributeList.getValue(0);
+		String currentPath = _targetDomain + _stepAttributeList.getValue(0);
 		try {
 			newSettings = new WebRequestSettings(new URL(currentPath),SubmitMethod.POST);
 		} catch (MalformedURLException e1) {
@@ -268,9 +280,10 @@ public class Step implements Comparable<Step> {
 	 */
 	private boolean invoke() {
 		String currentPath = _stepAttributeList.getValue(0);
-		currentPath = _currentBrowserState.getDomain() + currentPath;
+		currentPath = _targetDomain + currentPath;
 		HtmlPage invokePage = null;
 		Page tempPage;
+		
 		try {
 			tempPage = _currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
@@ -339,9 +352,9 @@ public class Step implements Comparable<Step> {
 				if (tempAttrs.getNamedItem("src") != null) {
 					if (!tempAttr.startsWith("http")) {
 						if (tempAttr.charAt(0) == '/') {
-							tempAttr = _currentBrowserState.getDomain() + tempAttr;
+							tempAttr = _targetDomain + tempAttr;
 						} else {
-							tempAttr = _currentBrowserState.getDomain() + '/' + tempAttr;
+							tempAttr = _targetDomain + '/' + tempAttr;
 						}
 					}
 					if (_currentBrowserState.addUrlToHistory(tempAttr)) {
@@ -366,10 +379,10 @@ public class Step implements Comparable<Step> {
 						aResource = styleResourceList.poll();
 						if (!aResource.startsWith("http")) {
 							if (aResource.charAt(0) == '/') {
-								aResource = _currentBrowserState.getDomain() 
+								aResource = _targetDomain 
 								+ aResource;
 							} else {
-								aResource = _currentBrowserState.getDomain() 
+								aResource = _targetDomain 
 								+ '/' + aResource;
 							}
 						}
@@ -406,9 +419,9 @@ public class Step implements Comparable<Step> {
 							aResource = tempAttrs.getNamedItem("href").getNodeValue();
 							if (!aResource.startsWith("http")) {
 								if (aResource.charAt(0) == '/') {
-									aResource = _currentBrowserState.getDomain() + aResource;
+									aResource = _targetDomain + aResource;
 								} else {
-									aResource = _currentBrowserState.getDomain() + '/' + aResource;
+									aResource = _targetDomain + '/' + aResource;
 								}
 							}
 							if (_currentBrowserState.addUrlToHistory(aResource)) {
@@ -426,9 +439,9 @@ public class Step implements Comparable<Step> {
 									aResource = StyleParsers.subDirBuilder(temporary.getUrl()) + styleResourceList.poll();
 									if (!aResource.startsWith("http")) {
 										if (aResource.charAt(0) == '/') {
-											aResource = _currentBrowserState.getDomain() + aResource;
+											aResource = _targetDomain + aResource;
 										} else {
-											aResource = _currentBrowserState.getDomain() + '/' + aResource;
+											aResource = _targetDomain + '/' + aResource;
 										}
 									}
 									if (_currentBrowserState.addUrlToHistory(aResource)) {
@@ -469,10 +482,10 @@ public class Step implements Comparable<Step> {
 	 * @return True if title is correct, else false
 	 */
 	private boolean verifyTitle() {
-		if (consoleLog.isDebugEnabled()) {
-			consoleLog.debug(_currentBrowserState.getCurrentPage().getTitleText());
-		}
 		if (_currentBrowserState.getCurrentPage() != null) {
+			if (consoleLog.isDebugEnabled()) {
+				consoleLog.debug(_currentBrowserState.getCurrentPage().getTitleText());
+			}
 			return _currentBrowserState.getCurrentPage().getTitleText().equals(_stepAttributeList.getValue(0));
 		}
 		return false;
@@ -487,7 +500,6 @@ public class Step implements Comparable<Step> {
 				Thread.sleep(Robot.getDefaultWaitStep());
 			} catch (InterruptedException e) {
 				consoleLog.error("Interrupted Exception during a default WAIT step", e);
-				e.printStackTrace();
 			}
 		} else {
 			try {
@@ -498,12 +510,10 @@ public class Step implements Comparable<Step> {
 					Thread.sleep(Robot.getDefaultWaitStep());
 				} catch (InterruptedException e1) {
 					consoleLog.error("Interrupted Exception during a WAIT step", e);
-					e1.printStackTrace();
 				}
 				e.printStackTrace();
 			} catch (InterruptedException e) {
 				consoleLog.error("Interrupted Exception during a WAIT step", e);
-				e.printStackTrace();
 			}
 		}
 	}
@@ -526,13 +536,13 @@ public class Step implements Comparable<Step> {
 		tempResult.append(',');
 		tempResult.append(replyTime);
 		tempResult.append(',');
-		tempResult.append(stepProxyTimeStarted);
+		tempResult.append(stepProxyTimeStarted % 1000);
 		tempResult.append(',');
-		tempResult.append(stepProxyTimeEnded);
+		tempResult.append(stepProxyTimeEnded % 1000);
 		tempResult.append(',');
-		tempResult.append(stepProxyTimeResponse);
+		tempResult.append((stepProxyTimeResponse%1000));
 		tempResult.append(',');
-		tempResult.append((stepProxyTimeResponse-stepProxyTimeStarted));
+		tempResult.append((stepProxyTimeEnded-replyTime));
 		tempResult.append(',');
 		tempResult.append(BodyByteAmount);
 		tempResult.append(',');
@@ -543,7 +553,7 @@ public class Step implements Comparable<Step> {
 		if (replyTime == 0) {
 			replyTime = 1;
 		}
-		tempResult.append(BodyByteAmount / replyTime);
+		tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / (double)(replyTime / 1000));
 		tempResult.append(',');
 		if (stepStatus) {
 			tempResult.append("success");
@@ -584,8 +594,12 @@ public class Step implements Comparable<Step> {
 	public void addProxySentAmount(int loadAmount) {
 		this.proxySentAmount += loadAmount;
 	}
-	public void setStepTimeEnded(long currentTimeMillis) {
+	
+	public void setStepProxyTimeEnded(long currentTimeMillis) {
 		stepProxyTimeEnded = currentTimeMillis;
+	}
+	public long getStepProxyTimeEnded() {
+		return stepProxyTimeEnded;
 	}
 	public void setStepTimeStarted(long stepTimeStarted) {
 		this.stepProxyTimeStarted = stepTimeStarted;

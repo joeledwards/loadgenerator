@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,7 +38,6 @@ public class ScriptCopier {
 				while(temp != -1) {
 					fileOut.write(temp);
 				}
-				fileOut.flush();
 				fileOut.close();
 				fileInputStream.close();
 				fileInputStream = new FileInputStream("ScriptThread1.xml");
@@ -50,6 +49,7 @@ public class ScriptCopier {
 		}
 		try {
 			fileInputStream.close();
+			fileOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

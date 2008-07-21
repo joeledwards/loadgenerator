@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import java.io.InputStream;
 import org.apache.log4j.Logger;

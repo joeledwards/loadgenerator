@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import java.net.URL;
 import java.util.LinkedList;

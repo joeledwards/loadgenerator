@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator;
+package com.awebstorm;
 
 
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-import com.awebstorm.loadgenerator.robot.Robot;
+import com.awebstorm.robot.Robot;
 
 /**
  * Listens to the proxy Socket and counts the bytes received and sent to the Robot.
@@ -46,13 +46,17 @@ public class ProxyThread extends Thread {
 			FromClient = incoming.getInputStream();
 			while (true) {
 				numberRead = FromClient.read(buffer, 0, 50);
-				if(numberRead == -1){
+				for(int i = 0; i < buffer.length; i++) {
+					System.out.print((char)buffer[i]);
+				}
+				if (numberRead == -1){
 					if (consoleLog.isDebugEnabled())
-						consoleLog.debug("Socket closing: " + myRobotOwner.getMyThread());
+						consoleLog.debug("Closing a ProxyThread.");
 					if(incoming.getPort() == 80) {
-						myRobotOwner.getCurrentStep().setStepTimeEnded(System.currentTimeMillis());
+						//myRobotOwner.getCurrentStep().setStepTimeEnded(System.currentTimeMillis());
 					} else {
-
+						if (outgoing.getKeepAlive())
+							myRobotOwner.getCurrentStep().setStepTimeStarted(System.currentTimeMillis());
 					}
 					break;
 				} else {
@@ -62,8 +66,8 @@ public class ProxyThread extends Thread {
 							myRobotOwner.getCurrentStep().setStepProxyTimeResponse(System.currentTimeMillis());
 					} else {
 						myRobotOwner.getCurrentStep().addProxySentAmount(numberRead);
-						if ( myRobotOwner.getCurrentStep().getStepTimeStarted() == 0 )
-							myRobotOwner.getCurrentStep().setStepTimeStarted(System.currentTimeMillis());
+						if ( myRobotOwner.getCurrentStep().getStepProxyTimeEnded() == 0 )
+							myRobotOwner.getCurrentStep().setStepProxyTimeEnded(System.currentTimeMillis());
 					}
 				}
 				if(!incoming.isClosed()) {
@@ -72,7 +76,7 @@ public class ProxyThread extends Thread {
 
 			}
 		} catch(IOException e) {
-			consoleLog.error("Could not accept a connection on: " + myRobotOwner.getMyThread(),e);
+			consoleLog.error("Could not accept a connection", e);
 		} catch(ArrayIndexOutOfBoundsException e) {
 			consoleLog.error("Buffer Overflow on " + numberRead,e);
 		}

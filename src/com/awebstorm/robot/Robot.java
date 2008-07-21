@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -13,13 +13,14 @@ public abstract class Robot implements Runnable {
 
 	protected HashMap<String, String> prefs = new HashMap<String, String>();
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
-	protected int httpRequestTimeout;
+	private String _targetDomain;
 	private static int defaultWaitStep = 1000;
 	//Robot ID vars
 	protected String robotID;
 	protected Step currentStep;
 	protected long timeLastStepFinished;
 	protected boolean stopExecuting;
+	protected boolean deadRobot;
 	protected Thread t;
 	
 	/**
@@ -39,7 +40,7 @@ public abstract class Robot implements Runnable {
 	 */
 	protected Robot(final InputStream script) {
 		this.stopExecuting = false;
-		new ScriptReader().run(script, stepQueue, prefs);
+		new ScriptReader().run(script, stepQueue, prefs, this);
 		this.setDefaultRobotPreferences();
 	}
 
@@ -62,9 +63,9 @@ public abstract class Robot implements Runnable {
 	 * Load the generic robot preferences.
 	 */
 	private void setDefaultRobotPreferences() {
-		httpRequestTimeout = Integer.parseInt(prefs.get("timeout"));
 		defaultWaitStep = Integer.parseInt(prefs.get("waitstep"));
 		robotID = prefs.get("jobID");
+		_targetDomain = prefs.get("domain");
 	}
 	
 	/**
@@ -98,13 +99,6 @@ public abstract class Robot implements Runnable {
 	public final void setTimeLastStepFinished(final long newTimeLastStepFinished) {
 		this.timeLastStepFinished = newTimeLastStepFinished;
 	}
-	/**
-	 * Retrieve my Thread.
-	 * @return My Thread
-	 */
-	public final Thread getMyThread() {
-		return t;
-	}
 	
 	/**
 	 * Retrieve the value of the defaultWaitStep.
@@ -113,5 +107,7 @@ public abstract class Robot implements Runnable {
 	public static int getDefaultWaitStep() {
 		return defaultWaitStep;
 	}
-
+	public String getTargetDomain() {
+		return _targetDomain;
+	}
 }

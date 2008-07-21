@@ -1,4 +1,4 @@
-package com.awebstorm.loadgenerator.robot;
+package com.awebstorm.robot;
 
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
@@ -19,7 +19,6 @@ public class BrowserState {
 
 	private WebClient vUser = new WebClient();
 	private HtmlPage currentPage;
-	private String _targetDomain;
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> _preferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
@@ -50,7 +49,7 @@ public class BrowserState {
 		boolean printContentOnFailingStatusCode = Boolean.parseBoolean(_preferences.get("printContentOnFailingStatusCode"));
 		String browVersionString = _preferences.get("htmlRobotBrowserVersion");
 		String proxyHost = _preferences.get("proxyHost");
-		_targetDomain = _preferences.get("domain");
+		int timeout = Integer.parseInt(_preferences.get("timeout"));
 
 		WebClient client;
 		if (proxyHost.equalsIgnoreCase("none") 
@@ -77,6 +76,7 @@ public class BrowserState {
 		client.setPrintContentOnFailingStatusCode(printContentOnFailingStatusCode);
 		client.setThrowExceptionOnFailingStatusCode(throwExceptionOnFailingStatusCode);
 		client.setThrowExceptionOnScriptError(throwExceptionOnScriptError);
+		client.setTimeout(timeout);
 		
 		try {
 			client.setUseInsecureSSL(useInsecureSSL);
@@ -88,13 +88,6 @@ public class BrowserState {
 		vUser = client;
 	}
 	
-	/**
-	 * Get the target Domain.
-	 * @return The target domain
-	 */
-	public final String getDomain() {
-		return _targetDomain;
-	}
 	/**
 	 * Set the state's current HtmlPage.
 	 * @param invokePage New Page
