@@ -40,51 +40,67 @@ public class BrowserState {
 	 */
 	private void configureState() {
 		
-		boolean javaScriptEnabled = Boolean.parseBoolean(_preferences.get("javaScriptEnabled"));
-		boolean redirectEnabled = Boolean.parseBoolean(_preferences.get("redirectEnabled"));
-		boolean throwExceptionOnScriptError = Boolean.parseBoolean(_preferences.get("throwExceptionOnScriptError"));
-		boolean useInsecureSSL = Boolean.parseBoolean(_preferences.get("useInsecureSSL"));
-		boolean popupBlockerEnabled = Boolean.parseBoolean(_preferences.get("popupBlockerEnabled"));
-		boolean throwExceptionOnFailingStatusCode = Boolean.parseBoolean(_preferences.get("throwExceptionOnFailingStatusCode"));
-		boolean printContentOnFailingStatusCode = Boolean.parseBoolean(_preferences.get("printContentOnFailingStatusCode"));
+		WebClient client = null;
 		String browVersionString = _preferences.get("htmlRobotBrowserVersion");
 		String proxyHost = _preferences.get("proxyHost");
-		int timeout = Integer.parseInt(_preferences.get("timeout"));
-
-		WebClient client;
-		if (proxyHost.equalsIgnoreCase("none") 
-				&& !browVersionString.equals("none")) {
-			BrowserVersionFactory browVerFactory = 
-				new BrowserVersionFactory(browVersionString);
-			client = new WebClient(browVerFactory.getNewBrowserVersion());
-		} else if (!browVersionString.equals("none") && !proxyHost.equalsIgnoreCase("none")) {
-			BrowserVersionFactory browVerFactory =
-				new BrowserVersionFactory(browVersionString);
-			client = 
-				new WebClient(browVerFactory.getNewBrowserVersion(), proxyHost, _proxyPort);
-		} else if (browVersionString.equals("none")) {
+		System.out.println(proxyHost);
+		if (proxyHost == null) {
+			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
+		} else if (browVersionString != null && proxyHost != null) {
 			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, _proxyPort);
 		} else {
 			client = new WebClient();
 		}
-		
-		client.setJavaScriptEnabled(javaScriptEnabled);
-		consoleLog.debug("Set pref redirecteEnabled: " + redirectEnabled);
-		client.setPopupBlockerEnabled(popupBlockerEnabled);
-		client.setRedirectEnabled(redirectEnabled);
-		client.setCache(new Cache());
-		client.setPrintContentOnFailingStatusCode(printContentOnFailingStatusCode);
-		client.setThrowExceptionOnFailingStatusCode(throwExceptionOnFailingStatusCode);
-		client.setThrowExceptionOnScriptError(throwExceptionOnScriptError);
-		client.setTimeout(timeout);
-		
-		try {
-			client.setUseInsecureSSL(useInsecureSSL);
-		} catch (GeneralSecurityException e) {
-			consoleLog.error("Failed Attempt to change InsecureSSL");
-			e.printStackTrace();
+		String temp = "";
+		temp = _preferences.get("javaScriptEnabled");
+		if (temp != null) {
+			client.setJavaScriptEnabled(Boolean.parseBoolean(temp));
 		}
-		
+		System.out.println(temp);
+		temp = _preferences.get("redirectEnabled");
+		if (temp != null) {
+			client.setRedirectEnabled(Boolean.parseBoolean(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("throwExceptionOnScriptError");
+		if (temp != null) {
+			client.setThrowExceptionOnScriptError(Boolean.parseBoolean(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("useInsecureSSL");
+		if (temp != null) {
+			try {
+				client.setUseInsecureSSL(Boolean.parseBoolean(temp));
+			} catch (GeneralSecurityException e) {
+				consoleLog.error("Failed Attempt to change InsecureSSL");
+				e.printStackTrace();
+			}
+		}
+		System.out.println(temp);
+		temp = _preferences.get("popupBlockerEnabled");
+		if (temp != null) {
+			client.setPopupBlockerEnabled(Boolean.parseBoolean(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("throwExceptionOnFailingStatusCode");
+		if (temp != null) {
+			client.setThrowExceptionOnFailingStatusCode(Boolean.parseBoolean(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("timeout");
+		if (temp != null) {
+			client.setTimeout(Integer.parseInt(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("printContentOnFailingStatusCode");
+		if (temp != null) {
+			client.setPrintContentOnFailingStatusCode(Boolean.parseBoolean(temp));
+		}
+		System.out.println(temp);
+		temp = _preferences.get("cacheSize");
+		if (temp != null) {
+			client.setCache(new Cache());
+		}
 		vUser = client;
 	}
 	

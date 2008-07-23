@@ -86,11 +86,11 @@ public class LoadGenerator {
 	 * @param ScriptLocation Location of the Robot's Script
 	 * @param prefsLocation Location of the Robot's preferences
 	 */
-	public void createRobot(InputStream script) {
+	public void createRobot(InputStream script, Proxy newProxy) {
 		if( consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Creating new Robot.");
 		}
-		Thread t = new Thread(selectRobotType(script), String.valueOf(robotThreadUID));
+		Thread t = new Thread(selectRobotType(script,newProxy), String.valueOf(robotThreadUID));
 		t.start();
 	}
 
@@ -148,8 +148,8 @@ public class LoadGenerator {
 	 * @param scriptLocation
 	 * @return
 	 */
-	private Robot selectRobotType(InputStream script) {
-			return new HTMLRobot(script,10000);
+	private Robot selectRobotType(InputStream script, Proxy newProxy) {
+			return new HTMLRobot(script,10000,newProxy);
 	}
 	
 	/**

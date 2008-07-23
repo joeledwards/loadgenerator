@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.httpclient.NameValuePair;
@@ -12,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.Attributes;
 
+import com.awebstorm.Proxy;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
@@ -57,12 +57,8 @@ public class Step implements Comparable<Step> {
 	private Logger resultLog = Logger.getLogger("com.awebstorm.robot.Step.resultLog");
 	private long replyTime = 0;
 	private long BodyByteAmount = 0; 
-	private long proxyReceiveAmount = 0;
-	private long proxySentAmount = 0;
-	private long stepProxyTimeStarted = 0;
-	private long stepProxyTimeResponse = 0;
-	private long stepProxyTimeEnded = 0;
 	private String _targetDomain;
+	private Proxy _myProxy;
 
 	/**
 	 * Creates a new Step.
@@ -76,6 +72,7 @@ public class Step implements Comparable<Step> {
 		_stepNum = value;
 		_stepAttributeList = list;
 		_myRobotOwner = myRobotOwner;
+		_myProxy=_myRobotOwner.getCurrentProxy();
 	}
 	
 	/**
@@ -107,15 +104,14 @@ public class Step implements Comparable<Step> {
 	 * @param browserState currentState of the robot's browser
 	 */
 	public void execute(String jobID, BrowserState browserState) {
+		_myProxy.resetProxyCounters();
 		replyTime = 0;
 		BodyByteAmount = 0; 
-		proxyReceiveAmount = 0;
-		proxySentAmount = 0;
-		stepProxyTimeStarted = 0;
-		stepProxyTimeResponse = 0;
-		stepProxyTimeEnded = 0;
 		_currentBrowserState = browserState;
 		_targetDomain = "http://" + _myRobotOwner.getTargetDomain();
+		if (!_myRobotOwner.getTargetDomain().equals(_myProxy.getRemotehost())) {
+			_myProxy.setRemotehost(_myRobotOwner.getTargetDomain());
+		}
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
 		try {
@@ -525,40 +521,83 @@ public class Step implements Comparable<Step> {
 	 */
 	private synchronized void report(boolean stepStatus, String jobID) {
 		
+		long proxyReceiveAmount = _myProxy.getProxyReceiveAmount();
+		long proxySentAmount = _myProxy.getProxySentAmount();
+		long stepProxyTimeStarted = _myProxy.getProxyTimeStarted();
+		long stepProxyTimeResponded = _myProxy.getProxyTimeResponded();
+		long stepProxyTimeEnded = _myProxy.getProxyTimeEnded();
+		
 		StringBuffer tempResult = new StringBuffer();
-		tempResult.append(jobID);
-		tempResult.append(',');
-		tempResult.append(_stepName);
-		tempResult.append(',');
-		tempResult.append(_stepNum);
-		tempResult.append(',');
-		tempResult.append(System.currentTimeMillis());
-		tempResult.append(',');
-		tempResult.append(replyTime);
-		tempResult.append(',');
-		tempResult.append(stepProxyTimeStarted % 1000);
-		tempResult.append(',');
-		tempResult.append(stepProxyTimeEnded % 1000);
-		tempResult.append(',');
-		tempResult.append((stepProxyTimeResponse%1000));
-		tempResult.append(',');
-		tempResult.append((stepProxyTimeEnded-replyTime));
-		tempResult.append(',');
-		tempResult.append(BodyByteAmount);
-		tempResult.append(',');
-		tempResult.append(proxyReceiveAmount);
-		tempResult.append(',');
-		tempResult.append(proxySentAmount);
-		tempResult.append(',');
-		if (replyTime == 0) {
-			replyTime = 1;
-		}
-		tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / (double)(replyTime / 1000));
-		tempResult.append(',');
-		if (stepStatus) {
-			tempResult.append("success");
+		if (resultLog.isDebugEnabled()) {
+			tempResult.append("jobID: " +jobID);
+			tempResult.append('\n');
+			tempResult.append("_stepName: " + _stepName);
+			tempResult.append('\n');
+			tempResult.append("_stepNum: " + _stepNum);
+			tempResult.append('\n');
+			tempResult.append("current Time: " + formatTime(System.currentTimeMillis()));
+			tempResult.append('\n');
+			tempResult.append("replyTime: " + replyTime);
+			tempResult.append('\n');
+			tempResult.append("stepProxyTimeStarted: " + formatTime(stepProxyTimeStarted));
+			tempResult.append('\n');
+			tempResult.append("stepProxyTimeEnded: " + formatTime(stepProxyTimeEnded));
+			tempResult.append('\n');
+			tempResult.append("stepProxyTimeResponded: " + formatTime(stepProxyTimeResponded));
+			tempResult.append('\n');
+			tempResult.append("stepProxyTimeResponded-stepProxyTimeStarted: " + (stepProxyTimeResponded-stepProxyTimeStarted));
+			tempResult.append('\n');
+			tempResult.append("BodyByteAmount: " + BodyByteAmount);
+			tempResult.append('\n');
+			tempResult.append("proxyReceiveAmount: " + proxyReceiveAmount);
+			tempResult.append('\n');
+			tempResult.append("proxySentAmount: " + proxySentAmount);
+			tempResult.append('\n');
+			if (replyTime == 0) {
+				replyTime = 1;
+			}
+			tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
+			tempResult.append('\n');
+			if (stepStatus) {
+				tempResult.append("success");
+			} else {
+				tempResult.append("failure");
+			}
 		} else {
-			tempResult.append("failure");
+			tempResult.append(jobID);
+			tempResult.append(',');
+			tempResult.append(_stepName);
+			tempResult.append(',');
+			tempResult.append(_stepNum);
+			tempResult.append(',');
+			tempResult.append(System.currentTimeMillis());
+			tempResult.append(',');
+			tempResult.append(replyTime);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeStarted);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeEnded);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeResponded);
+			tempResult.append(',');
+			tempResult.append((stepProxyTimeEnded-replyTime));
+			tempResult.append(',');
+			tempResult.append(BodyByteAmount);
+			tempResult.append(',');
+			tempResult.append(proxyReceiveAmount);
+			tempResult.append(',');
+			tempResult.append(proxySentAmount);
+			tempResult.append(',');
+			if (replyTime == 0) {
+				replyTime = 1;
+			}
+			tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
+			tempResult.append(',');
+			if (stepStatus) {
+				tempResult.append("success");
+			} else {
+				tempResult.append("failure");
+			}
 		}
 		resultLog.info(tempResult);
 	}
@@ -578,39 +617,40 @@ public class Step implements Comparable<Step> {
 	public final void setState(BrowserState newState) {
 		this._currentBrowserState = newState;
 	}
+	
+	private String formatTime(long milliseconds)
+	{
+	long millisInDay = milliseconds;
+	long MILLISECOND = millisInDay % 1000;
+	millisInDay /= 1000;
+	long SECOND = millisInDay % 60;
+	millisInDay /= 60;
+	long MINUTE = millisInDay % 60;
+	millisInDay /= 60;
+	long HOUR = millisInDay % 60;
+	StringBuffer buf = new StringBuffer(12);
+	if(HOUR < 10)
+	buf.append("0").append(HOUR);
+	else
+	buf.append(HOUR);
+	buf.append(":");
+	if(MINUTE < 10)
+	buf.append("0").append(MINUTE);
+	else
+	buf.append(MINUTE);
+	buf.append(":");
+	if(SECOND < 10)
+	buf.append("0").append(SECOND);
+	else
+	buf.append(SECOND);
+	buf.append(":");
+	if(MILLISECOND < 10)
+	buf.append("00").append(MILLISECOND);
+	else if(MILLISECOND < 100)
+	buf.append("0").append(MILLISECOND);
+	else
+	buf.append(MILLISECOND);
+	return buf.toString();
+	}
 
-	/**
-	 * Add the loadAmount to the current proxyReceiveAmount accumulator to keep track for this Step
-	 * @param loadAmount The amount of bytes received recorded by the proxy
-	 */
-	public void addProxyReceiveAmount(int loadAmount) {
-		this.proxyReceiveAmount += loadAmount;
-	}
-	
-	/**
-	 * Add the loadAmount to the current proxySentAmount accumulator to keep track for this Step
-	 * @param loadAmount The amount of bytes sent recorded by the proxy
-	 */
-	public void addProxySentAmount(int loadAmount) {
-		this.proxySentAmount += loadAmount;
-	}
-	
-	public void setStepProxyTimeEnded(long currentTimeMillis) {
-		stepProxyTimeEnded = currentTimeMillis;
-	}
-	public long getStepProxyTimeEnded() {
-		return stepProxyTimeEnded;
-	}
-	public void setStepTimeStarted(long stepTimeStarted) {
-		this.stepProxyTimeStarted = stepTimeStarted;
-	}
-	public long getStepTimeStarted() {
-		return stepProxyTimeStarted;
-	}
-	public long getStepProxyTimeResponse() {
-		return stepProxyTimeResponse;
-	}
-	public void setStepProxyTimeResponse(long stepProxyTimeResponse) {
-		this.stepProxyTimeResponse = stepProxyTimeResponse;
-	}
 }

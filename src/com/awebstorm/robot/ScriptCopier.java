@@ -11,6 +11,7 @@ import java.util.Queue;
 
 /**
  * Used to quickly copy scripts for testing purposes
+ * Does not work.
  * @author Cromano
  *
  */

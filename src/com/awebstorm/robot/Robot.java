@@ -3,6 +3,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
+import com.awebstorm.Proxy;
+
 /**
  * Generic Robot operations include Script parsing, general preferences, and stop boolean.
  * @author Cromano
@@ -15,13 +17,15 @@ public abstract class Robot implements Runnable {
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
 	private String _targetDomain;
 	private static int defaultWaitStep = 1000;
+	private InputStream _script;
 	//Robot ID vars
 	protected String robotID;
 	protected Step currentStep;
-	protected long timeLastStepFinished;
-	protected boolean stopExecuting;
-	protected boolean deadRobot;
+	protected long timeLastStepFinished = 0;
+	protected boolean stopExecuting = false;
+	protected boolean robotCompleted = false;
 	protected Thread t;
+	protected Proxy currentProxy;
 	
 	/**
 	 * Initialize a Robot in its own Thread.
@@ -38,9 +42,10 @@ public abstract class Robot implements Runnable {
 	 * 
 	 * @param script Location of the Robot Script
 	 */
-	protected Robot(final InputStream script) {
-		this.stopExecuting = false;
-		new ScriptReader().run(script, stepQueue, prefs, this);
+	protected Robot(final InputStream script, Proxy newProxy) {
+		_script = script;
+		currentProxy = newProxy;
+		new ScriptReader().run(_script, stepQueue, prefs, this);
 		this.setDefaultRobotPreferences();
 	}
 
@@ -53,11 +58,13 @@ public abstract class Robot implements Runnable {
 	}
 	
 	/**
-	 * Method must be implemented by extending classes, 
+	 * Method must be called by extending classes, 
 	 * it provides the functionality of parsing the 
 	 * input file for steps.
 	 */
-	public abstract void run();
+	public void run() {
+
+	}
 
 	/**
 	 * Load the generic robot preferences.
@@ -109,5 +116,11 @@ public abstract class Robot implements Runnable {
 	}
 	public String getTargetDomain() {
 		return _targetDomain;
+	}
+	public Proxy getCurrentProxy() {
+		return currentProxy;
+	}
+	public boolean isRobotCompleted() {
+		return robotCompleted;
 	}
 }

@@ -19,7 +19,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /** 
- * Parses Steps and preferences from a Script XML file.
+ * Parses Steps and preferences from a Script InputStream.
  * 
  * @author Cromano
  * @version 1.0
@@ -37,7 +37,7 @@ public class ScriptReader extends DefaultHandler {
 
 	/**
 	 * Parse a Script.
-	 * @param script Location of the script to parse
+	 * @param script InputStream of the script to parse
 	 * @param newStepQueue Queue to place new Steps into
 	 * @param newPrefs HashMap to place Robot preferences into
 	 */

@@ -8,32 +8,30 @@ import java.net.Socket;
 
 import org.apache.log4j.Logger;
 
-import com.awebstorm.robot.Robot;
-
 /**
  * Listens to the proxy Socket and counts the bytes received and sent to the Robot.
  * @author Cromano
  *
  */
-public class ProxyThread extends Thread {
+public class ProxyListener implements Runnable {
 	private Socket incoming, outgoing;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private Robot myRobotOwner;
+	private Proxy _myProxy;
 
 	/**
-	 * Creates a new ProxyThread to listen on this Socket with the specified Robot owner and pass on any info on in.
+	 * Creates a new ProxyListener to listen on this Socket with the specified Robot owner and pass on any info on in.
 	 * @param in Socket to listen on
 	 * @param out Socket to write on
 	 * @param myRobotOwner Robot that owns this listener
 	 */
-	ProxyThread(Socket in, Socket out, Robot myRobotOwner){
+	ProxyListener(Socket in, Socket out, Proxy myProxy){
 		incoming = in;
 		outgoing = out;
-		this.myRobotOwner=myRobotOwner;
+		this._myProxy=myProxy;
 	}
 
 	/**
-	 * Run this ProxyThread
+	 * Run this ProxyListener to accumulate necessary information in its Proxy
 	 */
 	public void run(){
 		byte[] buffer = new byte[60];
@@ -46,28 +44,27 @@ public class ProxyThread extends Thread {
 			FromClient = incoming.getInputStream();
 			while (true) {
 				numberRead = FromClient.read(buffer, 0, 50);
-				for(int i = 0; i < buffer.length; i++) {
-					System.out.print((char)buffer[i]);
-				}
 				if (numberRead == -1){
+					
 					if (consoleLog.isDebugEnabled())
-						consoleLog.debug("Closing a ProxyThread.");
+						consoleLog.debug("Closing a ProxyListener.");
 					if(incoming.getPort() == 80) {
-						//myRobotOwner.getCurrentStep().setStepTimeEnded(System.currentTimeMillis());
+						System.out.println("in: " + numberRead);
+						_myProxy.setProxyTimeEnded(System.currentTimeMillis());
 					} else {
-						if (outgoing.getKeepAlive())
-							myRobotOwner.getCurrentStep().setStepTimeStarted(System.currentTimeMillis());
+						System.out.println("out: " + numberRead);
 					}
 					break;
 				} else {
 					if (incoming.getPort() == 80) {
-						myRobotOwner.getCurrentStep().addProxyReceiveAmount(numberRead);
-						if ( myRobotOwner.getCurrentStep().getStepProxyTimeResponse() == 0 )
-							myRobotOwner.getCurrentStep().setStepProxyTimeResponse(System.currentTimeMillis());
+						System.out.println("in: " + numberRead);
+						if ( _myProxy.getProxyTimeResponded() == 0 )
+							_myProxy.setProxyTimeResponded(System.currentTimeMillis());
+						_myProxy.addProxyReceiveAmount(numberRead);
 					} else {
-						myRobotOwner.getCurrentStep().addProxySentAmount(numberRead);
-						if ( myRobotOwner.getCurrentStep().getStepProxyTimeEnded() == 0 )
-							myRobotOwner.getCurrentStep().setStepProxyTimeEnded(System.currentTimeMillis());
+						System.out.println("out: " + numberRead);
+						_myProxy.addProxySentAmount(numberRead);
+						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
 					}
 				}
 				if(!incoming.isClosed()) {

@@ -3,6 +3,8 @@ package com.awebstorm.robot;
 import java.io.InputStream;
 import org.apache.log4j.Logger;
 
+import com.awebstorm.Proxy;
+
 
 /**
  * Robot to handle HTML calls.
@@ -20,8 +22,8 @@ public class HTMLRobot extends Robot {
 	 * @param script script to parse
 	 * @param proxyPort Port on which to contact the local proxy
 	 */
-	public HTMLRobot(final InputStream script, final int proxyPort) {
-		super(script);
+	public HTMLRobot(final InputStream script, final int proxyPort, Proxy newProxy) {
+		super(script, newProxy);
 		currentState = new BrowserState(prefs, proxyPort);
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Built an HTMLRobot");
@@ -56,6 +58,7 @@ public class HTMLRobot extends Robot {
 				tempStep.execute(robotID, currentState);
 				stepNum++;
 		}
+		robotCompleted = true;
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Robot is closing: " + this.robotID);
 		}		

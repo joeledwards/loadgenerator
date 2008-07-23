@@ -3,6 +3,7 @@ package com.awebstorm.robot;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.PropertyResourceBundle;
 import java.util.Queue;
@@ -73,33 +74,33 @@ public class HTMLRobotBehaviour {
 
 		numberOfRobots = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
-		boolean robotsAlive = true;
+		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
 		try {
 			while (newStreams.size() < numberOfRobots) {
-				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
+				newStreams.add(new FileInputStream("ScriptThread1.xml"));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		for (int i = 0; i < loadGenProxyArray.length && !newStreams.isEmpty(); i++) {
-				HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i);
-				loadGenProxyArray[i].setMyRobotOwner(newRobot);
-				newRobot.init();
+		for (int i = 0;!newStreams.isEmpty();i++) {
+			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i,loadGenProxyArray[i]);	
+			robots.add(newRobot);
+			newRobot.init();
 		}
-		
-		while (robotsAlive) {
-			robotsAlive = false;
-			for (int i = 0; i < loadGenProxyArray.length; i++) {
-				if (loadGenProxyArray[i].getMyRobotOwner() != null) {
-					if (loadGenProxyArray[i].getMyRobotOwner().t.isAlive()) {
-						robotsAlive = true;
-						break;
-					} else {
-						loadGenProxyArray[i].setMyRobotOwner(null);
-					}
+		Iterator<Robot> robotIterator = robots.iterator();
+		while (!robots.isEmpty()) {
+			while (robotIterator.hasNext()) {
+				Robot nextRobot = robotIterator.next();
+				if (nextRobot == null ) {
+					robots.remove(nextRobot);
+					break;
+				} else if (nextRobot.isRobotCompleted()) {
+					robots.remove(nextRobot);
+					break;
 				}
 			}
+			robotIterator = robots.iterator();
 		}
 	}
 	

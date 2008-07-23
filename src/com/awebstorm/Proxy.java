@@ -5,9 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import com.awebstorm.ProxyThread;
-import com.awebstorm.robot.Robot;
-
+import com.awebstorm.ProxyListener;
 import org.apache.log4j.Logger;
 
 /**
@@ -21,9 +19,14 @@ public class Proxy implements Runnable {
 	private String remotehost;
 	private int remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private Robot myRobotOwner;
 	private Thread t;
 	private boolean shouldStopRunning = false;
+	private long proxyTimeResponded;
+	private long proxyReceiveAmount;
+	private long proxySentAmount;
+	
+	private long proxyTimeEnded;
+	private long proxyTimeStarted;
 
 	/**
 	 * Initialize a new Proxy in its own Daemon thread.
@@ -56,7 +59,8 @@ public class Proxy implements Runnable {
     	ServerSocket Server = null;
 
     	// Check for valid local and remote port, hostname not null
-    	consoleLog.info("Checking: Port " + localport + " to " + remotehost + " Port " + remoteport);
+    	if ( consoleLog.isDebugEnabled())
+    		consoleLog.debug("Checking: Port " + localport + " to " + remotehost + " Port " + remoteport);
     	if(localport <= 0) {
     		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
     		error = true;
@@ -95,20 +99,15 @@ public class Proxy implements Runnable {
     		}
     		try {
     			incoming = Server.accept();
-
-    			if (!myRobotOwner.getTargetDomain().equalsIgnoreCase(remotehost))
-    				this.remotehost = myRobotOwner.getTargetDomain();
-
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			outgoing = new Socket(remotehost, remoteport); 
     			outgoing.setReuseAddress(true);
-    			//System.out.println(myRobotOwner);
 
-    			ProxyThread thread1 = new ProxyThread(incoming, outgoing, myRobotOwner);
+    			Thread thread1 = new Thread (new ProxyListener(incoming, outgoing, this));
     			thread1.setDaemon(true);
     			thread1.start();
 
-    			ProxyThread thread2 = new ProxyThread(outgoing, incoming, myRobotOwner);
+    			Thread thread2 = new Thread (new ProxyListener(outgoing, incoming, this));
     			thread2.setDaemon(true);
     			thread2.start();
     		} catch (UnknownHostException e) {
@@ -119,6 +118,14 @@ public class Proxy implements Runnable {
     			System.exit(-2);
     		}
     	}
+    }
+    
+    public void resetProxyCounters() {
+    	this.proxyTimeResponded = 0;
+    	this.proxyReceiveAmount = 0;
+    	this.proxySentAmount = 0;
+    	this.proxyTimeEnded = 0;
+    	this.proxyTimeStarted = 0;
     }
     
     /** Getters and Setters */
@@ -134,14 +141,38 @@ public class Proxy implements Runnable {
 	public void setRemoteport(int remoteport) {
 		this.remoteport = remoteport;
 	}
-	public void setMyRobotOwner(Robot myRobotOwner) {
-		this.myRobotOwner = myRobotOwner;
-	}
-	public Robot getMyRobotOwner() {
-		return myRobotOwner;
-	}
 	public void setShouldStopRunning(boolean shouldStopRunning) {
 		this.shouldStopRunning = shouldStopRunning;
+	}
+	public void setProxyTimeResponded(long currentTimeMillis) {
+		this.proxyTimeResponded=currentTimeMillis;
+	}
+	public void addProxyReceiveAmount(int numberRead) {
+		this.proxyReceiveAmount+=numberRead;
+	}
+	public void addProxySentAmount(int numberRead) {
+		this.proxySentAmount+=numberRead;
+	}
+	public void setProxyTimeEnded(long currentTimeMillis) {
+		this.proxyTimeEnded=currentTimeMillis;
+	}
+	public long getProxyTimeEnded() {
+		return proxyTimeEnded;
+	}
+	public long getProxyTimeResponded() {
+		return proxyTimeResponded;
+	}
+	public void setProxyTimeStarted(long currentTimeMillis) {
+		this.proxyTimeStarted=currentTimeMillis;
+	}
+	public long getProxyReceiveAmount() {
+		return proxyReceiveAmount;
+	}
+	public long getProxySentAmount() {
+		return proxySentAmount;
+	}
+	public long getProxyTimeStarted() {
+		return proxyTimeStarted;
 	}
 }
 
