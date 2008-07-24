@@ -304,7 +304,7 @@ public class ProxyBehaviour extends UsingMatchers {
 	}
 	
 	/**
-	 * Generates 10 Proxies and makes 5 requests on each
+	 * Generates 10 Proxies and makes 50 requests on each
 	 */
 	public void shouldGenAndUse10ProxiesWith2Requests() {
 		Proxy[] proxyArray = new Proxy[10];
@@ -322,7 +322,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
 		for (int k = 0; k < 10; k++) {
-			for (int i = 0; i < 2; i ++) {
+			for (int i = 0; i < 50; i ++) {
 				OutputStream toTarget = null;
 				Socket outgoing= null;
 				try {

@@ -26,7 +26,7 @@ public class HTMLRobot extends Robot {
 		super(script, newProxy);
 		currentState = new BrowserState(prefs, proxyPort);
 		if (consoleLog.isDebugEnabled()) {
-			consoleLog.debug("Built an HTMLRobot");
+			consoleLog.debug("Built an HTMLRobot on" + this.robotID);
 		}
 	}
 	

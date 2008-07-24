@@ -520,50 +520,104 @@ public class Step implements Comparable<Step> {
 	 * @param jobID Current job ID
 	 */
 	private synchronized void report(boolean stepStatus, String jobID) {
-		
+
 		long proxyReceiveAmount = _myProxy.getProxyReceiveAmount();
 		long proxySentAmount = _myProxy.getProxySentAmount();
 		long stepProxyTimeStarted = _myProxy.getProxyTimeStarted();
 		long stepProxyTimeResponded = _myProxy.getProxyTimeResponded();
 		long stepProxyTimeEnded = _myProxy.getProxyTimeEnded();
-		
+
 		StringBuffer tempResult = new StringBuffer();
-		if (resultLog.isDebugEnabled()) {
-			tempResult.append("jobID: " +jobID);
-			tempResult.append('\n');
-			tempResult.append("_stepName: " + _stepName);
-			tempResult.append('\n');
-			tempResult.append("_stepNum: " + _stepNum);
-			tempResult.append('\n');
-			tempResult.append("current Time: " + formatTime(System.currentTimeMillis()));
-			tempResult.append('\n');
-			tempResult.append("replyTime: " + replyTime);
-			tempResult.append('\n');
-			tempResult.append("stepProxyTimeStarted: " + formatTime(stepProxyTimeStarted));
-			tempResult.append('\n');
-			tempResult.append("stepProxyTimeEnded: " + formatTime(stepProxyTimeEnded));
-			tempResult.append('\n');
-			tempResult.append("stepProxyTimeResponded: " + formatTime(stepProxyTimeResponded));
-			tempResult.append('\n');
-			tempResult.append("stepProxyTimeResponded-stepProxyTimeStarted: " + (stepProxyTimeResponded-stepProxyTimeStarted));
-			tempResult.append('\n');
-			tempResult.append("BodyByteAmount: " + BodyByteAmount);
-			tempResult.append('\n');
-			tempResult.append("proxyReceiveAmount: " + proxyReceiveAmount);
-			tempResult.append('\n');
-			tempResult.append("proxySentAmount: " + proxySentAmount);
-			tempResult.append('\n');
-			if (replyTime == 0) {
-				replyTime = 1;
-			}
-			tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
-			tempResult.append('\n');
-			if (stepStatus) {
-				tempResult.append("success");
+		ActionTypes currentType;
+		try {
+			currentType = ActionTypes.valueOf(_stepName);
+		} catch (IllegalArgumentException e) {
+			consoleLog.error("Unknown Step type found.",e);
+			return;
+		}
+		if ( currentType == null ) {
+			return;
+		}
+		switch (currentType) {
+		case INVOKE:
+		case POST:
+		case BUTTON:
+		case CLICK_LINK:
+			if (resultLog.isDebugEnabled()) {
+				tempResult.append("jobID: " +jobID);
+				tempResult.append('\n');
+				tempResult.append("_stepName: " + _stepName);
+				tempResult.append('\n');
+				tempResult.append("_stepNum: " + _stepNum);
+				tempResult.append('\n');
+				tempResult.append("current Time: " + formatTime(System.currentTimeMillis()));
+				tempResult.append('\n');
+				tempResult.append("replyTime: " + replyTime);
+				tempResult.append('\n');
+				tempResult.append("stepProxyTimeStarted: " + formatTime(stepProxyTimeStarted));
+				tempResult.append('\n');
+				tempResult.append("stepProxyTimeEnded: " + formatTime(stepProxyTimeEnded));
+				tempResult.append('\n');
+				tempResult.append("stepProxyTimeResponded: " + formatTime(stepProxyTimeResponded));
+				tempResult.append('\n');
+				tempResult.append("stepProxyTimeResponded-stepProxyTimeStarted: " + (stepProxyTimeResponded-stepProxyTimeStarted));
+				tempResult.append('\n');
+				tempResult.append("BodyByteAmount: " + BodyByteAmount);
+				tempResult.append('\n');
+				tempResult.append("proxyReceiveAmount: " + proxyReceiveAmount);
+				tempResult.append('\n');
+				tempResult.append("proxySentAmount: " + proxySentAmount);
+				tempResult.append('\n');
+				if (replyTime == 0) {
+					replyTime = 1;
+				}
+				tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
+				tempResult.append('\n');
+				if (stepStatus) {
+					tempResult.append("success");
+				} else {
+					tempResult.append("failure");
+				}
 			} else {
-				tempResult.append("failure");
+				tempResult.append(jobID);
+				tempResult.append(',');
+				tempResult.append(_stepName);
+				tempResult.append(',');
+				tempResult.append(_stepNum);
+				tempResult.append(',');
+				tempResult.append(System.currentTimeMillis());
+				tempResult.append(',');
+				tempResult.append(replyTime);
+				tempResult.append(',');
+				tempResult.append(stepProxyTimeStarted);
+				tempResult.append(',');
+				tempResult.append(stepProxyTimeEnded);
+				tempResult.append(',');
+				tempResult.append(stepProxyTimeResponded);
+				tempResult.append(',');
+				tempResult.append((stepProxyTimeEnded-replyTime));
+				tempResult.append(',');
+				tempResult.append(BodyByteAmount);
+				tempResult.append(',');
+				tempResult.append(proxyReceiveAmount);
+				tempResult.append(',');
+				tempResult.append(proxySentAmount);
+				tempResult.append(',');
+				if (replyTime == 0) {
+					replyTime = 1;
+				}
+				tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
+				tempResult.append(',');
+				if (stepStatus) {
+					tempResult.append("success");
+				} else {
+					tempResult.append("failure");
+				}
 			}
-		} else {
+			break;
+		case WAIT:
+		case FILL_FORM:
+		case VERIFY_TITLE:
 			tempResult.append(jobID);
 			tempResult.append(',');
 			tempResult.append(_stepName);
@@ -572,32 +626,12 @@ public class Step implements Comparable<Step> {
 			tempResult.append(',');
 			tempResult.append(System.currentTimeMillis());
 			tempResult.append(',');
-			tempResult.append(replyTime);
-			tempResult.append(',');
-			tempResult.append(stepProxyTimeStarted);
-			tempResult.append(',');
-			tempResult.append(stepProxyTimeEnded);
-			tempResult.append(',');
-			tempResult.append(stepProxyTimeResponded);
-			tempResult.append(',');
-			tempResult.append((stepProxyTimeEnded-replyTime));
-			tempResult.append(',');
-			tempResult.append(BodyByteAmount);
-			tempResult.append(',');
-			tempResult.append(proxyReceiveAmount);
-			tempResult.append(',');
-			tempResult.append(proxySentAmount);
-			tempResult.append(',');
-			if (replyTime == 0) {
-				replyTime = 1;
-			}
-			tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
-			tempResult.append(',');
 			if (stepStatus) {
 				tempResult.append("success");
 			} else {
 				tempResult.append("failure");
 			}
+			break;
 		}
 		resultLog.info(tempResult);
 	}
@@ -618,6 +652,11 @@ public class Step implements Comparable<Step> {
 		this._currentBrowserState = newState;
 	}
 	
+	/**
+	 * Result Debugging helper method.
+	 * @param milliseconds Time to convert in milliseconds
+	 * @return Well-formatted time message
+	 */
 	private String formatTime(long milliseconds)
 	{
 	long millisInDay = milliseconds;

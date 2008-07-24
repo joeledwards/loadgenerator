@@ -58,7 +58,7 @@ public class Proxy implements Runnable {
 
     	// Check for valid local and remote port, hostname not null
     	if ( consoleLog.isDebugEnabled())
-    		consoleLog.debug("Checking: Port " + localport + " to " + remotehost + " Port " + remoteport);
+    		consoleLog.debug("Opening a Proxy at " + localport + " to " + remotehost + " Port " + remoteport);
     	if(localport <= 0) {
     		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
     		error = true;

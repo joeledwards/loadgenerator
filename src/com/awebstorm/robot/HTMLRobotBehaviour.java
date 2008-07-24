@@ -10,7 +10,6 @@ import java.util.PropertyResourceBundle;
 import java.util.Queue;
 import java.util.ResourceBundle;
 
-import org.apache.log4j.LogManager;
 import org.apache.log4j.PropertyConfigurator;
 
 import com.awebstorm.Proxy;
@@ -25,10 +24,10 @@ public class HTMLRobotBehaviour {
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	private static int numberOfProxies = 1;
+	private static int maxNumberOfProxies = 100;
 	private static int numberOfRobots = 1;
-	private Proxy[] loadGenProxyArray = new Proxy[numberOfProxies];
-	private int localPort;
+	private Proxy[] loadGenProxyArray = new Proxy[maxNumberOfProxies];
+	private int localPort = 10000;
 	private String remotehost;
 	private int remoteport;
 	
@@ -74,10 +73,14 @@ public class HTMLRobotBehaviour {
 	public final void shouldGenARobotOnProxy() {
 
 		numberOfRobots = 1;
-		numberOfProxies = 1;
+		maxNumberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
+		for (int i = 0; i < numberOfRobots; i++) {
+			loadGenProxyArray[i] = new Proxy(localPort + i, remotehost, remoteport);
+			loadGenProxyArray[i].init();
+		}
 		try {
 			while (newStreams.size() < numberOfRobots) {
 				newStreams.add(new FileInputStream("ScriptThread1.xml"));
@@ -86,11 +89,11 @@ public class HTMLRobotBehaviour {
 			e.printStackTrace();
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i,loadGenProxyArray[i]);	
+			System.out.println(newStreams+" "+(localPort + i)+" "+loadGenProxyArray[i]);
+			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i, loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
-
 		Iterator<Robot> robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
@@ -228,10 +231,6 @@ public class HTMLRobotBehaviour {
 		localPort = Integer.parseInt(loadGeneratorProperties.getString("proxyLocalPortRange"));
 		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
 		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
-		for (int i = 0; i < loadGenProxyArray.length; i++) {
-			loadGenProxyArray[i] = new Proxy(localPort + i, remotehost, remoteport);
-			loadGenProxyArray[i].init();
-		}
 		
 /*		URL scheduler = null;
 		try {
@@ -252,7 +251,7 @@ public class HTMLRobotBehaviour {
 	 * Take down everything after tests.
 	 */
 	public final void tearDown() {
-		for (int i = 0; i < loadGenProxyArray.length; i++) {
+		for (int i = 0; i < numberOfRobots; i++) {
 			try {
 				loadGenProxyArray[i].shutdown();
 			} catch (IOException e) {
@@ -269,7 +268,7 @@ public class HTMLRobotBehaviour {
 	 * @return The number of proxies created
 	 */
 	public final int getNumberOfProxies() {
-		return numberOfProxies;
+		return maxNumberOfProxies;
 	}
 
 	public int getLocalPort() {
