@@ -98,11 +98,13 @@ public class Proxy implements Runnable {
     			break;
     		}
     		try {
+    			if (outgoing != null)
+    				outgoing.setReuseAddress(true);
+    			if (incoming != null)
+    				incoming.setReuseAddress(true);
     			incoming = Server.accept();
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			outgoing = new Socket(remotehost, remoteport); 
-    			outgoing.setReuseAddress(true);
-
     			Thread thread1 = new Thread (new ProxyListener(incoming, outgoing, this));
     			thread1.setDaemon(true);
     			thread1.start();
@@ -118,6 +120,8 @@ public class Proxy implements Runnable {
     			System.exit(-2);
     		}
     	}
+    	if(consoleLog.isDebugEnabled())
+    		consoleLog.debug("Closing a Proxy.");
     }
     
     public void resetProxyCounters() {
@@ -173,6 +177,10 @@ public class Proxy implements Runnable {
 	}
 	public long getProxyTimeStarted() {
 		return proxyTimeStarted;
+	}
+
+	public boolean isShouldStopRunning() {
+		return shouldStopRunning;
 	}
 }
 
