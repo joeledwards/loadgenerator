@@ -13,7 +13,7 @@
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-	</Properties>
+		<remoteport>80</remoteport></Properties>
 	<STEPS>
 		<WAIT length="1000"></WAIT>
 		<INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE></STEPS>

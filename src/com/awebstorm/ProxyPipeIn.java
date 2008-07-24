@@ -13,61 +13,50 @@ import org.apache.log4j.Logger;
  * @author Cromano
  *
  */
-public class ProxyListener implements Runnable {
+public class ProxyPipeIn implements Runnable {
 	private Socket incoming, outgoing;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Proxy _myProxy;
 
 	/**
-	 * Creates a new ProxyListener to listen on this Socket with the specified Robot owner and pass on any info on in.
+	 * Creates a new ProxyPipeIn to listen on this Socket with the specified Robot owner and pass on any info on in.
 	 * @param in Socket to listen on
 	 * @param out Socket to write on
 	 * @param myRobotOwner Robot that owns this listener
 	 */
-	ProxyListener(Socket in, Socket out, Proxy myProxy){
+	ProxyPipeIn(Socket in, Socket out, Proxy myProxy){
 		incoming = in;
 		outgoing = out;
 		this._myProxy=myProxy;
 	}
 
 	/**
-	 * Run this ProxyListener to accumulate necessary information in its Proxy
+	 * Run this ProxyPipeIn to accumulate necessary information in its Proxy
 	 */
 	public void run(){
 		byte[] buffer = new byte[60];
 		int numberRead = 0;
-		OutputStream ToClient;
-		InputStream FromClient;
+		OutputStream ToServer;
+		InputStream FromLocal;
 
 		try{
-			ToClient = outgoing.getOutputStream();      
-			FromClient = incoming.getInputStream();
+			ToServer = outgoing.getOutputStream();      
+			FromLocal = incoming.getInputStream();
 			while (true) {
-				numberRead = FromClient.read(buffer, 0, 50);
+				numberRead = FromLocal.read(buffer, 0, 50);
 				if (numberRead == -1){
 					if (consoleLog.isDebugEnabled())
-						consoleLog.debug("Closing a ProxyListener: " + incoming.getPort());
-					if(incoming.getPort() == 80) {
-						_myProxy.setProxyTimeEnded(System.currentTimeMillis());
-						outgoing.shutdownOutput();
+						consoleLog.debug("Closing a ProxyPipeIn: " + outgoing.getPort() + " " + incoming.getLocalPort());
+						//incoming.shutdownInput();
 						incoming.close();
 						outgoing.close();
-					} else {
-						incoming.shutdownInput();
-					}
 					break;
 				} else {
-					if (incoming.getPort() == 80) {
-						if ( _myProxy.getProxyTimeResponded() == 0 )
-							_myProxy.setProxyTimeResponded(System.currentTimeMillis());
-						_myProxy.addProxyReceiveAmount(numberRead);
-					} else {
 						_myProxy.addProxySentAmount(numberRead);
 						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
-					}
 				}
 				if(!incoming.isClosed()) {
-					ToClient.write(buffer, 0, numberRead);
+					ToServer.write(buffer, 0, numberRead);
 				}
 
 			}

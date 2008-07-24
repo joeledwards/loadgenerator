@@ -322,14 +322,11 @@ public class ProxyBehaviour extends UsingMatchers {
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
 		for (int k = 0; k < 10; k++) {
-			for (int i = 0; i < 50; i ++) {
+			for (int i = 0; i < 2; i ++) {
 				OutputStream toTarget = null;
 				Socket outgoing= null;
 				try {
 					outgoing = new Socket("127.0.0.1",10000+k);
-					if (outgoing != null)
-						outgoing.setReuseAddress(true);
-
 					toTarget = outgoing.getOutputStream();
 					toTarget.write(line1.getBytes());
 					toTarget.write(line2.getBytes());
@@ -339,7 +336,7 @@ public class ProxyBehaviour extends UsingMatchers {
 					toTarget.write(line6.getBytes());
 					toTarget.write(line7.getBytes());
 					toTarget.write(line8.getBytes());
-					outgoing.shutdownOutput();
+
 					InputStreamReader fromTarget = new InputStreamReader(outgoing.getInputStream());
 					BufferedReader bufferedFromTarget = new BufferedReader(fromTarget);
 					int temp = 0;
@@ -356,9 +353,6 @@ public class ProxyBehaviour extends UsingMatchers {
 					ensureThat(proxyArray[k].getProxySentAmount() == 
 						(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
 								+ line7.length() + line8.length()));
-					outgoing.shutdownInput();
-					fromTarget.close();
-					toTarget.close();
 					outgoing.close();
 					proxyArray[k].resetProxyCounters();
 

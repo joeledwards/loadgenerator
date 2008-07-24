@@ -112,6 +112,9 @@ public class Step implements Comparable<Step> {
 		if (!_myRobotOwner.getTargetDomain().equals(_myProxy.getRemotehost())) {
 			_myProxy.setRemotehost(_myRobotOwner.getTargetDomain());
 		}
+		if (!(_myRobotOwner.getTargetPort() == (_myProxy.getRemoteport()))) {
+			_myProxy.setRemoteport(_myRobotOwner.getTargetPort());
+		}
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
 		try {

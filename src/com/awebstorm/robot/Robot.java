@@ -16,6 +16,7 @@ public abstract class Robot implements Runnable {
 	protected HashMap<String, String> prefs = new HashMap<String, String>();
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
 	private String _targetDomain;
+	private int _targetPort;
 	private static int defaultWaitStep = 1000;
 	private InputStream _script;
 	//Robot ID vars
@@ -73,6 +74,7 @@ public abstract class Robot implements Runnable {
 		defaultWaitStep = Integer.parseInt(prefs.get("waitstep"));
 		robotID = prefs.get("jobID");
 		_targetDomain = prefs.get("domain");
+		_targetPort = Integer.parseInt(prefs.get("remoteport"));
 	}
 	
 	/**
@@ -125,5 +127,8 @@ public abstract class Robot implements Runnable {
 	}
 	public Thread.State getThreadState() {
 		return t.getState();
+	}
+	public int getTargetPort() {
+		return _targetPort;
 	}
 }

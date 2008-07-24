@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import com.awebstorm.ProxyListener;
+import com.awebstorm.ProxyPipeIn;
 import org.apache.log4j.Logger;
 
 /**
@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 public class Proxy implements Runnable {
 	
 	private int localport;
-	private String remotehost;
+	private String _remotehost;
 	private int remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Thread t;
@@ -39,12 +39,12 @@ public class Proxy implements Runnable {
 	/**
 	 * Proxy Constructor.
 	 * @param localport Local port to talk to the Robot
-	 * @param remotehost Remote host to make requests on
+	 * @param _remotehost Remote host to make requests on
 	 * @param remoteport Remote Port to talk on
 	 */
     public Proxy (int localport, String remotehost, int remoteport) {
 		this.localport=localport;
-		this.remotehost=remotehost;
+		this._remotehost=remotehost;
 		this.remoteport=remoteport;
     }
     
@@ -54,11 +54,11 @@ public class Proxy implements Runnable {
     public void run () {
 
     	boolean error = false;
-    	Socket incoming = null, outgoing = null;
+    	Socket localSocket = null, targetSocket = null;
 
     	// Check for valid local and remote port, hostname not null
     	if ( consoleLog.isDebugEnabled())
-    		consoleLog.debug("Opening a Proxy at " + localport + " to " + remotehost + " Port " + remoteport);
+    		consoleLog.debug("Opening a Proxy at " + localport + " to " + _remotehost + " Port " + remoteport);
     	if(localport <= 0) {
     		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
     		error = true;
@@ -67,7 +67,7 @@ public class Proxy implements Runnable {
     		consoleLog.fatal("Error: Invalid Remote Port Specification " + "\n");
     		error = true;
     	}
-    	if(remotehost == null) {
+    	if(_remotehost == null) {
     		consoleLog.fatal("Error: Invalid Remote Host Specification " + "\n");
     		error = true;
     	}
@@ -87,30 +87,30 @@ public class Proxy implements Runnable {
     	while (true) {
     		try {
     			try {
-    				incoming = server.accept();
+    				localSocket = server.accept();
     			} catch (SocketException e) {
     		    	if(consoleLog.isDebugEnabled())
     		    		consoleLog.debug("Closing a Proxy at " + server.getLocalPort());
     		    	break;
     			}
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
-    			outgoing = new Socket(remotehost, remoteport); 
-    			Thread thread1 = new Thread (new ProxyListener(incoming, outgoing, this));
+    			targetSocket = new Socket(_remotehost, remoteport);
+    			Thread thread1 = null;
+    			thread1 = new Thread (new ProxyPipeIn(localSocket, targetSocket, this));
     			thread1.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
-    				consoleLog.debug("Spawning Proxy Listener: " + thread1.getName());
+    				consoleLog.debug("Spawning ProxyPipeIn: " + thread1.getName());
     			}
     			thread1.start();
-    			
-    			Thread thread2 = new Thread (new ProxyListener(outgoing, incoming, this));
+    			Thread thread2 = null;
+    			thread2 = new Thread (new ProxyPipeOut(targetSocket, localSocket, this));
     			thread2.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
-    				consoleLog.debug("Spawning Proxy Listener: " + thread2.getName());
+    				consoleLog.debug("Spawning ProxyPipeOut: " + thread2.getName());
     			}
     			thread2.start();
-    			incoming = null;
     		} catch (UnknownHostException e) {
-    			consoleLog.fatal("Error: Unknown Host " + remotehost, e);
+    			consoleLog.fatal("Error: Unknown Host " + _remotehost, e);
     			System.exit(-1);
     		} catch(IOException e){
     			consoleLog.fatal("IOException when accepting new connection.", e);
@@ -146,10 +146,10 @@ public class Proxy implements Runnable {
     
     /** Getters and Setters */
 	public String getRemotehost() {
-		return remotehost;
+		return _remotehost;
 	}
 	public void setRemotehost(String remotehost) {
-		this.remotehost = remotehost;
+		this._remotehost = remotehost;
 	}
 	public int getRemoteport() {
 		return remoteport;
