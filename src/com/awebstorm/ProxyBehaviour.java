@@ -13,7 +13,6 @@ import org.jbehave.core.mock.UsingMatchers;
 public class ProxyBehaviour extends UsingMatchers {
 	
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	private int counter;
 	
 	/**
 	 * Should forward the sent bytes to server socket.
@@ -94,9 +93,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		String line6 = "Accept-Encoding: gzip, deflate\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
-		
-		String line9 = "GET /themes/pushbutton/header-b.jpg HTTP/1.1\r\n";
-		
+
 		OutputStream toTarget = null;
 		Socket outgoing= null;
 		try {
@@ -164,8 +161,6 @@ public class ProxyBehaviour extends UsingMatchers {
 		String line6 = "Accept-Encoding: gzip, deflate\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
-		
-		String line9 = "GET /themes/pushbutton/header-b.jpg HTTP/1.1\r\n";
 		
 		for ( int i = 0; i < 3; i ++) {
 		OutputStream toTarget = null;
@@ -239,8 +234,6 @@ public class ProxyBehaviour extends UsingMatchers {
 		String line6 = "Accept-Encoding: gzip, deflate\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
-
-		String line9 = "GET /themes/pushbutton/header-b.jpg HTTP/1.1\r\n";
 
 		for ( int i = 0; i < 1; i ++) {
 			OutputStream toTarget = null;

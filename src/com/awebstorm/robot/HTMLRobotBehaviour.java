@@ -2,6 +2,7 @@ package com.awebstorm.robot;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -260,7 +261,12 @@ public class HTMLRobotBehaviour {
 	public final void tearDown() {
 		for (int i = 0; i < loadGenProxyArray.length; i++) {
 			System.out.println("Killing Proxy at: " + (localPort+i));
-			loadGenProxyArray[i].setShouldStopRunning(true);
+			try {
+				loadGenProxyArray[i].shutdown();
+			} catch (IOException e) {
+				System.out.println("Could not shudown a Proxy");
+				e.printStackTrace();
+			}
 		}
 		System.out.println("Killed all Proxies");
 		LogManager.shutdown();
