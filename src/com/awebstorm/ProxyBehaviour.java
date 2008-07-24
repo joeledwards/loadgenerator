@@ -20,9 +20,7 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGet1() {
 		Proxy testProxy = new Proxy(10000,"www.customercentrix.com",80);
-		Thread myThread = new Thread(testProxy);
-		myThread.setDaemon(true);
-		myThread.start();
+		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
@@ -80,7 +78,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+		while (testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 			
 		}
 	}
@@ -90,9 +88,7 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGet2() {
 		Proxy testProxy = new Proxy(10001,"www.customercentrix.com",80);
-		Thread myThread = new Thread(testProxy);
-		myThread.setDaemon(true);
-		myThread.start();
+		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
@@ -153,7 +149,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+		while (testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 			
 		}
 	}
@@ -163,9 +159,7 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGet3() {
 		Proxy testProxy = new Proxy(10001,"www.customercentrix.com",80);
-		Thread myThread = new Thread(testProxy);
-		myThread.setDaemon(true);
-		myThread.start();
+		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
@@ -227,7 +221,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+		while (testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 			
 		}
 	}
@@ -237,13 +231,9 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGenAndUse10Proxies() {
 		Proxy[] proxyArray = new Proxy[10];
-		Thread[] threadArray = new Thread[10];
 		for (int i = 0; i < 10; i++) {
 			proxyArray[i] = new Proxy(10000+i,"www.customercentrix.com",80);
-			Thread myThread = new Thread(proxyArray[i]);
-			threadArray[i] = myThread;
-			myThread.setDaemon(true);
-			myThread.start();
+			proxyArray[i].init();
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
@@ -307,7 +297,7 @@ public class ProxyBehaviour extends UsingMatchers {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			while (threadArray[k].getState().compareTo(Thread.State.TERMINATED) != 0) {
+			while (proxyArray[k].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 				
 			}
 		}
@@ -318,13 +308,9 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGenAndUse10ProxiesWith2Requests() {
 		Proxy[] proxyArray = new Proxy[10];
-		Thread[] threadArray = new Thread[10];
 		for (int i = 0; i < 10; i++) {
 			proxyArray[i] = new Proxy(10000+i,"www.customercentrix.com",80);
-			Thread myThread = new Thread(proxyArray[i]);
-			threadArray[i] = myThread;
-			myThread.setDaemon(true);
-			myThread.start();
+			proxyArray[i].init();
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
@@ -388,7 +374,7 @@ public class ProxyBehaviour extends UsingMatchers {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			while (threadArray[k].getState().compareTo(Thread.State.TERMINATED) != 0) {
+			while (proxyArray[k].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 				
 			}
 		}

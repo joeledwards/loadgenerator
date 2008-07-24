@@ -25,7 +25,7 @@ public class HTMLRobotBehaviour {
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	private static int numberOfProxies = 5;
+	private static int numberOfProxies = 1;
 	private static int numberOfRobots = 1;
 	private Proxy[] loadGenProxyArray = new Proxy[numberOfProxies];
 	private int localPort;
@@ -74,6 +74,7 @@ public class HTMLRobotBehaviour {
 	public final void shouldGenARobotOnProxy() {
 
 		numberOfRobots = 1;
+		numberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
@@ -89,19 +90,13 @@ public class HTMLRobotBehaviour {
 			robots.add(newRobot);
 			newRobot.init();
 		}
+
 		Iterator<Robot> robotIterator = robots.iterator();
-		while (!robots.isEmpty()) {
-			while (robotIterator.hasNext()) {
-				Robot nextRobot = robotIterator.next();
-				if (nextRobot == null ) {
-					robots.remove(nextRobot);
-					break;
-				} else if (nextRobot.isRobotCompleted()) {
-					robots.remove(nextRobot);
-					break;
-				}
+		while (robotIterator.hasNext()) {
+			Robot nextRobot = robotIterator.next();
+			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
+				
 			}
-			robotIterator = robots.iterator();
 		}
 	}
 	
@@ -226,8 +221,6 @@ public class HTMLRobotBehaviour {
 	 */
 	public final void setUp() {
 		
-		System.out.println("Starting new test.");
-		
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
 		loadGeneratorProperties = 
 			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
@@ -260,16 +253,15 @@ public class HTMLRobotBehaviour {
 	 */
 	public final void tearDown() {
 		for (int i = 0; i < loadGenProxyArray.length; i++) {
-			System.out.println("Killing Proxy at: " + (localPort+i));
 			try {
 				loadGenProxyArray[i].shutdown();
 			} catch (IOException e) {
-				System.out.println("Could not shudown a Proxy");
-				e.printStackTrace();
+
+			}
+			while (loadGenProxyArray[i].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
+				
 			}
 		}
-		System.out.println("Killed all Proxies");
-		LogManager.shutdown();
 	}
 	
 	/**

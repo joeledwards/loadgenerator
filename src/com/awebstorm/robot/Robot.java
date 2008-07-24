@@ -24,7 +24,7 @@ public abstract class Robot implements Runnable {
 	protected long timeLastStepFinished = 0;
 	protected boolean stopExecuting = false;
 	protected boolean robotCompleted = false;
-	protected Thread t;
+	private Thread t;
 	protected Proxy currentProxy;
 	
 	/**
@@ -122,5 +122,8 @@ public abstract class Robot implements Runnable {
 	}
 	public boolean isRobotCompleted() {
 		return robotCompleted;
+	}
+	public Thread.State getThreadState() {
+		return t.getState();
 	}
 }

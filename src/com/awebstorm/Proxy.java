@@ -23,10 +23,8 @@ public class Proxy implements Runnable {
 	private long proxyTimeResponded;
 	private long proxyReceiveAmount;
 	private long proxySentAmount;
-	
 	private long proxyTimeEnded;
 	private long proxyTimeStarted;
-	
 	private ServerSocket server;
 	
 	/**
@@ -188,6 +186,9 @@ public class Proxy implements Runnable {
 	}
 	public long getProxyTimeStarted() {
 		return proxyTimeStarted;
+	}
+	public Thread.State getThreadState() {
+		return this.t.getState();
 	}
 }
 
