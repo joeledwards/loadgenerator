@@ -48,24 +48,20 @@ public class ProxyListener implements Runnable {
 					if (consoleLog.isDebugEnabled())
 						consoleLog.debug("Closing a ProxyListener: " + incoming.getPort());
 					if(incoming.getPort() == 80) {
-						System.out.println("in: " + numberRead);
 						_myProxy.setProxyTimeEnded(System.currentTimeMillis());
 						outgoing.shutdownOutput();
 						incoming.close();
 						outgoing.close();
 					} else {
-						System.out.println("out: " + numberRead);
 						incoming.shutdownInput();
 					}
 					break;
 				} else {
 					if (incoming.getPort() == 80) {
-						System.out.println("in: " + numberRead);
 						if ( _myProxy.getProxyTimeResponded() == 0 )
 							_myProxy.setProxyTimeResponded(System.currentTimeMillis());
 						_myProxy.addProxyReceiveAmount(numberRead);
 					} else {
-						System.out.println("out: " + numberRead);
 						_myProxy.addProxySentAmount(numberRead);
 						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
 					}
