@@ -44,26 +44,19 @@ public class ProxyListener implements Runnable {
 			FromClient = incoming.getInputStream();
 			while (true) {
 				numberRead = FromClient.read(buffer, 0, 50);
-				if (_myProxy.isShouldStopRunning()) {
-					if(!outgoing.isClosed())
-						outgoing.close();
-					if(!incoming.isClosed())
-						incoming.close();
-					break;
-				}
 				if (numberRead == -1){
-					
 					if (consoleLog.isDebugEnabled())
 						consoleLog.debug("Closing a ProxyListener: " + incoming.getPort());
 					if(incoming.getPort() == 80) {
 						System.out.println("in: " + numberRead);
 						_myProxy.setProxyTimeEnded(System.currentTimeMillis());
 						outgoing.shutdownOutput();
+						incoming.close();
+						outgoing.close();
 					} else {
 						System.out.println("out: " + numberRead);
 						incoming.shutdownInput();
 					}
-					
 					break;
 				} else {
 					if (incoming.getPort() == 80) {

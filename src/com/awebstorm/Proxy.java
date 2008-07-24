@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import com.awebstorm.ProxyListener;
@@ -20,14 +22,15 @@ public class Proxy implements Runnable {
 	private int remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Thread t;
-	private boolean shouldStopRunning = false;
 	private long proxyTimeResponded;
 	private long proxyReceiveAmount;
 	private long proxySentAmount;
 	
 	private long proxyTimeEnded;
 	private long proxyTimeStarted;
-
+	
+	private ServerSocket server;
+	
 	/**
 	 * Initialize a new Proxy in its own Daemon thread.
 	 */
@@ -56,7 +59,6 @@ public class Proxy implements Runnable {
 
     	boolean error = false;
     	Socket incoming = null, outgoing = null;
-    	ServerSocket Server = null;
 
     	// Check for valid local and remote port, hostname not null
     	if ( consoleLog.isDebugEnabled())
@@ -78,9 +80,7 @@ public class Proxy implements Runnable {
 
     	//Test and create a listening socket at Proxy
     	try{
-    		Server = new ServerSocket();
-    		Server.setReuseAddress(true);
-    		Server.bind(new InetSocketAddress(localport));
+    		server = new ServerSocket(localport);
     	}
     	catch(IOException e) {
     		consoleLog.fatal("Could not create the proxy on port: " + localport, e);
@@ -89,29 +89,30 @@ public class Proxy implements Runnable {
 
     	//Loop to listen for incoming connection, and accept if there is one
     	while (true) {
-    		if (shouldStopRunning) {
-    			try {
-					Server.close();
-				} catch (IOException e) {
-					consoleLog.fatal("Could not close connection on: " + localport, e);
-				}
-    			break;
-    		}
     		try {
-    			if (outgoing != null)
-    				outgoing.setReuseAddress(true);
-    			if (incoming != null)
-    				incoming.setReuseAddress(true);
-    			incoming = Server.accept();
+    			try {
+    				incoming = server.accept();
+    			} catch (SocketException e) {
+    		    	if(consoleLog.isDebugEnabled())
+    		    		consoleLog.debug("Closing a Proxy at " + server.getLocalPort());
+    		    	break;
+    			}
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			outgoing = new Socket(remotehost, remoteport); 
     			Thread thread1 = new Thread (new ProxyListener(incoming, outgoing, this));
     			thread1.setDaemon(true);
+    			if (consoleLog.isDebugEnabled()) {
+    				consoleLog.debug("Spawning Proxy Listener: " + thread1.getName());
+    			}
     			thread1.start();
-
+    			
     			Thread thread2 = new Thread (new ProxyListener(outgoing, incoming, this));
     			thread2.setDaemon(true);
+    			if (consoleLog.isDebugEnabled()) {
+    				consoleLog.debug("Spawning Proxy Listener: " + thread2.getName());
+    			}
     			thread2.start();
+    			incoming = null;
     		} catch (UnknownHostException e) {
     			consoleLog.fatal("Error: Unknown Host " + remotehost, e);
     			System.exit(-1);
@@ -120,16 +121,31 @@ public class Proxy implements Runnable {
     			System.exit(-2);
     		}
     	}
-    	if(consoleLog.isDebugEnabled())
-    		consoleLog.debug("Closing a Proxy.");
+/*    	if(consoleLog.isDebugEnabled())
+    		consoleLog.debug("Closing a Proxy at " + Server.getLocalPort());
+    	try {
+			Server.close();
+		} catch (IOException e) {
+			consoleLog.error("Could not close the Server Socket on the Proxy.",e);
+		}*/
     }
     
+    /**
+     * Reset the Timers and byte counters.
+     */
     public void resetProxyCounters() {
     	this.proxyTimeResponded = 0;
     	this.proxyReceiveAmount = 0;
     	this.proxySentAmount = 0;
     	this.proxyTimeEnded = 0;
     	this.proxyTimeStarted = 0;
+    }
+    
+    /**
+     * Shutdown the proxy.
+     */
+    public void shutdown() throws IOException {
+    	server.close();
     }
     
     /** Getters and Setters */
@@ -144,9 +160,6 @@ public class Proxy implements Runnable {
 	}
 	public void setRemoteport(int remoteport) {
 		this.remoteport = remoteport;
-	}
-	public void setShouldStopRunning(boolean shouldStopRunning) {
-		this.shouldStopRunning = shouldStopRunning;
 	}
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
@@ -177,10 +190,6 @@ public class Proxy implements Runnable {
 	}
 	public long getProxyTimeStarted() {
 		return proxyTimeStarted;
-	}
-
-	public boolean isShouldStopRunning() {
-		return shouldStopRunning;
 	}
 }
 
