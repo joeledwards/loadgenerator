@@ -80,6 +80,9 @@ public class ProxyBehaviour extends UsingMatchers {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+			
+		}
 	}
 	
 	/**
@@ -149,6 +152,9 @@ public class ProxyBehaviour extends UsingMatchers {
 			testProxy.shutdown();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+			
 		}
 	}
 	
@@ -221,6 +227,9 @@ public class ProxyBehaviour extends UsingMatchers {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		while (myThread.getState().compareTo(Thread.State.TERMINATED) != 0) {
+			
+		}
 	}
 	
 	/**
@@ -228,9 +237,11 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGenAndUse10Proxies() {
 		Proxy[] proxyArray = new Proxy[10];
+		Thread[] threadArray = new Thread[10];
 		for (int i = 0; i < 10; i++) {
 			proxyArray[i] = new Proxy(10000+i,"www.customercentrix.com",80);
 			Thread myThread = new Thread(proxyArray[i]);
+			threadArray[i] = myThread;
 			myThread.setDaemon(true);
 			myThread.start();
 		}
@@ -296,6 +307,9 @@ public class ProxyBehaviour extends UsingMatchers {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			while (threadArray[k].getState().compareTo(Thread.State.TERMINATED) != 0) {
+				
+			}
 		}
 	}
 	
@@ -304,9 +318,11 @@ public class ProxyBehaviour extends UsingMatchers {
 	 */
 	public void shouldGenAndUse10ProxiesWith2Requests() {
 		Proxy[] proxyArray = new Proxy[10];
+		Thread[] threadArray = new Thread[10];
 		for (int i = 0; i < 10; i++) {
 			proxyArray[i] = new Proxy(10000+i,"www.customercentrix.com",80);
 			Thread myThread = new Thread(proxyArray[i]);
+			threadArray[i] = myThread;
 			myThread.setDaemon(true);
 			myThread.start();
 		}
@@ -371,6 +387,9 @@ public class ProxyBehaviour extends UsingMatchers {
 				proxyArray[k].shutdown();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+			while (threadArray[k].getState().compareTo(Thread.State.TERMINATED) != 0) {
+				
 			}
 		}
 	}
