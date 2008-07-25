@@ -96,17 +96,18 @@ public class Proxy implements Runnable {
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
     			targetSocket = new Socket(_remotehost, remoteport);
     			Thread thread1 = null;
-    			thread1 = new Thread (new ProxyPipeIn(localSocket, targetSocket, this));
+    			thread1 = new Thread (new ProxyPipeOut(localSocket, targetSocket, this));
     			thread1.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
-    				consoleLog.debug("Spawning ProxyPipeIn: " + thread1.getName());
+    				consoleLog.debug("Spawning ProxyPipeOut: " + thread1.getName());
     			}
     			thread1.start();
+    			
     			Thread thread2 = null;
-    			thread2 = new Thread (new ProxyPipeOut(targetSocket, localSocket, this));
+    			thread2 = new Thread (new ProxyPipeIn(targetSocket, localSocket, this));
     			thread2.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
-    				consoleLog.debug("Spawning ProxyPipeOut: " + thread2.getName());
+    				consoleLog.debug("Spawning ProxyPipeIn: " + thread2.getName());
     			}
     			thread2.start();
     		} catch (UnknownHostException e) {

@@ -21,19 +21,16 @@ public class ProxyBehaviour extends UsingMatchers {
 	public void shouldGet1() {
 		Proxy testProxy = new Proxy(10000,"www.customercentrix.com",80);
 		testProxy.init();
-		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
+		String line1 = "GET http://www.customercentrix.com/themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
-		String line4 = "Accept-Language: en-us\r\n";
-		String line5 = "UA-CPU: x86\r\n";
-		String line6 = "Accept-Encoding: gzip, deflate\r\n";
+		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
 		OutputStream toTarget = null;
 		Socket outgoing= null;
 		try {
-			outgoing = new Socket("127.0.0.1",10000);
+			outgoing = new Socket("localhost",10000);
 			if (outgoing != null)
 				outgoing.setReuseAddress(true);
 
@@ -41,9 +38,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			toTarget.write(line1.getBytes());
 			toTarget.write(line2.getBytes());
 			toTarget.write(line3.getBytes());
-			toTarget.write(line4.getBytes());
-			toTarget.write(line5.getBytes());
-			toTarget.write(line6.getBytes());
 			toTarget.write(line7.getBytes());
 			toTarget.write(line8.getBytes());
 			outgoing.shutdownOutput();
@@ -57,12 +51,16 @@ public class ProxyBehaviour extends UsingMatchers {
 				temp = bufferedFromTarget.read();
 				counter++;
 			}
+			if (counter-1 != testProxy.getProxyReceiveAmount()) {
+				System.out.println("counter: " + (counter-1) + " " 
+						+ "ReceiveAmount: " + testProxy.getProxyReceiveAmount() + " " 
+						+ "Sent: " + testProxy.getProxySentAmount());
+			}
 			ensureThat(counter-1 == testProxy.getProxyReceiveAmount());
 			ensureThat(counter-1 == 692);
-			ensureThat(testProxy.getProxySentAmount() == 487);
+			ensureThat(testProxy.getProxySentAmount() == 447);
 			ensureThat(testProxy.getProxySentAmount() == 
-				(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
-				 + line7.length() + line8.length()));
+				(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
 			outgoing.shutdownInput();
 			fromTarget.close();
 			toTarget.close();

@@ -36,29 +36,41 @@ public class ProxyPipeOut implements Runnable {
 	public void run(){
 		byte[] buffer = new byte[60];
 		int numberRead = 0;
-		OutputStream ToLocal;
-		InputStream FromServer;
+		OutputStream toServer;
+		InputStream fromLocal;
 
 		try{
-			ToLocal = incoming.getOutputStream();      
-			FromServer = outgoing.getInputStream();
-			while (true) {
-				numberRead = FromServer.read(buffer, 0, 50);
+			toServer = incoming.getOutputStream();      
+			fromLocal = outgoing.getInputStream();
+			boolean notEnd=true;
+			while (notEnd) {
+				numberRead = fromLocal.read(buffer, 0, 50);
 				if (numberRead == -1){
-						_myProxy.setProxyTimeEnded(System.currentTimeMillis());
-						if (consoleLog.isDebugEnabled())
-							consoleLog.debug("Closing a ProxyPipeOut: " + incoming.getLocalPort() + " " + outgoing.getPort());
-						incoming.shutdownOutput();
-						outgoing.close();
-						//incoming.close();
-					break;
+					_myProxy.setProxyTimeEnded(System.currentTimeMillis());
+					if (consoleLog.isDebugEnabled())
+						consoleLog.debug("Closing a ProxyPipeOut: " 
+								+ outgoing.getLocalPort() + " "
+								+ outgoing.getPort() + " " 
+								+ incoming.getLocalPort() + " " 
+								+ incoming.getPort());
+					//incoming.close();
+					notEnd=false;
 				} else {
+					if (consoleLog.isDebugEnabled()) {
+						consoleLog.debug("out:" + numberRead);
+						StringBuffer debugBuffer = new StringBuffer();
+						for(int i = 0; i < numberRead; i++) {
+							debugBuffer.append((char)buffer[i]);
+						}
+						consoleLog.debug(debugBuffer);
+					}
+					
 						if ( _myProxy.getProxyTimeResponded() == 0 )
 							_myProxy.setProxyTimeResponded(System.currentTimeMillis());
-						_myProxy.addProxyReceiveAmount(numberRead);
+						_myProxy.addProxySentAmount(numberRead);
 				}
-				if(!outgoing.isClosed()) {
-					ToLocal.write(buffer, 0, numberRead);
+				if(notEnd) {
+					toServer.write(buffer, 0, numberRead);
 				}
 			}
 		} catch(IOException e) {
