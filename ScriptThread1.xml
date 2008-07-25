@@ -15,6 +15,6 @@
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
 		<remoteport>80</remoteport></Properties>
 	<STEPS>
-		<WAIT length="1000"></WAIT>
+		<WAIT length="0"></WAIT>
 		<INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE></STEPS>
 </MyScript>

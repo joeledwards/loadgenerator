@@ -2,6 +2,7 @@ package com.awebstorm;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -23,7 +24,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		testProxy.init();
 		String line1 = "GET http://www.customercentrix.com/themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
+		String line3 = "Accept: image/jpg\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
@@ -40,17 +41,19 @@ public class ProxyBehaviour extends UsingMatchers {
 			toTarget.write(line3.getBytes());
 			toTarget.write(line7.getBytes());
 			toTarget.write(line8.getBytes());
-			outgoing.shutdownOutput();
-			InputStreamReader fromTarget = new InputStreamReader(outgoing.getInputStream());
-			BufferedReader bufferedFromTarget = new BufferedReader(fromTarget);
+			InputStream fromTarget = outgoing.getInputStream();
 			int temp = 0;
 			int counter = 0;
 			while(true) {
 				if(temp == -1)
 					break;
-				temp = bufferedFromTarget.read();
+				temp = fromTarget.read();
+				System.out.print((char)temp);
 				counter++;
+				if(counter-1 == 690)
+					break;
 			}
+			outgoing.close();
 			if (counter-1 != testProxy.getProxyReceiveAmount()) {
 				System.out.println("counter: " + (counter-1) + " " 
 						+ "ReceiveAmount: " + testProxy.getProxyReceiveAmount() + " " 
@@ -58,13 +61,14 @@ public class ProxyBehaviour extends UsingMatchers {
 			}
 			ensureThat(counter-1 == testProxy.getProxyReceiveAmount());
 			ensureThat(counter-1 == 692);
-			ensureThat(testProxy.getProxySentAmount() == 447);
+			if (testProxy.getProxySentAmount() != 258) {
+				System.out.println("counter: " + (counter-1) + " " 
+						+ "ReceiveAmount: " + testProxy.getProxyReceiveAmount() + " " 
+						+ "Sent: " + testProxy.getProxySentAmount());
+			}
+			ensureThat(testProxy.getProxySentAmount() == 258);
 			ensureThat(testProxy.getProxySentAmount() == 
 				(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
-			outgoing.shutdownInput();
-			fromTarget.close();
-			toTarget.close();
-			outgoing.close();
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -89,10 +93,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
-		String line4 = "Accept-Language: en-us\r\n";
-		String line5 = "UA-CPU: x86\r\n";
-		String line6 = "Accept-Encoding: gzip, deflate\r\n";
+		String line3 = "Accept: image/jpg\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 		
@@ -108,12 +109,8 @@ public class ProxyBehaviour extends UsingMatchers {
 			toTarget.write(line1.getBytes());
 			toTarget.write(line2.getBytes());
 			toTarget.write(line3.getBytes());
-			toTarget.write(line4.getBytes());
-			toTarget.write(line5.getBytes());
-			toTarget.write(line6.getBytes());
 			toTarget.write(line7.getBytes());
 			toTarget.write(line8.getBytes());
-			outgoing.shutdownOutput();
 			InputStreamReader fromTarget = new InputStreamReader(outgoing.getInputStream());
 			BufferedReader bufferedFromTarget = new BufferedReader(fromTarget);
 			int temp = 0;
@@ -126,10 +123,9 @@ public class ProxyBehaviour extends UsingMatchers {
 			}
 			ensureThat(counter-1 == testProxy.getProxyReceiveAmount());
 			ensureThat(counter-1 == 692);
-			ensureThat(testProxy.getProxySentAmount() == 487);
+			ensureThat(testProxy.getProxySentAmount() == 228);
 			ensureThat(testProxy.getProxySentAmount() == 
-				(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
-				 + line7.length() + line8.length()));
+				(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
 			outgoing.shutdownInput();
 			fromTarget.close();
 			toTarget.close();
@@ -160,10 +156,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
-		String line4 = "Accept-Language: en-us\r\n";
-		String line5 = "UA-CPU: x86\r\n";
-		String line6 = "Accept-Encoding: gzip, deflate\r\n";
+		String line3 = "Accept: image/jpg\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
@@ -179,12 +172,8 @@ public class ProxyBehaviour extends UsingMatchers {
 				toTarget.write(line1.getBytes());
 				toTarget.write(line2.getBytes());
 				toTarget.write(line3.getBytes());
-				toTarget.write(line4.getBytes());
-				toTarget.write(line5.getBytes());
-				toTarget.write(line6.getBytes());
 				toTarget.write(line7.getBytes());
 				toTarget.write(line8.getBytes());
-				outgoing.shutdownOutput();
 				InputStreamReader fromTarget = new InputStreamReader(outgoing.getInputStream());
 				BufferedReader bufferedFromTarget = new BufferedReader(fromTarget);
 				int temp = 0;
@@ -197,10 +186,9 @@ public class ProxyBehaviour extends UsingMatchers {
 				}
 				ensureThat(counter-1 == testProxy.getProxyReceiveAmount());
 				ensureThat(counter-1 == 692);
-				ensureThat(testProxy.getProxySentAmount() == 487);
+				ensureThat(testProxy.getProxySentAmount() == 228);
 				ensureThat(testProxy.getProxySentAmount() == 
-					(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
-							+ line7.length() + line8.length()));
+					(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
 				outgoing.shutdownInput();
 				fromTarget.close();
 				toTarget.close();
@@ -235,10 +223,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
-		String line4 = "Accept-Language: en-us\r\n";
-		String line5 = "UA-CPU: x86\r\n";
-		String line6 = "Accept-Encoding: gzip, deflate\r\n";
+		String line3 = "Accept: image/jpg\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
 		String line8 = "Connection: Keep-Alive\r\n\r\n";
 
@@ -255,12 +240,8 @@ public class ProxyBehaviour extends UsingMatchers {
 					toTarget.write(line1.getBytes());
 					toTarget.write(line2.getBytes());
 					toTarget.write(line3.getBytes());
-					toTarget.write(line4.getBytes());
-					toTarget.write(line5.getBytes());
-					toTarget.write(line6.getBytes());
 					toTarget.write(line7.getBytes());
 					toTarget.write(line8.getBytes());
-					outgoing.shutdownOutput();
 					InputStreamReader fromTarget = new InputStreamReader(outgoing.getInputStream());
 					BufferedReader bufferedFromTarget = new BufferedReader(fromTarget);
 					int temp = 0;
@@ -273,10 +254,9 @@ public class ProxyBehaviour extends UsingMatchers {
 					}
 					ensureThat(counter-1 == proxyArray[k].getProxyReceiveAmount());
 					ensureThat(counter-1 == 692);
-					ensureThat(proxyArray[k].getProxySentAmount() == 487);
+					ensureThat(proxyArray[k].getProxySentAmount() == 228);
 					ensureThat(proxyArray[k].getProxySentAmount() == 
-						(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
-								+ line7.length() + line8.length()));
+						(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
 					outgoing.shutdownInput();
 					fromTarget.close();
 					toTarget.close();
@@ -312,12 +292,9 @@ public class ProxyBehaviour extends UsingMatchers {
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
-		String line3 = "Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-ms-application, application/vnd.ms-xpsdocument, application/xaml+xml, application/x-ms-xbap, application/x-shockwave-flash, */*\r\n";
-		String line4 = "Accept-Language: en-us\r\n";
-		String line5 = "UA-CPU: x86\r\n";
-		String line6 = "Accept-Encoding: gzip, deflate\r\n";
+		String line3 = "Accept: image/jpg\r\n";
 		String line7 = "User-Agent: Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)\r\n";
-		String line8 = "Connection: Keep-Alive\r\n\r\n";
+		String line8 = "Proxy-Connection: Keep-Alive\r\n\r\n";
 
 		for (int k = 0; k < 10; k++) {
 			for (int i = 0; i < 2; i ++) {
@@ -329,9 +306,6 @@ public class ProxyBehaviour extends UsingMatchers {
 					toTarget.write(line1.getBytes());
 					toTarget.write(line2.getBytes());
 					toTarget.write(line3.getBytes());
-					toTarget.write(line4.getBytes());
-					toTarget.write(line5.getBytes());
-					toTarget.write(line6.getBytes());
 					toTarget.write(line7.getBytes());
 					toTarget.write(line8.getBytes());
 
@@ -344,14 +318,15 @@ public class ProxyBehaviour extends UsingMatchers {
 							break;
 						temp = bufferedFromTarget.read();
 						counter++;
+						if(counter-1 == 692)
+							outgoing.close();
 					}
+					
 					ensureThat(counter-1 == proxyArray[k].getProxyReceiveAmount());
 					ensureThat(counter-1 == 692);
-					ensureThat(proxyArray[k].getProxySentAmount() == 487);
+					ensureThat(proxyArray[k].getProxySentAmount() == 228);
 					ensureThat(proxyArray[k].getProxySentAmount() == 
-						(line1.length() + line2.length() + line3.length() + line4.length() + line5.length() + line6.length()
-								+ line7.length() + line8.length()));
-					outgoing.close();
+						(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
 					proxyArray[k].resetProxyCounters();
 
 				} catch (UnknownHostException e) {

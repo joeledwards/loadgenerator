@@ -34,7 +34,6 @@ public class ProxyPipeOut implements Runnable {
 	 * Run this ProxyPipeIn to accumulate necessary information in its Proxy
 	 */
 	public void run(){
-		byte[] buffer = new byte[60];
 		int numberRead = 0;
 		OutputStream toServer;
 		InputStream fromLocal;
@@ -44,34 +43,32 @@ public class ProxyPipeOut implements Runnable {
 			fromLocal = outgoing.getInputStream();
 			boolean notEnd=true;
 			while (notEnd) {
-				numberRead = fromLocal.read(buffer, 0, 50);
-				if (numberRead == -1){
+				numberRead = fromLocal.read();
+				if (numberRead == -1) {
 					_myProxy.setProxyTimeEnded(System.currentTimeMillis());
-					if (consoleLog.isDebugEnabled())
+					if (consoleLog.isDebugEnabled()) {
 						consoleLog.debug("Closing a ProxyPipeOut: " 
 								+ outgoing.getLocalPort() + " "
 								+ outgoing.getPort() + " " 
 								+ incoming.getLocalPort() + " " 
 								+ incoming.getPort());
-					//incoming.close();
-					notEnd=false;
-				} else {
-					if (consoleLog.isDebugEnabled()) {
-						consoleLog.debug("out:" + numberRead);
-						StringBuffer debugBuffer = new StringBuffer();
-						for(int i = 0; i < numberRead; i++) {
-							debugBuffer.append((char)buffer[i]);
-						}
-						consoleLog.debug(debugBuffer);
+						consoleLog.debug(incoming.isClosed());
+						consoleLog.debug(incoming.isInputShutdown());
+						consoleLog.debug(incoming.isOutputShutdown());
+						consoleLog.debug(outgoing.isClosed());
+						consoleLog.debug(outgoing.isInputShutdown());
+						consoleLog.debug(outgoing.isOutputShutdown());
 					}
-					
-						if ( _myProxy.getProxyTimeResponded() == 0 )
-							_myProxy.setProxyTimeResponded(System.currentTimeMillis());
-						_myProxy.addProxySentAmount(numberRead);
+
+					notEnd = false;
+				} else {
+					if ( _myProxy.getProxyTimeResponded() == 0 )
+						_myProxy.setProxyTimeResponded(System.currentTimeMillis());
+					_myProxy.incrementProxySentAmount();
 				}
-				if(notEnd) {
-					toServer.write(buffer, 0, numberRead);
-				}
+				//if(notEnd) {
+					toServer.write(numberRead);
+				//}
 			}
 		} catch(IOException e) {
 			consoleLog.error("Could not accept a connection", e);

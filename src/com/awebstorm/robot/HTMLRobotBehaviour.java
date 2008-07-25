@@ -72,7 +72,7 @@ public class HTMLRobotBehaviour {
 	 */
 	public final void shouldGenARobotOnProxy() {
 
-		numberOfRobots = 1;
+		numberOfRobots = 2;
 		maxNumberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
@@ -83,7 +83,7 @@ public class HTMLRobotBehaviour {
 		}
 		try {
 			while (newStreams.size() < numberOfRobots) {
-				newStreams.add(new FileInputStream("ScriptThread1.xml"));
+				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

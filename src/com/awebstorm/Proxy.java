@@ -86,11 +86,21 @@ public class Proxy implements Runnable {
     	//Loop to listen for incoming connection, and accept if there is one
     	while (true) {
     		try {
+    			if (localSocket != null)
+    			System.out.println(localSocket.isClosed());
+    			if (targetSocket != null)
+    			System.out.println(targetSocket.isClosed());
+    			//localSocket = null;
+    			//targetSocket = null;
     			try {
     				localSocket = server.accept();
     			} catch (SocketException e) {
     		    	if(consoleLog.isDebugEnabled())
     		    		consoleLog.debug("Closing a Proxy at " + server.getLocalPort());
+        			if (localSocket != null)
+            			System.out.println(localSocket.isClosed());
+            			if (targetSocket != null)
+            			System.out.println(targetSocket.isClosed());
     		    	break;
     			}
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
@@ -161,11 +171,11 @@ public class Proxy implements Runnable {
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
 	}
-	public void addProxyReceiveAmount(int numberRead) {
-		this.proxyReceiveAmount+=numberRead;
+	public void incrementProxyReceiveAmount() {
+		this.proxyReceiveAmount++;
 	}
-	public void addProxySentAmount(int numberRead) {
-		this.proxySentAmount+=numberRead;
+	public void incrementProxySentAmount() {
+		this.proxySentAmount++;
 	}
 	public void setProxyTimeEnded(long currentTimeMillis) {
 		this.proxyTimeEnded=currentTimeMillis;

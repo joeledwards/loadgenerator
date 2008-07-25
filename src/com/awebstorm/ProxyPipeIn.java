@@ -34,7 +34,6 @@ public class ProxyPipeIn implements Runnable {
 	 * Run this ProxyPipeIn to accumulate necessary information in its Proxy
 	 */
 	public void run(){
-		byte[] buffer = new byte[60];
 		int numberRead = 0;
 		OutputStream toLocal;
 		InputStream fromServer;
@@ -44,35 +43,31 @@ public class ProxyPipeIn implements Runnable {
 			fromServer = incoming.getInputStream();
 			boolean notEnd=true;
 			while (notEnd) {
-				numberRead = fromServer.read(buffer, 0, 50);
+				numberRead = fromServer.read();
 				if (numberRead == -1){
-					if (consoleLog.isDebugEnabled())
+					if (consoleLog.isDebugEnabled()) {
 						consoleLog.debug("Closing a ProxyPipeIn: " 
 								+ incoming.getPort() + " " 
 								+ incoming.getLocalPort() + " " 
 								+ outgoing.getPort() + " " 
 								+ outgoing.getLocalPort());
-						outgoing.shutdownOutput();
-						incoming.close();
-						if(!outgoing.isClosed())
-							outgoing.close();
+						//outgoing.shutdownOutput();
+						//incoming.close();
+						consoleLog.debug(incoming.isClosed());
+						consoleLog.debug(incoming.isInputShutdown());
+						consoleLog.debug(incoming.isOutputShutdown());
+						consoleLog.debug(outgoing.isClosed());
+						consoleLog.debug(outgoing.isInputShutdown());
+						consoleLog.debug(outgoing.isOutputShutdown());
+					}
 					notEnd=false;
 				} else {
-					if(consoleLog.isDebugEnabled()) {
-						consoleLog.debug("in:" + numberRead);
-						StringBuffer debugBuffer = new StringBuffer();
-						for(int i = 0; i < numberRead; i++) {
-							if((char)buffer[i] != '\n')
-								debugBuffer.append((char)buffer[i]);
-						}
-						consoleLog.debug(debugBuffer);
-					}
-						_myProxy.addProxyReceiveAmount(numberRead);
-						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
+					_myProxy.incrementProxyReceiveAmount();
+					_myProxy.setProxyTimeStarted(System.currentTimeMillis());
 				}
-				if(notEnd) {
-					toLocal.write(buffer, 0, numberRead);
-				}
+				//if(notEnd) {
+					toLocal.write(numberRead);
+				//}
 
 			}
 		} catch(IOException e) {

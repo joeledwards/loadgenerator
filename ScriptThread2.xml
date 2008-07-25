@@ -6,7 +6,7 @@
 
 	<Properties>
 		<cacheSize>50</cacheSize>
-		<domain>http://www.customercentrix.com</domain>
+		<domain>www.customercentrix.com</domain>
 		<jobID>0002</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
@@ -18,7 +18,7 @@
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-	</Properties>
+		<remoteport>80</remoteport></Properties>
 
 	<STEPS>
 		<WAIT length="1000"></WAIT>
