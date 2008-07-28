@@ -156,9 +156,15 @@ public class Proxy implements Runnable {
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
 	}
+	/**
+	 * Increase the proxyReceiveAmount by 1.
+	 */
 	public synchronized void incrementProxyReceiveAmount() {
 		this.proxyReceiveAmount++;
 	}
+	/**
+	 * Increase the proxySentAmount by 1.
+	 */
 	public synchronized void incrementProxySentAmount() {
 		this.proxySentAmount++;
 	}
@@ -183,12 +189,24 @@ public class Proxy implements Runnable {
 	public long getProxyTimeStarted() {
 		return proxyTimeStarted;
 	}
+	/**
+	 * Returns the Thread.getState() of this Proxy's Thread.
+	 * @return This Proxy's Thread's State
+	 */
 	public Thread.State getThreadState() {
 		return this.t.getState();
 	}
+	/**
+	 * Retrieves the local port on which the ServerSocket is listening.
+	 * @return ServerSocket on which the proxy is listening
+	 */
 	public int getLocalport() {
 		return localport;
 	}
+	/**
+	 * Is the Proxy is ready to accept incoming connections.
+	 * @return True if the the Proxy ServerSocket is listening, else false
+	 */
 	public boolean isReadyToListen() {
 		return readyToListen;
 	}
