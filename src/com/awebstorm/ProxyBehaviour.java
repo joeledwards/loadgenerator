@@ -19,10 +19,12 @@ public class ProxyBehaviour extends UsingMatchers {
 	 * Retrieve 1 object on a new port
 	 */
 	public void shouldGet1() {
+		
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Beginning Test shouldGet1()");
 		}
-		Proxy testProxy = new Proxy("www.customercentrix.com",80);
+		Proxy testProxy = new Proxy("www.customercentrix.com", 80);
+
 		String line1 = "GET http://www.customercentrix.com/themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/jpg\r\n";
@@ -32,9 +34,6 @@ public class ProxyBehaviour extends UsingMatchers {
 		OutputStream toTarget = null;
 		Socket outgoing= null;
 		try {
-			while (!testProxy.isReadyToListen()) {
-				
-			}
 			outgoing = new Socket("localhost",testProxy.getLocalport());
 			if (outgoing != null)
 				outgoing.setReuseAddress(true);
@@ -115,9 +114,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			OutputStream toTarget = null;
 			Socket outgoing= null;
 			try {
-				while (!testProxy.isReadyToListen()) {
-					
-				}
 				outgoing = new Socket("127.0.0.1",testProxy.getLocalport());
 				if (outgoing != null)
 					outgoing.setReuseAddress(true);
@@ -190,9 +186,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			OutputStream toTarget = null;
 			Socket outgoing= null;
 			try {
-				while (!testProxy.isReadyToListen()) {
-					
-				}
 				outgoing = new Socket("localhost",testProxy.getLocalport());
 				if (outgoing != null)
 					outgoing.setReuseAddress(true);
@@ -265,9 +258,6 @@ public class ProxyBehaviour extends UsingMatchers {
 				OutputStream toTarget = null;
 				Socket outgoing= null;
 				try {
-					while (!proxyArray[k].isReadyToListen()) {
-						
-					}
 					outgoing = new Socket("127.0.0.1",proxyArray[k].getLocalport());
 					if (outgoing != null)
 						outgoing.setReuseAddress(true);

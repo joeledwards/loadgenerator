@@ -51,14 +51,6 @@ public class ProxyPipeIn implements Runnable {
 								+ incoming.getLocalPort() + " " 
 								+ outgoing.getPort() + " " 
 								+ outgoing.getLocalPort());
-						//outgoing.shutdownOutput();
-						//incoming.close();
-						consoleLog.debug(incoming.isClosed());
-						consoleLog.debug(incoming.isInputShutdown());
-						consoleLog.debug(incoming.isOutputShutdown());
-						consoleLog.debug(outgoing.isClosed());
-						consoleLog.debug(outgoing.isInputShutdown());
-						consoleLog.debug(outgoing.isOutputShutdown());
 					}
 					notEnd=false;
 				} else {

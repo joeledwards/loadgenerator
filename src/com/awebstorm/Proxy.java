@@ -26,17 +26,35 @@ public class Proxy implements Runnable {
 	private long proxyTimeEnded;
 	private long proxyTimeStarted;
 	private ServerSocket server;
-	private boolean readyToListen = false;
 	
 	/**
 	 * Proxy Constructor.
-	 * @param localport Local port to talk to the Robot
 	 * @param _remotehost Remote host to make requests on
 	 * @param remoteport Remote Port to talk on
 	 */
     public Proxy (String remotehost, int remoteport) {
 		this._remotehost=remotehost;
 		this.remoteport=remoteport;
+    	// Check for valid remote port and hostname not null
+    	if ( consoleLog.isDebugEnabled())
+    		consoleLog.debug("Opening a Proxy at " + _remotehost + " Port " + remoteport);
+    	if(remoteport <=0) {
+    		consoleLog.error("Error: Invalid Remote Port Specification " + "\n");
+    		return;
+    	}
+    	if(_remotehost == null) {
+    		consoleLog.error("Error: Invalid Remote Host Specification " + "\n");
+    		return;
+    	}
+    	//Test and create a listening socket at Proxy
+    	try{
+    		server = new ServerSocket(0);
+    		this.localport = server.getLocalPort();
+    	}
+    	catch(IOException e) {
+    		consoleLog.error("Could not create the proxy on random port: ", e);
+    		return;
+    	}
 		this.init();
     }
     
@@ -54,38 +72,17 @@ public class Proxy implements Runnable {
      */
     public void run () {
 
-    	boolean error = false;
+    	//Could not create a socket port, end execution now
+    	if (server == null || !server.isBound() || server.isClosed()) {
+    		return;
+    	}
+
     	Socket localSocket = null, targetSocket = null;
-
-    	// Check for valid local and remote port, hostname not null
-    	if ( consoleLog.isDebugEnabled())
-    		consoleLog.debug("Opening a Proxy at " + _remotehost + " Port " + remoteport);
-    	if(remoteport <=0) {
-    		consoleLog.fatal("Error: Invalid Remote Port Specification " + "\n");
-    		error = true;
-    	}
-    	if(_remotehost == null) {
-    		consoleLog.fatal("Error: Invalid Remote Host Specification " + "\n");
-    		error = true;
-    	}
-    	if(error)
-    		System.exit(-1);
-
-    	//Test and create a listening socket at Proxy
-    	try{
-    		server = new ServerSocket(0);
-    		this.localport = server.getLocalPort();
-    	}
-    	catch(IOException e) {
-    		consoleLog.fatal("Could not create the proxy on random port: ", e);
-    		System.exit(-2);
-    	}
 
     	//Loop to listen for incoming connection, and accept if there is one
     	while (true) {
     		try {
     			try {
-    				readyToListen = true;
     				localSocket = server.accept();
     			} catch (SocketException e) {
     		    	if(consoleLog.isDebugEnabled())
@@ -141,7 +138,6 @@ public class Proxy implements Runnable {
     	server.close();
     }
     
-    /** Getters and Setters */
 	public String getRemotehost() {
 		return _remotehost;
 	}
@@ -203,13 +199,6 @@ public class Proxy implements Runnable {
 	 */
 	public int getLocalport() {
 		return localport;
-	}
-	/**
-	 * Is the Proxy is ready to accept incoming connections.
-	 * @return True if the the Proxy ServerSocket is listening, else false
-	 */
-	public boolean isReadyToListen() {
-		return readyToListen;
 	}
 }
 

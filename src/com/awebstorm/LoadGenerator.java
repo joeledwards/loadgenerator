@@ -28,7 +28,7 @@ public class LoadGenerator {
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private static URL scheduler;
 	private static int numberOfRobots = 1;
-	private static int numberOfProxies = 100;
+	private static int numberOfProxies = 1;
 	private static PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator.properties";
 	private static boolean stop = false;

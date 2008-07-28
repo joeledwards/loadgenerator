@@ -6,7 +6,7 @@
 
 	<Properties>
 		<cacheSize>50</cacheSize>
-		<domain>http://www.customercentrix.com</domain>
+		<domain>www.customercentrix.com</domain>
 		<jobID>0001</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>

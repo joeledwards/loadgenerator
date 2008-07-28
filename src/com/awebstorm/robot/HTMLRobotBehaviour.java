@@ -36,7 +36,6 @@ public class HTMLRobotBehaviour {
 	public final void shouldGenARobotForBadRequest() {
 		
 		numberOfRobots = 1;
-		maxNumberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		for (int i = 0; i < numberOfRobots; i++) {
@@ -48,10 +47,6 @@ public class HTMLRobotBehaviour {
 			e.printStackTrace();
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			//Proxy must be ready before the HTMLRobot is constructed.
-			while (!loadGenProxyArray[i].isReadyToListen()) {
-				
-			}
 			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
@@ -89,7 +84,6 @@ public class HTMLRobotBehaviour {
 	public final void shouldGenARobotOnProxy() {
 
 		numberOfRobots = 1;
-		maxNumberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
@@ -104,10 +98,6 @@ public class HTMLRobotBehaviour {
 			e.printStackTrace();
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			//Proxy must be ready before the HTMLRobot is constructed.
-			while (!loadGenProxyArray[i].isReadyToListen()) {
-				
-			}
 			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
@@ -144,14 +134,10 @@ public class HTMLRobotBehaviour {
 	public final void shouldGen5RobotsOnProxy() {
 
 		numberOfRobots = 5;
-		maxNumberOfProxies = 5;
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
 		for (int i = 0; i < numberOfRobots; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			while (!loadGenProxyArray[i].isReadyToListen()) {
-				
-			}
 		}
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
@@ -196,17 +182,13 @@ public class HTMLRobotBehaviour {
 	/**
 	 * Test 1 Threaded Robots on 1 Threaded proxies with multiple steps per Robot.
 	 */
-	public final void shouldGen5RobotsOn5ProxiesMultiStep() {
+	public final void shouldGen1RobotsOn1ProxyMultiStep() {
 
 		numberOfRobots = 1;
-		maxNumberOfProxies = 1;
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
 		for (int i = 0; i < maxNumberOfProxies; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			while (!loadGenProxyArray[i].isReadyToListen()) {
-				
-			}
 		}
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {

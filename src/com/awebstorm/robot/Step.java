@@ -108,6 +108,7 @@ public class Step implements Comparable<Step> {
 		replyTime = 0;
 		BodyByteAmount = 0; 
 		_currentBrowserState = browserState;
+		//HTMLRobot handles http protocols
 		_targetDomain = "http://" + _myRobotOwner.getTargetDomain();
 		if (!_myRobotOwner.getTargetDomain().equals(_myProxy.getRemotehost())) {
 			_myProxy.setRemotehost(_myRobotOwner.getTargetDomain());
@@ -352,9 +353,16 @@ public class Step implements Comparable<Step> {
 					if (!tempAttr.startsWith("http")) {
 						if (tempAttr.charAt(0) == '/') {
 							tempAttr = _targetDomain + tempAttr;
+						} else if (tempAttr.startsWith("https") || tempAttr.startsWith("ftp") ||
+								tempAttr.startsWith("file") || tempAttr.startsWith("jar")) {
+							consoleLog.info("Bad protocol encountered.");
 						} else {
 							tempAttr = _targetDomain + '/' + tempAttr;
 						}
+						//In case of domain seperate from the domain for the script
+					} else if (!tempAttr.startsWith(_targetDomain)) {
+						consoleLog.info("Bad domain encountered: " + tempAttr);
+						_currentBrowserState.addUrlToHistory(tempAttr);
 					}
 					if (_currentBrowserState.addUrlToHistory(tempAttr)) {
 						temporary = _currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
@@ -384,6 +392,9 @@ public class Step implements Comparable<Step> {
 								aResource = _targetDomain 
 								+ '/' + aResource;
 							}
+						} else if (!aResource.startsWith(_targetDomain)) {
+							consoleLog.info("Bad domain encountered: " + aResource);
+							_currentBrowserState.addUrlToHistory(aResource);
 						}
 						if (_currentBrowserState.addUrlToHistory(aResource)) {
 							temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
@@ -422,6 +433,9 @@ public class Step implements Comparable<Step> {
 								} else {
 									aResource = _targetDomain + '/' + aResource;
 								}
+							} else if (!aResource.startsWith(_targetDomain)) {
+								consoleLog.info("Bad domain encountered: " + aResource);
+								_currentBrowserState.addUrlToHistory(aResource);
 							}
 							if (_currentBrowserState.addUrlToHistory(aResource)) {
 								temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();

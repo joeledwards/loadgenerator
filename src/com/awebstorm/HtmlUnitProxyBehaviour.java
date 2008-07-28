@@ -26,6 +26,7 @@ public class HtmlUnitProxyBehaviour {
 		testClient.setPrintContentOnFailingStatusCode(false);
 		testClient.setThrowExceptionOnFailingStatusCode(false);
 		try {
+			@SuppressWarnings("unused")
 			Page newPage = testClient.getPage("http://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Wikiversity-logo.svg/30px-Wikiversity-logo.svg.png");
 		} catch (FailingHttpStatusCodeException e1) {
 			e1.printStackTrace();

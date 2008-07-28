@@ -52,12 +52,6 @@ public class ProxyPipeOut implements Runnable {
 								+ outgoing.getPort() + " " 
 								+ incoming.getLocalPort() + " " 
 								+ incoming.getPort());
-						consoleLog.debug(incoming.isClosed());
-						consoleLog.debug(incoming.isInputShutdown());
-						consoleLog.debug(incoming.isOutputShutdown());
-						consoleLog.debug(outgoing.isClosed());
-						consoleLog.debug(outgoing.isInputShutdown());
-						consoleLog.debug(outgoing.isOutputShutdown());
 					}
 					outgoing.close();
 					incoming.close();
