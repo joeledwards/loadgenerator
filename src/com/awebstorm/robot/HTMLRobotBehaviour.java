@@ -149,7 +149,7 @@ public class HTMLRobotBehaviour {
 		maxNumberOfProxies = 5;
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
-		for (int i = 0; i < maxNumberOfProxies; i++) {
+		for (int i = 0; i < numberOfRobots; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
 			loadGenProxyArray[i].init();
 			while (!loadGenProxyArray[i].isReadyToListen()) {

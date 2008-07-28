@@ -8,12 +8,12 @@ import java.util.LinkedList;
  * @author Cromano
  *
  */
-public final class StyleParsers {
+public final class StyleParser {
 	
 	/**
 	 * Hidden Constructor for Utility class.
 	 */
-	private StyleParsers() {  
+	private StyleParser() {  
 		
 	}
 	
@@ -91,23 +91,4 @@ public final class StyleParsers {
 		return styleSheet.toExternalForm().substring(0, styleSheet.toExternalForm().lastIndexOf('/') + 1);
 	}
 	
-	/**
-	 * Test the functionality of StyleParser.
-	 * @param args Some arguments
-	 */
-	public static void main(final String[] args) {
-		//Element Test
-		long start = System.currentTimeMillis();
-		LinkedList<String> test = StyleParsers.grabStyleElementText("@import \"found1\" @import avnower[onvaso[vnsdvobasvvaservoin\'found2\'");
-		System.out.println("@import \"found1\" @import avnower[onvaso[vnsdvobasvvaservoin\'found2\'");
-		for (int i = 0; i < test.size(); i++) {
-			System.out.println(test.get(i));
-		}
-		//Sheet Test
-		test = StyleParsers.grabStyleSheetText("url(hello1) ((())) asdiovnaovavuiobnauipvqaviburl(hello2\")");
-		for (int i = 0; i < test.size(); i++) {
-			System.out.println(test.get(i));
-		}
-		System.out.println((System.currentTimeMillis() - start));
-	}
 }

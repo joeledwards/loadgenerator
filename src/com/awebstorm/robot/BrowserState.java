@@ -11,7 +11,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
- * The current state of a virtual browser.
+ * The current state of an HTML Robot
  * @author Cromano
  *
  */
@@ -25,7 +25,7 @@ public class BrowserState {
 	private int _proxyPort;
 	
 	/**
-	 * Default Constructor ensures no NullPointerExceptions.
+	 * Default Constructor loads settings from the preferences procured from the script InputStream.
 	 * @param preferences Prefs loaded from script
 	 * @param proxyPort Port on which to contact the local proxy
 	 */
@@ -43,6 +43,7 @@ public class BrowserState {
 		WebClient client = null;
 		String browVersionString = _preferences.get("htmlRobotBrowserVersion");
 		String proxyHost = _preferences.get("proxyHost");
+		
 		if (proxyHost == null) {
 			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
 		} else if (browVersionString != null && proxyHost != null) {
@@ -50,6 +51,9 @@ public class BrowserState {
 		} else {
 			client = new WebClient();
 		}
+		
+		client.setThrowExceptionOnFailingStatusCode(false);
+		
 		String temp = "";
 		temp = _preferences.get("javaScriptEnabled");
 		if (temp != null) {
@@ -95,6 +99,12 @@ public class BrowserState {
 		temp = _preferences.get("cacheSize");
 		if (temp != null) {
 			client.setCache(new Cache());
+		} else {
+			consoleLog.debug("A preference was not set: " + temp);
+		}
+		temp = _preferences.get("throwExceptionOnFailingStatusCode");
+		if (temp != null) {
+			client.setThrowExceptionOnFailingStatusCode(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + temp);
 		}

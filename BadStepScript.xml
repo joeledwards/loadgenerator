@@ -13,9 +13,10 @@
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-		<remoteport>80</remoteport></Properties>
+		<remoteport>80</remoteport>
+		<throwExceptionOnFailingStatusCode>false</throwExceptionOnFailingStatusCode></Properties>
 	<STEPS>
-		<WAIT length="3000" />
+		<WAIT length="3000" ></WAIT>
 		<INVOKE path="/NoPageHere.htm" />
 		<VERIFY_TITLE title="bad_title" />
 		<BUTTON name="test_button" />

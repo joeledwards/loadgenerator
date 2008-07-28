@@ -372,7 +372,7 @@ public class Step implements Comparable<Step> {
 					tempAttrs = ((HtmlStyle) temp).getAttributes();
 					tempAttr = ((HtmlStyle) temp).getTextContent();
 					LinkedList<String> styleResourceList = 
-						StyleParsers.grabStyleElementText(tempAttr);
+						StyleParser.grabStyleElementText(tempAttr);
 					String aResource;
 					while (!styleResourceList.isEmpty()){
 						aResource = styleResourceList.poll();
@@ -398,9 +398,9 @@ public class Step implements Comparable<Step> {
 							}
 							if (aResource.endsWith(".css")) {
 								LinkedList<String> tempHolder = 
-									StyleParsers.grabStyleSheetText(temporary.getContentAsString());
+									StyleParser.grabStyleSheetText(temporary.getContentAsString());
 								String path = 
-									StyleParsers.subDirBuilder(temporary.getUrl());
+									StyleParser.subDirBuilder(temporary.getUrl());
 								while (!tempHolder.isEmpty()) {
 									if (consoleLog.isDebugEnabled()) {
 										consoleLog.debug(tempHolder.peek());
@@ -433,9 +433,9 @@ public class Step implements Comparable<Step> {
 								if (temporary.getStatusCode() != 200) {
 									tempStatus = false;
 								}
-								LinkedList<String> styleResourceList = StyleParsers.grabStyleSheetText(temporary.getContentAsString());
+								LinkedList<String> styleResourceList = StyleParser.grabStyleSheetText(temporary.getContentAsString());
 								while (!styleResourceList.isEmpty()) {
-									aResource = StyleParsers.subDirBuilder(temporary.getUrl()) + styleResourceList.poll();
+									aResource = StyleParser.subDirBuilder(temporary.getUrl()) + styleResourceList.poll();
 									if (!aResource.startsWith("http")) {
 										if (aResource.charAt(0) == '/') {
 											aResource = _targetDomain + aResource;
