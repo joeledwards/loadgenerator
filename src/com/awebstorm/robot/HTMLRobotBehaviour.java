@@ -72,7 +72,7 @@ public class HTMLRobotBehaviour {
 	 */
 	public final void shouldGenARobotOnProxy() {
 
-		numberOfRobots = 2;
+		numberOfRobots = 1;
 		maxNumberOfProxies = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
@@ -98,6 +98,23 @@ public class HTMLRobotBehaviour {
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
 			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
+				
+			}
+		}
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		robotIterator = robots.iterator();
+		while (robotIterator.hasNext()) {
+			Proxy testProxy = robotIterator.next().getCurrentProxy();
+			try {
+				testProxy.shutdown();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			while(testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
 				
 			}
 		}

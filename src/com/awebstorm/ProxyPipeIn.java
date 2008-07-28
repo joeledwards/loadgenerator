@@ -64,11 +64,8 @@ public class ProxyPipeIn implements Runnable {
 				} else {
 					_myProxy.incrementProxyReceiveAmount();
 					_myProxy.setProxyTimeStarted(System.currentTimeMillis());
-				}
-				//if(notEnd) {
 					toLocal.write(numberRead);
-				//}
-
+				}
 			}
 		} catch(IOException e) {
 			consoleLog.error("Could not accept a connection", e);

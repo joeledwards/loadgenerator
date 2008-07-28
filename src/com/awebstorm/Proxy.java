@@ -2,6 +2,7 @@ package com.awebstorm;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -86,21 +87,15 @@ public class Proxy implements Runnable {
     	//Loop to listen for incoming connection, and accept if there is one
     	while (true) {
     		try {
-    			if (localSocket != null)
-    			System.out.println(localSocket.isClosed());
-    			if (targetSocket != null)
-    			System.out.println(targetSocket.isClosed());
-    			//localSocket = null;
-    			//targetSocket = null;
     			try {
     				localSocket = server.accept();
     			} catch (SocketException e) {
     		    	if(consoleLog.isDebugEnabled())
     		    		consoleLog.debug("Closing a Proxy at " + server.getLocalPort());
-        			if (localSocket != null)
-            			System.out.println(localSocket.isClosed());
+        			if (localSocket != null && consoleLog.isDebugEnabled())
+            			consoleLog.debug("Local Socket is Closed: " + localSocket.isClosed());
             			if (targetSocket != null)
-            			System.out.println(targetSocket.isClosed());
+            				consoleLog.debug("Target Socket is Closed: " + targetSocket.isClosed());
     		    	break;
     			}
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
@@ -128,13 +123,6 @@ public class Proxy implements Runnable {
     			System.exit(-2);
     		}
     	}
-/*    	if(consoleLog.isDebugEnabled())
-    		consoleLog.debug("Closing a Proxy at " + Server.getLocalPort());
-    	try {
-			Server.close();
-		} catch (IOException e) {
-			consoleLog.error("Could not close the Server Socket on the Proxy.",e);
-		}*/
     }
     
     /**

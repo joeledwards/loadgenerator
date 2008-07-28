@@ -59,16 +59,15 @@ public class ProxyPipeOut implements Runnable {
 						consoleLog.debug(outgoing.isInputShutdown());
 						consoleLog.debug(outgoing.isOutputShutdown());
 					}
-
+					outgoing.close();
+					incoming.close();
 					notEnd = false;
 				} else {
 					if ( _myProxy.getProxyTimeResponded() == 0 )
 						_myProxy.setProxyTimeResponded(System.currentTimeMillis());
 					_myProxy.incrementProxySentAmount();
-				}
-				//if(notEnd) {
 					toServer.write(numberRead);
-				//}
+				}
 			}
 		} catch(IOException e) {
 			consoleLog.error("Could not accept a connection", e);
