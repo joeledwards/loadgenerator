@@ -23,7 +23,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			consoleLog.debug("Beginning Test shouldGet1()");
 		}
 		Proxy testProxy = new Proxy("www.customercentrix.com",80);
-		testProxy.init();
 		String line1 = "GET http://www.customercentrix.com/themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/jpg\r\n";
@@ -106,7 +105,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			consoleLog.debug("Beginning Test shouldGet3WithoutAccum()");
 		}
 		Proxy testProxy = new Proxy("www.customercentrix.com",80);
-		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/jpg\r\n";
@@ -182,7 +180,6 @@ public class ProxyBehaviour extends UsingMatchers {
 			consoleLog.debug("Beginning Test shouldGet2WithAccum()");
 		}
 		Proxy testProxy = new Proxy("www.customercentrix.com",80);
-		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
 		String line3 = "Accept: image/jpg\r\n";
@@ -256,7 +253,6 @@ public class ProxyBehaviour extends UsingMatchers {
 		Proxy[] proxyArray = new Proxy[10];
 		for (int i = 0; i < 10; i++) {
 			proxyArray[i] = new Proxy("www.customercentrix.com",80);
-			proxyArray[i].init();
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";

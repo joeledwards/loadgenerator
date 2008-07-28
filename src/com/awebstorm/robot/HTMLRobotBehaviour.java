@@ -41,7 +41,6 @@ public class HTMLRobotBehaviour {
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		for (int i = 0; i < numberOfRobots; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			loadGenProxyArray[i].init();
 		}
 		try {
 			newStreams.add(new FileInputStream("BadStepScript.xml"));
@@ -96,7 +95,6 @@ public class HTMLRobotBehaviour {
 		
 		for (int i = 0; i < numberOfRobots; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			loadGenProxyArray[i].init();
 		}
 		try {
 			while (newStreams.size() < numberOfRobots) {
@@ -151,7 +149,6 @@ public class HTMLRobotBehaviour {
 		
 		for (int i = 0; i < numberOfRobots; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			loadGenProxyArray[i].init();
 			while (!loadGenProxyArray[i].isReadyToListen()) {
 				
 			}
@@ -207,7 +204,6 @@ public class HTMLRobotBehaviour {
 		
 		for (int i = 0; i < maxNumberOfProxies; i++) {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
-			loadGenProxyArray[i].init();
 			while (!loadGenProxyArray[i].isReadyToListen()) {
 				
 			}

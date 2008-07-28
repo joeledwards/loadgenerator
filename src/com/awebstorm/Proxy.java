@@ -29,15 +29,6 @@ public class Proxy implements Runnable {
 	private boolean readyToListen = false;
 	
 	/**
-	 * Initialize a new Proxy in its own Daemon thread.
-	 */
-	public void init() {	    	
-		t=new Thread(this);
-		t.setDaemon(true);
-		t.start();
-	}
-	
-	/**
 	 * Proxy Constructor.
 	 * @param localport Local port to talk to the Robot
 	 * @param _remotehost Remote host to make requests on
@@ -46,7 +37,17 @@ public class Proxy implements Runnable {
     public Proxy (String remotehost, int remoteport) {
 		this._remotehost=remotehost;
 		this.remoteport=remoteport;
+		this.init();
     }
+    
+	/**
+	 * Initialize a new Proxy in its own Daemon thread.
+	 */
+	private void init() {	    	
+		t=new Thread(this);
+		t.setDaemon(true);
+		t.start();
+	}
     
     /**
      * Run the proxy.

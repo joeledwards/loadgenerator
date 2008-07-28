@@ -20,7 +20,6 @@ public class HtmlUnitProxyBehaviour {
 	
 		Proxy testProxy = new Proxy(remoteHost,remotePort);
 		System.out.println(testProxy.getLocalport());
-		testProxy.init();
 		
 		WebClient testClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, "localhost",testProxy.getLocalport());
 		testClient.setRedirectEnabled(true);
