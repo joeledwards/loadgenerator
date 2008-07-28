@@ -63,8 +63,8 @@ public class ProxyPipeOut implements Runnable {
 					incoming.close();
 					notEnd = false;
 				} else {
-					if ( _myProxy.getProxyTimeResponded() == 0 )
-						_myProxy.setProxyTimeResponded(System.currentTimeMillis());
+					if ( _myProxy.getProxyTimeStarted() == 0 )
+						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
 					_myProxy.incrementProxySentAmount();
 					toServer.write(numberRead);
 				}

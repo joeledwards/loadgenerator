@@ -25,7 +25,7 @@ public abstract class Robot implements Runnable {
 	protected long timeLastStepFinished = 0;
 	protected boolean stopExecuting = false;
 	protected boolean robotCompleted = false;
-	private Thread t;
+	protected Thread t;
 	protected Proxy currentProxy;
 	
 	/**
@@ -33,6 +33,7 @@ public abstract class Robot implements Runnable {
 	 */
 	public final void init() {	
 		t = new Thread(this);
+		t.setDaemon(true);
 		t.start();
 	}
 	

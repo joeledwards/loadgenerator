@@ -78,7 +78,7 @@ public class HTMLRobotBehaviour {
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
 		for (int i = 0; i < numberOfRobots; i++) {
-			loadGenProxyArray[i] = new Proxy(localPort + i, remotehost, remoteport);
+			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
 			loadGenProxyArray[i].init();
 		}
 		try {
@@ -90,7 +90,11 @@ public class HTMLRobotBehaviour {
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
 			System.out.println(newStreams+" "+(localPort + i)+" "+loadGenProxyArray[i]);
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), localPort + i, loadGenProxyArray[i]);
+			//Proxy must be ready before the HTMLRobot is constructed.
+			while (!loadGenProxyArray[i].isReadyToListen()) {
+				
+			}
+			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}

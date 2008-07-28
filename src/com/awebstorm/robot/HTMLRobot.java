@@ -55,7 +55,15 @@ public class HTMLRobot extends Robot {
 							+ ',' + stepNum);
 				}
 				this.currentStep = tempStep;
+				
+				Thread.yield();
 				tempStep.execute(robotID, currentState);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					consoleLog.error("HTMLRobot interrupted during sleep.",e);
+				}
+				
 				stepNum++;
 		}
 		robotCompleted = true;

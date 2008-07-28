@@ -63,7 +63,9 @@ public class ProxyPipeIn implements Runnable {
 					notEnd=false;
 				} else {
 					_myProxy.incrementProxyReceiveAmount();
-					_myProxy.setProxyTimeStarted(System.currentTimeMillis());
+					if (_myProxy.getProxyTimeResponded() == 0)
+						_myProxy.setProxyTimeResponded(System.currentTimeMillis());
+					
 					toLocal.write(numberRead);
 				}
 			}

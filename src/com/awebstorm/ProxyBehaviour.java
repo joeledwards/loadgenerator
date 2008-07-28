@@ -13,7 +13,6 @@ import org.jbehave.core.mock.UsingMatchers;
 public class ProxyBehaviour extends UsingMatchers {
 	
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
-	private boolean notSetUp = true;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	
 	/**
@@ -23,7 +22,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Beginning Test shouldGet1()");
 		}
-		Proxy testProxy = new Proxy(10000,"www.customercentrix.com",80);
+		Proxy testProxy = new Proxy("www.customercentrix.com",80);
 		testProxy.init();
 		String line1 = "GET http://www.customercentrix.com/themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
@@ -34,7 +33,10 @@ public class ProxyBehaviour extends UsingMatchers {
 		OutputStream toTarget = null;
 		Socket outgoing= null;
 		try {
-			outgoing = new Socket("localhost",10000);
+			while (!testProxy.isReadyToListen()) {
+				
+			}
+			outgoing = new Socket("localhost",testProxy.getLocalport());
 			if (outgoing != null)
 				outgoing.setReuseAddress(true);
 
@@ -103,7 +105,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Beginning Test shouldGet3WithoutAccum()");
 		}
-		Proxy testProxy = new Proxy(10001,"www.customercentrix.com",80);
+		Proxy testProxy = new Proxy("www.customercentrix.com",80);
 		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
@@ -115,10 +117,13 @@ public class ProxyBehaviour extends UsingMatchers {
 			OutputStream toTarget = null;
 			Socket outgoing= null;
 			try {
-				outgoing = new Socket("127.0.0.1",10001);
+				while (!testProxy.isReadyToListen()) {
+					
+				}
+				outgoing = new Socket("127.0.0.1",testProxy.getLocalport());
 				if (outgoing != null)
 					outgoing.setReuseAddress(true);
-
+				
 				toTarget = outgoing.getOutputStream();
 				toTarget.write(line1.getBytes());
 				toTarget.write(line2.getBytes());
@@ -176,7 +181,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Beginning Test shouldGet2WithAccum()");
 		}
-		Proxy testProxy = new Proxy(10001,"www.customercentrix.com",80);
+		Proxy testProxy = new Proxy("www.customercentrix.com",80);
 		testProxy.init();
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
 		String line2 = "Host: www.customercentrix.com\r\n";
@@ -188,10 +193,12 @@ public class ProxyBehaviour extends UsingMatchers {
 			OutputStream toTarget = null;
 			Socket outgoing= null;
 			try {
-				outgoing = new Socket("127.0.0.1",10001);
+				while (!testProxy.isReadyToListen()) {
+					
+				}
+				outgoing = new Socket("localhost",testProxy.getLocalport());
 				if (outgoing != null)
 					outgoing.setReuseAddress(true);
-
 				toTarget = outgoing.getOutputStream();
 				toTarget.write(line1.getBytes());
 				toTarget.write(line2.getBytes());
@@ -242,13 +249,13 @@ public class ProxyBehaviour extends UsingMatchers {
 	/**
 	 * Generates 10 Proxies and makes one request on each to test multiple proxy non---interference
 	 */
-	/*public void shouldGenAndUse10Proxies() {
+	public void shouldGenAndUse10Proxies() {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Beginning Test shouldGenAndUse10Proxies()");
 		}
 		Proxy[] proxyArray = new Proxy[10];
 		for (int i = 0; i < 10; i++) {
-			proxyArray[i] = new Proxy(10000+i,"www.customercentrix.com",80);
+			proxyArray[i] = new Proxy("www.customercentrix.com",80);
 			proxyArray[i].init();
 		}
 		String line1 = "GET /themes/pushbutton/header-a.jpg HTTP/1.1\r\n";
@@ -262,7 +269,10 @@ public class ProxyBehaviour extends UsingMatchers {
 				OutputStream toTarget = null;
 				Socket outgoing= null;
 				try {
-					outgoing = new Socket("127.0.0.1",10000+k);
+					while (!proxyArray[k].isReadyToListen()) {
+						
+					}
+					outgoing = new Socket("127.0.0.1",proxyArray[k].getLocalport());
 					if (outgoing != null)
 						outgoing.setReuseAddress(true);
 
@@ -285,8 +295,8 @@ public class ProxyBehaviour extends UsingMatchers {
 							break;
 					}
 					outgoing.close();
-					ensureThat(counter-1 == proxyArray[k].getProxyReceiveAmount());
-					ensureThat(counter-1 == 692);
+					ensureThat(counter == proxyArray[k].getProxyReceiveAmount());
+					ensureThat(counter == 692);
 					ensureThat(proxyArray[k].getProxySentAmount() == 233);
 					ensureThat(proxyArray[k].getProxySentAmount() == 
 						(line1.length() + line2.length() + line3.length() + line7.length() + line8.length()));
@@ -311,7 +321,7 @@ public class ProxyBehaviour extends UsingMatchers {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Finished Test shouldGenAndUse10Proxies()");
 		}
-	}*/
+	}
 	
 	public final void setUp() {
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);

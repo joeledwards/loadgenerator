@@ -2,7 +2,6 @@ package com.awebstorm;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -27,6 +26,7 @@ public class Proxy implements Runnable {
 	private long proxyTimeEnded;
 	private long proxyTimeStarted;
 	private ServerSocket server;
+	private boolean readyToListen = false;
 	
 	/**
 	 * Initialize a new Proxy in its own Daemon thread.
@@ -43,8 +43,7 @@ public class Proxy implements Runnable {
 	 * @param _remotehost Remote host to make requests on
 	 * @param remoteport Remote Port to talk on
 	 */
-    public Proxy (int localport, String remotehost, int remoteport) {
-		this.localport=localport;
+    public Proxy (String remotehost, int remoteport) {
 		this._remotehost=remotehost;
 		this.remoteport=remoteport;
     }
@@ -59,11 +58,7 @@ public class Proxy implements Runnable {
 
     	// Check for valid local and remote port, hostname not null
     	if ( consoleLog.isDebugEnabled())
-    		consoleLog.debug("Opening a Proxy at " + localport + " to " + _remotehost + " Port " + remoteport);
-    	if(localport <= 0) {
-    		consoleLog.fatal("Error: Invalid Local Port Specification " + "\n");
-    		error = true;
-    	}
+    		consoleLog.debug("Opening a Proxy at " + _remotehost + " Port " + remoteport);
     	if(remoteport <=0) {
     		consoleLog.fatal("Error: Invalid Remote Port Specification " + "\n");
     		error = true;
@@ -77,10 +72,11 @@ public class Proxy implements Runnable {
 
     	//Test and create a listening socket at Proxy
     	try{
-    		server = new ServerSocket(localport);
+    		server = new ServerSocket(0);
+    		this.localport = server.getLocalPort();
     	}
     	catch(IOException e) {
-    		consoleLog.fatal("Could not create the proxy on port: " + localport, e);
+    		consoleLog.fatal("Could not create the proxy on random port: ", e);
     		System.exit(-2);
     	}
 
@@ -88,6 +84,7 @@ public class Proxy implements Runnable {
     	while (true) {
     		try {
     			try {
+    				readyToListen = true;
     				localSocket = server.accept();
     			} catch (SocketException e) {
     		    	if(consoleLog.isDebugEnabled())
@@ -159,10 +156,10 @@ public class Proxy implements Runnable {
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
 	}
-	public void incrementProxyReceiveAmount() {
+	public synchronized void incrementProxyReceiveAmount() {
 		this.proxyReceiveAmount++;
 	}
-	public void incrementProxySentAmount() {
+	public synchronized void incrementProxySentAmount() {
 		this.proxySentAmount++;
 	}
 	public void setProxyTimeEnded(long currentTimeMillis) {
@@ -188,6 +185,12 @@ public class Proxy implements Runnable {
 	}
 	public Thread.State getThreadState() {
 		return this.t.getState();
+	}
+	public int getLocalport() {
+		return localport;
+	}
+	public boolean isReadyToListen() {
+		return readyToListen;
 	}
 }
 
