@@ -296,7 +296,7 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("MalformedURL", e);
 			return false;
 		} catch (SocketTimeoutException e) {
-			consoleLog.info("Socket Timed Out from licit/illicit factors.");
+			consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 			return false;
 		} catch (IOException e) {
 			consoleLog.error("IO Error during Invoke.", e);
@@ -360,7 +360,7 @@ public class Step implements Comparable<Step> {
 								|| tempAttr.startsWith("ftp") 
 								|| tempAttr.startsWith("file") 
 								|| tempAttr.startsWith("jar")) {
-							consoleLog.info("Bad protocol encountered.");
+							consoleLog.debug("Bad protocol encountered.");
 						} else {
 							tempAttr = _targetDomain + '/' + tempAttr;
 						}
@@ -655,7 +655,7 @@ public class Step implements Comparable<Step> {
 			}
 			break;
 			default:
-				consoleLog.info("A unknown Step was found during reporting.");
+				consoleLog.error("A unknown Step was found during reporting.");
 			break;
 		}
 		resultLog.info(tempResult);

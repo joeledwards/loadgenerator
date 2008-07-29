@@ -1,5 +1,6 @@
 package com.awebstorm.robot;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,6 +33,8 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 	private String remotehost;
 	private int remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
+	private long fileStart;
+	private long fileEnd;
 	
 	/**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
@@ -82,6 +85,10 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
+		File consoleFile = new File("console.log");
+		fileEnd = consoleFile.length();
+		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		ensureThat(reader.isConsoleLogHasNoErrors());
 	}
 	
 	/**
@@ -135,6 +142,10 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
+		File consoleFile = new File("console.log");
+		fileEnd = consoleFile.length();
+		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		ensureThat(reader.isConsoleLogHasNoErrors());
 	}
 	
 	/**
@@ -188,7 +199,10 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-
+		File consoleFile = new File("console.log");
+		fileEnd = consoleFile.length();
+		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		ensureThat(reader.isConsoleLogHasNoErrors());
 	}
 	
 	/**
@@ -242,12 +256,18 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
+		File consoleFile = new File("console.log");
+		fileEnd = consoleFile.length();
+		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		ensureThat(reader.isConsoleLogHasNoErrors());
 	}
 
 	/**
 	 * Setup general operations before each test.
 	 */
 	public final void setUp() {
+		File consoleFile = new File("console.log");
+		fileStart = consoleFile.length();
 		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
 		loadGeneratorProperties = 
 			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);

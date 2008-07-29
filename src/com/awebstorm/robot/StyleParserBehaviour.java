@@ -38,7 +38,7 @@ public class StyleParserBehaviour extends UsingMatchers {
 		try {
 			str = new URL ("http://dir/dir/dir/dir/fake.css");
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			consoleLog.error("Bad URL in a StyleParser test.", e);
 		}
 		ensureThat(StyleParser.subDirBuilder(str).equals("http://dir/dir/dir/dir/"));
 	}
