@@ -21,8 +21,9 @@ public class HTMLRobot extends Robot {
 	 * Constructor defines the InputStream to be read.
 	 * @param script script to parse
 	 * @param proxyPort Port on which to contact the local proxy
+	 * @param newProxy Proxy that will be used to record throughput information
 	 */
-	public HTMLRobot(final InputStream script, final int proxyPort, Proxy newProxy) {
+	public HTMLRobot(final InputStream script, final int proxyPort, final Proxy newProxy) {
 		super(script, newProxy);
 		currentState = new BrowserState(prefs, proxyPort);
 		if (consoleLog.isDebugEnabled()) {
@@ -34,7 +35,7 @@ public class HTMLRobot extends Robot {
 	 * Get the port on which this Robot speaks.
 	 * @return Port on which this Robot speaks to its proxy
 	 */
-	public int getProxyPort() {
+	public final int getProxyPort() {
 		return currentState.getProxyPort();
 	}
 
@@ -61,7 +62,7 @@ public class HTMLRobot extends Robot {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					consoleLog.error("HTMLRobot interrupted during sleep.",e);
+					consoleLog.error("HTMLRobot interrupted during sleep.", e);
 				}
 				
 				stepNum++;

@@ -19,6 +19,5 @@
 		<WAIT length="3000" ></WAIT>
 		<INVOKE path="" />
 		<VERIFY_TITLE title="bad_title" />
-		<BUTTON name="test_button" />
 	</STEPS>
 </MyScript>

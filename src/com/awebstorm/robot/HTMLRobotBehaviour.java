@@ -10,7 +10,9 @@ import java.util.PropertyResourceBundle;
 import java.util.Queue;
 import java.util.ResourceBundle;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.jbehave.core.mock.UsingMatchers;
 
 import com.awebstorm.Proxy;
 
@@ -19,7 +21,7 @@ import com.awebstorm.Proxy;
  * @author Cromano
  *
  */
-public class HTMLRobotBehaviour {
+public class HTMLRobotBehaviour  extends UsingMatchers {
 	
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
@@ -29,9 +31,10 @@ public class HTMLRobotBehaviour {
 	private Proxy[] loadGenProxyArray = new Proxy[maxNumberOfProxies];
 	private String remotehost;
 	private int remoteport;
+	private Logger consoleLog = Logger.getLogger(this.getClass());
 	
 	/**
-	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request
+	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
 	 */
 	public final void shouldGenARobotForBadRequest() {
 		
@@ -44,7 +47,7 @@ public class HTMLRobotBehaviour {
 		try {
 			newStreams.add(new FileInputStream("BadStepScript.xml"));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
 			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
@@ -56,13 +59,12 @@ public class HTMLRobotBehaviour {
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
 			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted Sleep.",e);
+				}
 			}
-		}
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
@@ -70,10 +72,14 @@ public class HTMLRobotBehaviour {
 			try {
 				testProxy.shutdown();
 			} catch (IOException e) {
-				e.printStackTrace();
+				consoleLog.error("Could not shutdown a proxy.", e);
 			}
 			while(testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted Sleep.", e);
+				}
 			}
 		}
 	}
@@ -95,7 +101,7 @@ public class HTMLRobotBehaviour {
 				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			consoleLog.error("Could not find the script file.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
 			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
@@ -106,13 +112,12 @@ public class HTMLRobotBehaviour {
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
 			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
-		}
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
@@ -120,10 +125,14 @@ public class HTMLRobotBehaviour {
 			try {
 				testProxy.shutdown();
 			} catch (IOException e) {
-				e.printStackTrace();
+				consoleLog.error("Could not shutdown a proxy.", e);
 			}
 			while(testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
 		}
 	}
@@ -149,20 +158,19 @@ public class HTMLRobotBehaviour {
 				
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			consoleLog.error("Could not find a script file.", e);
 		}
 		
 		Iterator<Robot> robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
 			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted Sleep", e);
+				}
 			}
-		}
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
@@ -170,10 +178,14 @@ public class HTMLRobotBehaviour {
 			try {
 				testProxy.shutdown();
 			} catch (IOException e) {
-				e.printStackTrace();
+				consoleLog.error("Could not shutdown a proxy.", e);
 			}
 			while(testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
 		}
 
@@ -200,21 +212,19 @@ public class HTMLRobotBehaviour {
 				
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			consoleLog.error("Could not find a script file.", e);
 		}
-
 
 		Iterator<Robot> robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
 			Robot nextRobot = robotIterator.next();
 			while (nextRobot.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
-		}
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 		robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
@@ -222,10 +232,14 @@ public class HTMLRobotBehaviour {
 			try {
 				testProxy.shutdown();
 			} catch (IOException e) {
-				e.printStackTrace();
+				consoleLog.error("Could not shutdown a proxy.", e);
 			}
 			while(testProxy.getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
 		}
 	}
@@ -250,10 +264,14 @@ public class HTMLRobotBehaviour {
 			try {
 				loadGenProxyArray[i].shutdown();
 			} catch (IOException e) {
-
+				consoleLog.error("Could not shutdown a Proxy.", e);
 			}
 			while (loadGenProxyArray[i].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
 			}
 		}
 	}

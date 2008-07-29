@@ -67,24 +67,24 @@ public class Step implements Comparable<Step> {
 	 * @param list Attributes of the step
 	 * @param myRobotOwner Robot that owns this step
 	 */
-	public Step(String name, int value, Attributes list, Robot myRobotOwner) {
+	public Step(final String name, final int value, final Attributes list, final Robot myRobotOwner) {
 		_stepName = name;
 		_stepNum = value;
 		_stepAttributeList = list;
 		_myRobotOwner = myRobotOwner;
-		_myProxy=_myRobotOwner.getCurrentProxy();
+		_myProxy = _myRobotOwner.getCurrentProxy();
 	}
 	
 	/**
-	 * Name of the Step
-	 * @return
+	 * Name of the Step.
+	 * @return Name of this step
 	 */
 	public String getName() {
 		return _stepName;
 	}
 	
 	/**
-	 * Attributes of the Step
+	 * Attributes of the Step.
 	 * @return
 	 */
 	public Attributes getList() {
@@ -92,18 +92,20 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Compare two steps by value
+	 * Compare two steps by value.
+	 * @param o Step to compare this step to
+	 * @return Will return negative, 1, or positive if o is greater, equal, or less than this Step
 	 */
-	public int compareTo(Step o) {
+	public int compareTo(final Step o) {
 		return _stepNum - o.getValue();
 	}
 
 	/**
-	 * Execute a Step
+	 * Execute a Step.
 	 * @param jobID Robot job ID
 	 * @param browserState currentState of the robot's browser
 	 */
-	public void execute(String jobID, BrowserState browserState) {
+	public void execute(final String jobID, BrowserState browserState) {
 		_myProxy.resetProxyCounters();
 		replyTime = 0;
 		BodyByteAmount = 0; 
@@ -124,7 +126,7 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
 		}
-		if ( currentType == null ) {
+		if (currentType == null) {
 			return;
 		}
 		
@@ -164,29 +166,29 @@ public class Step implements Comparable<Step> {
 	/**
 	 * Click a link on a webpage. CLICK_LINK STEP
 	 * Not Yet Implemented
-	 * @return
+	 * @return The step status
 	 */
 	private boolean clickLink() {
 		return false;
 	}
 
 	/**
-	 * Standard POST STEP using the parameters stored in the postList
+	 * Standard POST STEP using the parameters stored in the postList.
 	 * @return Success?
 	 */
 	private boolean post() {
 		
 		List<NameValuePair> postList = new LinkedList<NameValuePair>();
-		for (int i = 1;i < _stepAttributeList.getLength(); i++) {
-			postList.add(new NameValuePair(_stepAttributeList.getLocalName(i),_stepAttributeList.getValue(i)));
+		for (int i = 1; i < _stepAttributeList.getLength(); i++) {
+			postList.add(new NameValuePair(_stepAttributeList.getLocalName(i), _stepAttributeList.getValue(i)));
 		}
 		WebRequestSettings newSettings = null;
 		HtmlPage postPage = null;
 		String currentPath = _targetDomain + _stepAttributeList.getValue(0);
 		try {
-			newSettings = new WebRequestSettings(new URL(currentPath),SubmitMethod.POST);
+			newSettings = new WebRequestSettings(new URL(currentPath), SubmitMethod.POST);
 		} catch (MalformedURLException e1) {
-			consoleLog.error("Bad URL passed to a POST operation.",e1);
+			consoleLog.error("Bad URL passed to a POST operation.", e1);
 			return false;
 		}
 		newSettings.setRequestParameters(postList);
@@ -194,14 +196,14 @@ public class Step implements Comparable<Step> {
 		try {
 			tempResponsePage = _currentBrowserState.getVUser().getPage(newSettings);
 		} catch (FailingHttpStatusCodeException e) {
-			consoleLog.error("POST operation, " + _stepName + " has a bad status message.",e);
+			consoleLog.error("POST operation, " + _stepName + " has a bad status message.", e);
 			return false;
 		} catch (IOException e) {
-			consoleLog.error("IOException thrown during a POST operation.",e);
+			consoleLog.error("IOException thrown during a POST operation.", e);
 			return false;
 		}
 		
-		if ( tempResponsePage.getClass() == HtmlPage.class ) {
+		if (tempResponsePage.getClass() == HtmlPage.class) {
 			postPage = (HtmlPage) tempResponsePage;
 			_currentBrowserState.setCurrentPage(postPage);
 			postList.clear();
@@ -231,7 +233,7 @@ public class Step implements Comparable<Step> {
 	/**
 	 * Fill a Form with information. Usually followed by a BUTTON or CLICK.
 	 * Not Yet Implemented.
-	 * @return
+	 * @return Step status
 	 */
 	private boolean fillForm() {
 		boolean tempStatus = true;
@@ -239,35 +241,36 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Press the button whose name is given
-	 * @return
+	 * Press the button whose name is given.
+	 * @return Step status
 	 */
 	private boolean button() {
 		HtmlButton tempButton = null;
-		if( _currentBrowserState.getCurrentPage() == null )
-			return false;
-		List<HtmlForm> tempForms = _currentBrowserState.getCurrentPage().getForms();
-		
-		if(tempForms == null) {
-			consoleLog.error("No Forms to search for buttons.");
+		if (_currentBrowserState.getCurrentPage() == null) {
 			return false;
 		}
-		for (HtmlForm i: tempForms) {
+		List<HtmlForm> tempForms = _currentBrowserState.getCurrentPage().getForms();
+		
+		if (tempForms == null) {
+			consoleLog.debug("No Forms to search for buttons.");
+			return false;
+		}
+		for (HtmlForm i : tempForms) {
 			try {
 				tempButton = i.getButtonByName(_stepAttributeList.getValue(0));
 			} catch (ElementNotFoundException e) {
-				consoleLog.error("No such Button exists");
+				consoleLog.debug("No such Button exists");
 				return false;
 			}
 		}
-		if(tempButton == null) {
-			consoleLog.error("No Button to click.");
+		if (tempButton == null) {
+			consoleLog.debug("No Button to click.");
 			return false;
 		}
 		try {
 			tempButton.click();
 		} catch (IOException e) {
-			consoleLog.error("Bad Button Clicked.");
+			consoleLog.debug("Bad Button Clicked.");
 			e.printStackTrace();
 			return false;
 		}
@@ -275,8 +278,8 @@ public class Step implements Comparable<Step> {
 	}
 
 	/**
-	 * Standard GET STEP
-	 * @return
+	 * Standard GET STEP.
+	 * @return Step status
 	 */
 	private boolean invoke() {
 		String currentPath = _stepAttributeList.getValue(0);
@@ -287,20 +290,20 @@ public class Step implements Comparable<Step> {
 		try {
 			tempPage = _currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
-			consoleLog.error("Bad Status Code.",e);
+			consoleLog.error("Bad Status Code.", e);
 			return false;
 		} catch (MalformedURLException e) {
-			consoleLog.error("MalformedURL",e);
+			consoleLog.error("MalformedURL", e);
 			return false;
-		} catch (SocketTimeoutException e ) {
+		} catch (SocketTimeoutException e) {
 			consoleLog.info("Socket Timed Out from licit/illicit factors.");
 			return false;
 		} catch (IOException e) {
-			consoleLog.error("IO Error during Invoke.",e);
+			consoleLog.error("IO Error during Invoke.", e);
 			return false;
 		}
 		
-		if ( tempPage.getClass() == HtmlPage.class ) {
+		if (tempPage.getClass() == HtmlPage.class) {
 			invokePage = (HtmlPage) tempPage;
 			_currentBrowserState.setCurrentPage(invokePage);
 			replyTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
@@ -353,15 +356,17 @@ public class Step implements Comparable<Step> {
 					if (!tempAttr.startsWith("http")) {
 						if (tempAttr.charAt(0) == '/') {
 							tempAttr = _targetDomain + tempAttr;
-						} else if (tempAttr.startsWith("https") || tempAttr.startsWith("ftp") ||
-								tempAttr.startsWith("file") || tempAttr.startsWith("jar")) {
+						} else if (tempAttr.startsWith("https") 
+								|| tempAttr.startsWith("ftp") 
+								|| tempAttr.startsWith("file") 
+								|| tempAttr.startsWith("jar")) {
 							consoleLog.info("Bad protocol encountered.");
 						} else {
 							tempAttr = _targetDomain + '/' + tempAttr;
 						}
 						//In case of domain seperate from the domain for the script
 					} else if (!tempAttr.startsWith(_targetDomain)) {
-						consoleLog.info("Bad domain encountered: " + tempAttr);
+						consoleLog.debug("Bad domain encountered: " + tempAttr);
 						_currentBrowserState.addUrlToHistory(tempAttr);
 					}
 					if (_currentBrowserState.addUrlToHistory(tempAttr)) {
@@ -393,7 +398,7 @@ public class Step implements Comparable<Step> {
 								+ '/' + aResource;
 							}
 						} else if (!aResource.startsWith(_targetDomain)) {
-							consoleLog.info("Bad domain encountered: " + aResource);
+							consoleLog.debug("Bad domain encountered: " + aResource);
 							_currentBrowserState.addUrlToHistory(aResource);
 						}
 						if (_currentBrowserState.addUrlToHistory(aResource)) {
@@ -434,7 +439,7 @@ public class Step implements Comparable<Step> {
 									aResource = _targetDomain + '/' + aResource;
 								}
 							} else if (!aResource.startsWith(_targetDomain)) {
-								consoleLog.info("Bad domain encountered: " + aResource);
+								consoleLog.debug("Bad domain encountered: " + aResource);
 								_currentBrowserState.addUrlToHistory(aResource);
 							}
 							if (_currentBrowserState.addUrlToHistory(aResource)) {
@@ -536,7 +541,7 @@ public class Step implements Comparable<Step> {
 	 * @param stepStatus Success if true, Failure if false
 	 * @param jobID Current job ID
 	 */
-	private synchronized void report(boolean stepStatus, String jobID) {
+	private synchronized void report(final boolean stepStatus, final String jobID) {
 
 		long proxyReceiveAmount = _myProxy.getProxyReceiveAmount();
 		long proxySentAmount = _myProxy.getProxySentAmount();
@@ -552,7 +557,7 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
 		}
-		if ( currentType == null ) {
+		if (currentType == null) {
 			return;
 		}
 		switch (currentType) {
@@ -649,6 +654,9 @@ public class Step implements Comparable<Step> {
 				tempResult.append("failure");
 			}
 			break;
+			default:
+				consoleLog.info("A unknown Step was found during reporting.");
+			break;
 		}
 		resultLog.info(tempResult);
 	}
@@ -674,39 +682,42 @@ public class Step implements Comparable<Step> {
 	 * @param milliseconds Time to convert in milliseconds
 	 * @return Well-formatted time message
 	 */
-	private String formatTime(long milliseconds)
-	{
-	long millisInDay = milliseconds;
-	long MILLISECOND = millisInDay % 1000;
-	millisInDay /= 1000;
-	long SECOND = millisInDay % 60;
-	millisInDay /= 60;
-	long MINUTE = millisInDay % 60;
-	millisInDay /= 60;
-	long HOUR = millisInDay % 60;
-	StringBuffer buf = new StringBuffer(12);
-	if(HOUR < 10)
-	buf.append("0").append(HOUR);
-	else
-	buf.append(HOUR);
-	buf.append(":");
-	if(MINUTE < 10)
-	buf.append("0").append(MINUTE);
-	else
-	buf.append(MINUTE);
-	buf.append(":");
-	if(SECOND < 10)
-	buf.append("0").append(SECOND);
-	else
-	buf.append(SECOND);
-	buf.append(":");
-	if(MILLISECOND < 10)
-	buf.append("00").append(MILLISECOND);
-	else if(MILLISECOND < 100)
-	buf.append("0").append(MILLISECOND);
-	else
-	buf.append(MILLISECOND);
-	return buf.toString();
+	private String formatTime(final long milliseconds) {
+		long millisInDay = milliseconds;
+		long millisecond = millisInDay % 1000;
+		millisInDay /= 1000;
+		long second = millisInDay % 60;
+		millisInDay /= 60;
+		long minute = millisInDay % 60;
+		millisInDay /= 60;
+		long hour = millisInDay % 60;
+		StringBuffer buf = new StringBuffer(12);
+		if (hour < 10) {
+			buf.append("0").append(hour);
+		} else {
+			buf.append(hour);
+		}
+		buf.append(":");
+		if (minute < 10) {
+			buf.append("0").append(minute);
+		} else {
+			buf.append(minute);
+		}
+		buf.append(":");
+		if (second < 10) {
+			buf.append("0").append(second);
+		} else {
+			buf.append(second);
+		}
+		buf.append(":");
+		if (millisecond < 10) {
+			buf.append("00").append(millisecond);
+		} else if (millisecond < 100) {
+			buf.append("0").append(millisecond);
+		} else {
+			buf.append(millisecond);
+		}
+		return buf.toString();
 	}
 
 }

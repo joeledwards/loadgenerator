@@ -16,24 +16,24 @@ import org.apache.log4j.Logger;
 public class ProxyPipeOut implements Runnable {
 	private Socket outgoing, incoming;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private Proxy _myProxy;
+	private Proxy myProxyOwner;
 
 	/**
 	 * Creates a new ProxyPipeIn to listen on this Socket with the specified Robot owner and pass on any info on in.
 	 * @param in Socket to listen on
 	 * @param out Socket to write on
-	 * @param myRobotOwner Robot that owns this listener
+	 * @param myProxy Proxy that created this ProxyPipeOut in order to keep track of bytes and time
 	 */
-	ProxyPipeOut(Socket out, Socket in, Proxy myProxy){
+	ProxyPipeOut(final Socket out, final Socket in, final Proxy myProxy) {
 		outgoing = out;
 		incoming = in;
-		this._myProxy=myProxy;
+		this.myProxyOwner = myProxy;
 	}
 
 	/**
-	 * Run this ProxyPipeIn to accumulate necessary information in its Proxy
+	 * Run this ProxyPipeIn to accumulate necessary information in its Proxy.
 	 */
-	public void run(){
+	public final void run() {
 		int numberRead = 0;
 		OutputStream toServer;
 		InputStream fromLocal;
@@ -41,11 +41,11 @@ public class ProxyPipeOut implements Runnable {
 		try{
 			toServer = incoming.getOutputStream();      
 			fromLocal = outgoing.getInputStream();
-			boolean notEnd=true;
+			boolean notEnd = true;
 			while (notEnd) {
 				numberRead = fromLocal.read();
 				if (numberRead == -1) {
-					_myProxy.setProxyTimeEnded(System.currentTimeMillis());
+					myProxyOwner.setProxyTimeEnded(System.currentTimeMillis());
 					if (consoleLog.isDebugEnabled()) {
 						consoleLog.debug("Closing a ProxyPipeOut: " 
 								+ outgoing.getLocalPort() + " "
@@ -57,9 +57,9 @@ public class ProxyPipeOut implements Runnable {
 					incoming.close();
 					notEnd = false;
 				} else {
-					if ( _myProxy.getProxyTimeStarted() == 0 )
-						_myProxy.setProxyTimeStarted(System.currentTimeMillis());
-					_myProxy.incrementProxySentAmount();
+					if ( myProxyOwner.getProxyTimeStarted() == 0 )
+						myProxyOwner.setProxyTimeStarted(System.currentTimeMillis());
+					myProxyOwner.incrementProxySentAmount();
 					toServer.write(numberRead);
 				}
 			}

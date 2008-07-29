@@ -40,8 +40,9 @@ public class ScriptReader extends DefaultHandler {
 	 * @param script InputStream of the script to parse
 	 * @param newStepQueue Queue to place new Steps into
 	 * @param newPrefs HashMap to place Robot preferences into
+	 * @param myRobotOwner Robot to parse steps for
 	 */
-	public final void run(final InputStream script, final PriorityQueue<Step> newStepQueue, final HashMap<String, String> newPrefs, Robot myRobotOwner) {
+	public final void run(final InputStream script, final PriorityQueue<Step> newStepQueue, final HashMap<String, String> newPrefs, final Robot myRobotOwner) {
 
 		this._myRobotOwner = myRobotOwner;
 		SAXParserFactory newFactory;

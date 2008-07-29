@@ -16,18 +16,18 @@ import org.apache.log4j.Logger;
 public class ProxyPipeIn implements Runnable {
 	private Socket incoming, outgoing;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private Proxy _myProxy;
+	private Proxy myProxyOwner;
 
 	/**
 	 * Creates a new ProxyPipeIn to listen on this Socket with the specified Robot owner and pass on any info on in.
 	 * @param in Socket to listen on
 	 * @param out Socket to write on
-	 * @param myRobotOwner Robot that owns this listener
+	 * @param myProxy Proxy that created this ProxyPipeIn in order to keep byte and time recording
 	 */
-	ProxyPipeIn(Socket in, Socket out, Proxy myProxy){
+	ProxyPipeIn(final Socket in, final Socket out, final Proxy myProxy) {
 		incoming = in;
 		outgoing = out;
-		this._myProxy=myProxy;
+		this.myProxyOwner = myProxy;
 	}
 
 	/**
@@ -41,8 +41,10 @@ public class ProxyPipeIn implements Runnable {
 		try{
 			toLocal = outgoing.getOutputStream();      
 			fromServer = incoming.getInputStream();
-			boolean notEnd=true;
+			boolean notEnd = true;
 			while (notEnd) {
+				if(incoming.isInputShutdown())
+					break;
 				numberRead = fromServer.read();
 				if (numberRead == -1){
 					if (consoleLog.isDebugEnabled()) {
@@ -52,19 +54,21 @@ public class ProxyPipeIn implements Runnable {
 								+ outgoing.getPort() + " " 
 								+ outgoing.getLocalPort());
 					}
-					notEnd=false;
+					//incoming.close();
+					notEnd = false;
 				} else {
-					_myProxy.incrementProxyReceiveAmount();
-					if (_myProxy.getProxyTimeResponded() == 0)
-						_myProxy.setProxyTimeResponded(System.currentTimeMillis());
+					myProxyOwner.incrementProxyReceiveAmount();
+					if (myProxyOwner.getProxyTimeResponded() == 0) {
+						myProxyOwner.setProxyTimeResponded(System.currentTimeMillis());
+					}
 					
 					toLocal.write(numberRead);
 				}
 			}
-		} catch(IOException e) {
+		} catch (IOException e) {
 			consoleLog.error("Could not accept a connection", e);
-		} catch(ArrayIndexOutOfBoundsException e) {
-			consoleLog.error("Buffer Overflow on " + numberRead,e);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			consoleLog.error("Buffer Overflow on " + numberRead, e);
 		}
 	}
 }

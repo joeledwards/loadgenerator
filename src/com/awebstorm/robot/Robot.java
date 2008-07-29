@@ -42,9 +42,10 @@ public abstract class Robot implements Runnable {
 	 * Child classes should call this to setup the Robot fields 
 	 * and parse the Script
 	 * 
-	 * @param script Location of the Robot Script
+	 * @param script Script to be parsed into steps
+	 * @param newProxy Proxy recording this Robots actions
 	 */
-	protected Robot(final InputStream script, Proxy newProxy) {
+	protected Robot(final InputStream script, final Proxy newProxy) {
 		_script = script;
 		currentProxy = newProxy;
 		new ScriptReader().run(_script, stepQueue, prefs, this);

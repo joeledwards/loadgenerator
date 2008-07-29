@@ -4,11 +4,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jbehave.core.mock.UsingMatchers;
 
 public class StyleParserBehaviour extends UsingMatchers {
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
+	private Logger consoleLog = Logger.getLogger(this.getClass());
 	
 	/**
 	 * Should retrieve the appropriate String resources from the Element Text.

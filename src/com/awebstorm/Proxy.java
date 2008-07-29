@@ -17,7 +17,7 @@ public class Proxy implements Runnable {
 	
 	private int localport;
 	private String _remotehost;
-	private int remoteport;
+	private int _remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Thread t;
 	private long proxyTimeResponded;
@@ -29,29 +29,29 @@ public class Proxy implements Runnable {
 	
 	/**
 	 * Proxy Constructor.
-	 * @param _remotehost Remote host to make requests on
+	 * @param remotehost Remote host to make requests on
 	 * @param remoteport Remote Port to talk on
 	 */
-    public Proxy (String remotehost, int remoteport) {
-		this._remotehost=remotehost;
-		this.remoteport=remoteport;
+    public Proxy(final String remotehost, final int remoteport) {
+		this._remotehost = remotehost;
+		this._remoteport = remoteport;
     	// Check for valid remote port and hostname not null
-    	if ( consoleLog.isDebugEnabled())
+    	if (consoleLog.isDebugEnabled()) {
     		consoleLog.debug("Opening a Proxy at " + _remotehost + " Port " + remoteport);
-    	if(remoteport <=0) {
+    	}
+    	if (remoteport <= 0) {
     		consoleLog.error("Error: Invalid Remote Port Specification " + "\n");
     		return;
     	}
-    	if(_remotehost == null) {
+    	if (_remotehost == null) {
     		consoleLog.error("Error: Invalid Remote Host Specification " + "\n");
     		return;
     	}
     	//Test and create a listening socket at Proxy
-    	try{
+    	try {
     		server = new ServerSocket(0);
     		this.localport = server.getLocalPort();
-    	}
-    	catch(IOException e) {
+    	} catch (IOException e) {
     		consoleLog.error("Could not create the proxy on random port: ", e);
     		return;
     	}
@@ -62,7 +62,7 @@ public class Proxy implements Runnable {
 	 * Initialize a new Proxy in its own Daemon thread.
 	 */
 	private void init() {	    	
-		t=new Thread(this);
+		t = new Thread(this);
 		t.setDaemon(true);
 		t.start();
 	}
@@ -70,9 +70,9 @@ public class Proxy implements Runnable {
     /**
      * Run the proxy.
      */
-    public void run () {
+    public final void run() {
 
-    	//Could not create a socket port, end execution now
+    	//Could not create a socket port, end now
     	if (server == null || !server.isBound() || server.isClosed()) {
     		return;
     	}
@@ -85,18 +85,20 @@ public class Proxy implements Runnable {
     			try {
     				localSocket = server.accept();
     			} catch (SocketException e) {
-    		    	if(consoleLog.isDebugEnabled())
+    		    	if (consoleLog.isDebugEnabled()) {
     		    		consoleLog.debug("Closing a Proxy at " + server.getLocalPort());
-        			if (localSocket != null && consoleLog.isDebugEnabled())
+    		    	}
+        			if (localSocket != null && consoleLog.isDebugEnabled()) {
             			consoleLog.debug("Local Socket is Closed: " + localSocket.isClosed());
             			if (targetSocket != null)
             				consoleLog.debug("Target Socket is Closed: " + targetSocket.isClosed());
+        			}
     		    	break;
     			}
     			//Create the 2 threads for the incoming and outgoing traffic of Proxy server
-    			targetSocket = new Socket(_remotehost, remoteport);
+    			targetSocket = new Socket(_remotehost, _remoteport);
     			Thread thread1 = null;
-    			thread1 = new Thread (new ProxyPipeOut(localSocket, targetSocket, this));
+    			thread1 = new Thread(new ProxyPipeOut(localSocket, targetSocket, this));
     			thread1.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
     				consoleLog.debug("Spawning ProxyPipeOut: " + thread1.getName());
@@ -104,7 +106,7 @@ public class Proxy implements Runnable {
     			thread1.start();
     			
     			Thread thread2 = null;
-    			thread2 = new Thread (new ProxyPipeIn(targetSocket, localSocket, this));
+    			thread2 = new Thread(new ProxyPipeIn(targetSocket, localSocket, this));
     			thread2.setDaemon(true);
     			if (consoleLog.isDebugEnabled()) {
     				consoleLog.debug("Spawning ProxyPipeIn: " + thread2.getName());
@@ -113,7 +115,7 @@ public class Proxy implements Runnable {
     		} catch (UnknownHostException e) {
     			consoleLog.fatal("Error: Unknown Host " + _remotehost, e);
     			System.exit(-1);
-    		} catch(IOException e){
+    		} catch (IOException e) {
     			consoleLog.fatal("IOException when accepting new connection.", e);
     			System.exit(-2);
     		}
@@ -123,7 +125,7 @@ public class Proxy implements Runnable {
     /**
      * Reset the Timers and byte counters.
      */
-    public void resetProxyCounters() {
+    public final void resetProxyCounters() {
     	this.proxyTimeResponded = 0;
     	this.proxyReceiveAmount = 0;
     	this.proxySentAmount = 0;
@@ -134,7 +136,7 @@ public class Proxy implements Runnable {
     /**
      * Shutdown the proxy.
      */
-    public void shutdown() throws IOException {
+    public final void shutdown() throws IOException {
     	server.close();
     }
     
@@ -145,10 +147,10 @@ public class Proxy implements Runnable {
 		this._remotehost = remotehost;
 	}
 	public int getRemoteport() {
-		return remoteport;
+		return _remoteport;
 	}
 	public void setRemoteport(int remoteport) {
-		this.remoteport = remoteport;
+		this._remoteport = remoteport;
 	}
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
