@@ -11,14 +11,18 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.jbehave.core.mock.UsingMatchers;
 
-import com.awebstorm.robot.ConsoleLogReader;
+import com.awebstorm.robot.LogDataExtractor;
 
+/**
+ * Tests the proxy behaviour for correct functionality against the customercentrix.com web server
+ * @author Cromano
+ *
+ */
 public class ProxyBehaviour extends UsingMatchers {
 	
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private long fileStart;
-	private long fileEnd;
 	
 	/**
 	 * Retrieve 1 object on a new port.
@@ -96,9 +100,7 @@ public class ProxyBehaviour extends UsingMatchers {
 				consoleLog.error("Interrupted sleep.", e);
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Finished Test shouldGet1()");
@@ -175,9 +177,7 @@ public class ProxyBehaviour extends UsingMatchers {
 				consoleLog.error("Interrupted sleep.", e);
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Finished Test shouldGet3WithoutAccum()");
@@ -254,9 +254,7 @@ public class ProxyBehaviour extends UsingMatchers {
 				consoleLog.error("Interrupted sleep.", e);
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Finished Test shouldGet2WithAccum()");
@@ -341,9 +339,7 @@ public class ProxyBehaviour extends UsingMatchers {
 				}
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Finished Test shouldGenAndUse10Proxies()");

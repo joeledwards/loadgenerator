@@ -19,7 +19,6 @@ public class BehaviourContainer implements Behaviours {
 	@SuppressWarnings("unchecked")
 	public final Class[] getBehaviours() {
 		return new Class[] { 
-			//(new HtmlUnitProxyBehaviour()).getClass(),
 			(new StyleParserBehaviour()).getClass(),
 			(new HTMLRobotBehaviour()).getClass(),
 			(new ProxyBehaviour()).getClass(),

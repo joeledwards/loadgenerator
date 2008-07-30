@@ -31,6 +31,7 @@ public class LoadGenerator {
 	private static int numberOfProxies = 1;
 	private static PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator.properties";
+	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
 	private static boolean stop = false;
 	private static PriorityBlockingQueue<Robot> aliveRobotList = new PriorityBlockingQueue<Robot>();
 	private static long robotThreadUID;

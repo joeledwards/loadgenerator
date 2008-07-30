@@ -20,9 +20,9 @@ public class BrowserState {
 	private WebClient vUser = new WebClient();
 	private HtmlPage currentPage;
 	private HashSet<String> browserHistory = new HashSet<String>();
-	private HashMap<String,String> _preferences;
+	private HashMap<String,String> statePreferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private int _proxyPort;
+	private int localProxyPort;
 	
 	/**
 	 * Default Constructor loads settings from the preferences procured from the script InputStream.
@@ -30,8 +30,8 @@ public class BrowserState {
 	 * @param proxyPort Port on which to contact the local proxy
 	 */
 	public BrowserState(final HashMap<String, String> preferences, final int proxyPort) {
-		this._proxyPort=proxyPort;
-		_preferences = preferences;
+		this.localProxyPort=proxyPort;
+		statePreferences = preferences;
 		configureState();
 	}
 	
@@ -41,13 +41,13 @@ public class BrowserState {
 	private void configureState() {
 		
 		WebClient client = null;
-		String browVersionString = _preferences.get("htmlRobotBrowserVersion");
-		String proxyHost = _preferences.get("proxyHost");
+		String browVersionString = statePreferences.get("htmlRobotBrowserVersion");
+		String proxyHost = statePreferences.get("proxyHost");
 		
 		if (proxyHost == null) {
 			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
 		} else if (browVersionString != null && proxyHost != null) {
-			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, _proxyPort);
+			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, localProxyPort);
 		} else {
 			client = new WebClient();
 		}
@@ -55,25 +55,25 @@ public class BrowserState {
 		client.setThrowExceptionOnFailingStatusCode(false);
 		
 		String temp = "";
-		temp = _preferences.get("javaScriptEnabled");
+		temp = statePreferences.get("javaScriptEnabled");
 		if (temp != null) {
 			client.setJavaScriptEnabled(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "javaScriptEnabled");
 		}
-		temp = _preferences.get("redirectEnabled");
+		temp = statePreferences.get("redirectEnabled");
 		if (temp != null) {
 			client.setRedirectEnabled(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "redirectEnabled");
 		}
-		temp = _preferences.get("throwExceptionOnScriptError");
+		temp = statePreferences.get("throwExceptionOnScriptError");
 		if (temp != null) {
 			client.setThrowExceptionOnScriptError(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "throwExceptionOnScriptError");
 		}
-		temp = _preferences.get("useInsecureSSL");
+		temp = statePreferences.get("useInsecureSSL");
 		if (temp != null) {
 			try {
 				client.setUseInsecureSSL(Boolean.parseBoolean(temp));
@@ -84,19 +84,19 @@ public class BrowserState {
 		} else {
 			consoleLog.debug("A preference was not set: " + "useInsecureSSL");
 		}
-		temp = _preferences.get("popupBlockerEnabled");
+		temp = statePreferences.get("popupBlockerEnabled");
 		if (temp != null) {
 			client.setPopupBlockerEnabled(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "popupBlockerEnabled");
 		}
-		temp = _preferences.get("timeout");
+		temp = statePreferences.get("timeout");
 		if (temp != null) {
 			client.setTimeout(Integer.parseInt(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "timeout");
 		}
-		temp = _preferences.get("cacheSize");
+		temp = statePreferences.get("cacheSize");
 		if (temp != null) {
 			client.setCache(new Cache());
 		} else {
@@ -141,7 +141,7 @@ public class BrowserState {
 	 * @return Proxy port of this state
 	 */
 	public int getProxyPort() {
-		return _proxyPort;
+		return localProxyPort;
 	}
 	
 }

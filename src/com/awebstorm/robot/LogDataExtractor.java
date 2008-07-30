@@ -1,28 +1,33 @@
 package com.awebstorm.robot;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-public class ConsoleLogReader {
+/**
+ * Contains the utility class and methods to parse the console.log file from a Robot.
+ * @author Cromano
+ *
+ */
+public class LogDataExtractor {
 	
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private BufferedReader results;
-	private long fileStart;
-	private long fileEnd;
-	private String filename;
-	private HashMap<String,ALine> myLines = new HashMap<String,ALine>();
+	private HashMap<String, ALineData> myLines = new HashMap<String, ALineData>();
 	private boolean consoleLogHasNoErrors;
 	
-	public class ALine {
+	/**
+	 * Holds the data values extracted from an info line and the values getters and setters.
+	 * @author Cromano
+	 *
+	 */
+	public class ALineData {
 		private String stepNum;
 		private String reportTime;
 		private String replyTime;
@@ -37,103 +42,208 @@ public class ConsoleLogReader {
 		private String stepStatus;
 		private String jobID;
 		
-		public String getStepNum() {
+		/**
+		 * step number getter.
+		 * @return step number
+		 */
+		public final String getStepNum() {
 			return stepNum;
 		}
-		public void setStepNum(String stepNum) {
+		/**
+		 * step number setter.
+		 * @param stepNum step number
+		 */
+		public final void setStepNum(final String stepNum) {
 			this.stepNum = stepNum;
 		}
-		public String getReportTime() {
+		/**
+		 * time that the report was filed getter.
+		 * @return report time
+		 */
+		public final String getReportTime() {
 			return reportTime;
 		}
-		public void setReportTime(String reportTime) {
+		/**
+		 * time that the report was filed setter.
+		 * @param reportTime report time
+		 */
+		public final void setReportTime(final String reportTime) {
 			this.reportTime = reportTime;
 		}
-		public String getReplyTime() {
+		/**
+		 * time it took to receive a reply form the target getter.
+		 * @return reply time
+		 */
+		public final String getReplyTime() {
 			return replyTime;
 		}
-		public void setReplyTime(String replyTime) {
+		/**
+		 * time it took to receive a reply form the target setter.
+		 * @param replyTime reply time
+		 */
+		public final void setReplyTime(final String replyTime) {
 			this.replyTime = replyTime;
 		}
-		public String getTimeStarted() {
+		/**
+		 * time that the step started getter.
+		 * @return time started
+		 */
+		public final String getTimeStarted() {
 			return timeStarted;
 		}
-		public void setTimeStarted(String timeStarted) {
+		/**
+		 * time that the step started setter.
+		 * @param timeStarted time started
+		 */
+		public final void setTimeStarted(final String timeStarted) {
 			this.timeStarted = timeStarted;
 		}
-		public String getTimeEnded() {
+		/**
+		 * time that the step ended getter.
+		 * @return time ended
+		 */
+		public final String getTimeEnded() {
 			return timeEnded;
 		}
-		public void setTimeEnded(String timeEnded) {
+		/**
+		 * time that the step ended setter.
+		 * @param timeEnded time ended
+		 */
+		public final void setTimeEnded(final String timeEnded) {
 			this.timeEnded = timeEnded;
 		}
-		public String getTimeResponded() {
+		/**
+		 * time that the target responded getter.
+		 * @return time responded
+		 */
+		public final String getTimeResponded() {
 			return timeResponded;
 		}
-		public void setTimeResponded(String timeResponded) {
+		/**
+		 * time that the target responded setter.
+		 * @param timeResponded time responded
+		 */
+		public final void setTimeResponded(final String timeResponded) {
 			this.timeResponded = timeResponded;
 		}
-		public String getTimeLength() {
+		/**
+		 * The difference between the time responded and the time started getter.
+		 * @return step time length
+		 */
+		public final String getTimeLength() {
 			return timeLength;
 		}
-		public void setTimeLength(String timeLength) {
+		/**
+		 * The difference between the time responded and the time started setter.
+		 * @param timeLength step time length
+		 */
+		public final void setTimeLength(final String timeLength) {
 			this.timeLength = timeLength;
 		}
-		public String getBodyBytes() {
+		/**
+		 * Size of a step's body getter.
+		 * @return size of a step's body
+		 */
+		public final String getBodyBytes() {
 			return bodyBytes;
 		}
-		public void setBodyBytes(String bodyBytes) {
+		/**
+		 * Size of a step's body setter.
+		 * @param bodyBytes size of the step's body
+		 */
+		public final void setBodyBytes(final String bodyBytes) {
 			this.bodyBytes = bodyBytes;
 		}
-		public String getReceiveBytes() {
+		/**
+		 * bytes received during the step getter.
+		 * @return bytes received during the step
+		 */
+		public final String getReceiveBytes() {
 			return receiveBytes;
 		}
-		public void setReceiveBytes(String receiveBytes) {
+		/**
+		 * bytes received during the step setter.
+		 * @param receiveBytes bytes received during the step
+		 */
+		public final void setReceiveBytes(final String receiveBytes) {
 			this.receiveBytes = receiveBytes;
 		}
-		public String getSentBytes() {
+		/**
+		 * bytes sent during the step getter.
+		 * @return bytes sent during the step
+		 */
+		public final String getSentBytes() {
 			return sentBytes;
 		}
-		public void setSentBytes(String sentBytes) {
+		/**
+		 * bytes sent during the step setter.
+		 * @param sentBytes bytes sent during the step
+		 */
+		public final void setSentBytes(final String sentBytes) {
 			this.sentBytes = sentBytes;
 		}
-		public String getThroughput() {
+		/**
+		 * throughput over the length of the step getter.
+		 * @return throughput over the length
+		 */
+		public final String getThroughput() {
 			return throughput;
 		}
-		public void setThroughput(String throughput) {
+		/**
+		 * throughput over the length of the step setter.
+		 * @param throughput throughput over the length
+		 */
+		public final void setThroughput(final String throughput) {
 			this.throughput = throughput;
 		}
-		public String getStepStatus() {
+		/**
+		 * step status getter.
+		 * @return the step's status
+		 */
+		public final String getStepStatus() {
 			return stepStatus;
 		}
-		public void setStepStatus(String stepStatus) {
+		/**
+		 * step status setter.
+		 * @param stepStatus the step's status
+		 */
+		public final void setStepStatus(final String stepStatus) {
 			this.stepStatus = stepStatus;
 		}
-		public String getJobID() {
+		/**
+		 * the step's job ID getter.
+		 * @return the step's job ID
+		 */
+		public final String getJobID() {
 			return jobID;
 		}
-		public void setJobID(String jobID) {
+		/**
+		 * the step's job ID setter.
+		 * @param jobID the step's job ID
+		 */
+		public final void setJobID(final String jobID) {
 			this.jobID = jobID;
 		}
 	}
 	
 	/**
 	 * Retrieves the lines that were collected from the console.log between the two points if any
-	 * @return A LinkedList<ALine> containing the values of the special steps that
+	 * @return A LinkedList<ALineData> containing the values of the special steps that
 	 * should be cross-referenced.
 	 */
-	public HashMap<String,ALine> getMyLines() {
+	public final HashMap<String, ALineData> getMyLines() {
 		return myLines;
 	}
 	
 	/**
-	 * Creates a new ConsoleLogReader and reads and parses the file a line at a time.
+	 * Creates a new LogDataExtractor and reads and parses the file a line at a time.
+	 * This will parse the lines till the end-of-file so the useful data must be the
+	 * last entered into the log.
+	 * 
 	 * @param filename Name of the file to parse
+	 * @param fileStart The location in the file to begin extracting data
 	 */
-	public ConsoleLogReader(String filename, long fileStart, long fileEnd) {
-		this.filename = filename;
-		this.fileStart = fileStart;
-		this.fileEnd = fileEnd;
+	public LogDataExtractor(final String filename, final long fileStart) {
 		File consoleFile = new File(filename);
 		FileInputStream results2 = null;
 		consoleLogHasNoErrors = true;
@@ -142,10 +252,9 @@ public class ConsoleLogReader {
 			results2.skip(fileStart);
 			results = new BufferedReader(new InputStreamReader(results2));
 		} catch (FileNotFoundException e) {
-			//consoleLog.error("Could not find a consoleLog.", e);
 			consoleLogHasNoErrors = false;
 		} catch (IOException e) {
-			//consoleLog.error("IO error on consoleLog.", e);
+			consoleLog.error("IO error on consoleLog.", e);
 			consoleLogHasNoErrors = false;
 		}
 		try {
@@ -156,15 +265,14 @@ public class ConsoleLogReader {
 				newLine = results.readLine();
 			}
 		} catch (IOException e) {
-			//consoleLog.error("Could not read a line from the file.", e);
+			consoleLog.error("Could not read a line from the file.", e);
 			consoleLogHasNoErrors = false;
 		}
 		try {
 			results.close();
 			results2.close();
-			deleteFile(filename);
 		} catch (IOException e) {
-			//consoleLog.error("Could not close the stream to the console.log during parsing.", e);
+			consoleLog.error("Could not close the stream to the console.log during parsing.", e);
 			consoleLogHasNoErrors = false;
 		}
 	}
@@ -174,7 +282,7 @@ public class ConsoleLogReader {
 	 * @param line A line of text without a line termination character included
 	 * @return This line indicates an error
 	 */
-	public boolean parseALine(String line) {
+	public final boolean parseALine(String line) {
 		//Remove the leading dots, they indicate tests started
 		int i = 0;
 		while (true) {
@@ -196,7 +304,7 @@ public class ConsoleLogReader {
 		} else if (line.startsWith("[DEBUG]", 0)) {
 			return true;
 		} else if (line.startsWith("[INFO ]", 0)) {
-			ALine infoLine = new ALine();
+			ALineData infoLine = new ALineData();
 			String subline = line.substring(41);
 			int j = 0;
 			newChar = subline.charAt(j);
@@ -204,7 +312,7 @@ public class ConsoleLogReader {
 				j++;
 				newChar = subline.charAt(j);
 			}
-			subline = subline.substring(j+1);
+			subline = subline.substring(j + 1);
 			infoLine.setJobID(subline.substring(0, 4));
 			subline = subline.substring(5);
 			if (subline.startsWith("WAIT")) {
@@ -213,47 +321,37 @@ public class ConsoleLogReader {
 				}
 			} else if (subline.startsWith("INVOKE")) {
 				subline = subline.substring(7);
-				//consoleLog.info(parseCommaEnded(subline));
+				//Extract Data params
 				infoLine.setStepNum(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getStepNum().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReportTime(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReportTime().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReplyTime(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReplyTime().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeStarted(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeStarted().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeEnded(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeEnded().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeResponded(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeResponded().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeLength(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeLength().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setBodyBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getBodyBytes().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReceiveBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReceiveBytes().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setSentBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getSentBytes().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setThroughput(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getThroughput().length() + 1);
-				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setStepStatus(parseCommaEnded(subline));
 				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
 				if (infoLine.getStepStatus().equals("success")) {
 					return true;
 				}
 			} else if (subline.startsWith("POST")) {
-				subline = subline.substring(7);
+				subline = subline.substring(5);
+				//Extract Data params
 				infoLine.setStepNum(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getStepNum().length() + 1);
 				infoLine.setReportTime(parseCommaEnded(subline));
@@ -278,15 +376,14 @@ public class ConsoleLogReader {
 				subline = subline.substring(infoLine.getThroughput().length() + 1);
 				infoLine.setStepStatus(parseCommaEnded(subline));
 				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
-					if (infoLine.getStepStatus().equals("success")) {
-						return true;
-					}
+				if (infoLine.getStepStatus().equals("success")) {
+					return true;
+				}
 			} else if (subline.startsWith("VERIFY_TITLE")) {
 				if (subline.contains("success")) {
 					return true;
 				}
 			} else {
-				//TODO - Other steps that have not been implemented go here
 				return true;
 			}
 
@@ -297,11 +394,11 @@ public class ConsoleLogReader {
 
 	
 	/**
-	 * Used to parse the part of the line that is comma delimited to pull values from the text.
+	 * Parse the part of the line that is comma or space delimited in order to pull values from the text.
 	 * @param line Line of text to pull a value from
 	 * @return The value pulled out
 	 */
-	public String parseCommaEnded(String line) {
+	public final String parseCommaEnded(final String line) {
 		int k = 0;
 		char someChar = line.charAt(0);
 		while (someChar != ',' && someChar != ' ') {
@@ -312,14 +409,10 @@ public class ConsoleLogReader {
 	}
 	
 	/**
-	 * Deletes a file whose name was given.
-	 * @param filename Name of the file to delete
+	 * Retrieves the status of a set of lines parsed.
+	 * @return true if the log lines parsed have no errors, else false;
 	 */
-	public void deleteFile(String filename) {
-		(new File(filename)).delete();
-	}
-
-	public boolean isConsoleLogHasNoErrors() {
+	public final boolean isConsoleLogHasNoErrors() {
 		return consoleLogHasNoErrors;
 	}
 	

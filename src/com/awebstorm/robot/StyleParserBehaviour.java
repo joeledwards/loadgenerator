@@ -22,7 +22,7 @@ public class StyleParserBehaviour extends UsingMatchers {
 	}
 	
 	/**
-	 * Should retrieve the appropriate String resources from the StyleShet text.
+	 * Should retrieve the appropriate String resources from the StyleSheet text.
 	 */
 	public void shouldParseStyleSheetCorrectly() {
 		LinkedList<String> test = StyleParser.grabStyleSheetText("url(hello1/test.img) ((())) asdiovnaovavuiobnauipvqaviburl(hello2\")");

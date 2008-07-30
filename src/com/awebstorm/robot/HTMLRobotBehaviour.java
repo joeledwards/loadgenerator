@@ -17,7 +17,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jbehave.core.mock.UsingMatchers;
 
 import com.awebstorm.Proxy;
-import com.awebstorm.robot.ConsoleLogReader.ALine;
+import com.awebstorm.robot.LogDataExtractor.ALineData;
 
 /**
  * Test the behaviour of the HTMLRobot class.
@@ -31,12 +31,11 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
 	private static int maxNumberOfProxies = 100;
 	private static int numberOfRobots = 1;
-	private Proxy[] loadGenProxyArray = new Proxy[maxNumberOfProxies];
+	private Proxy[] loadGenProxyArray;
 	private String remotehost;
 	private int remoteport;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private long fileStart;
-	private long fileEnd;
 	
 	/**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
@@ -87,11 +86,9 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		HashMap<String,ALine> results = reader.getMyLines();
+		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0010-2").getSentBytes().equals("222"));
 		ensureThat(results.get("0010-2").getReceiveBytes().equals("6024"));
 	}
@@ -147,11 +144,9 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		HashMap<String,ALine> results = reader.getMyLines();
+		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
 		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
 	}
@@ -192,11 +187,6 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-		try {
-			Thread.sleep(4000);
-		} catch (InterruptedException e) {
-			consoleLog.error("Interrupted sleep.", e);
-		}
 		robotIterator = robots.iterator();
 		while (robotIterator.hasNext()) {
 			Proxy testProxy = robotIterator.next().getCurrentProxy();
@@ -213,11 +203,9 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		HashMap<String,ALine> results = reader.getMyLines();
+		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
 		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
 		ensureThat(results.get("0002-2").getSentBytes().equals("222"));
@@ -282,11 +270,9 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 				}
 			}
 		}
-		File consoleFile = new File("console.log");
-		fileEnd = consoleFile.length();
-		ConsoleLogReader reader = new ConsoleLogReader("console.log", fileStart, fileEnd);
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		HashMap<String,ALine> results = reader.getMyLines();
+		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
 		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
 		ensureThat(results.get("0001-3").getSentBytes().equals("222"));
@@ -307,6 +293,7 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 
 		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
 		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
+		loadGenProxyArray = new Proxy[Integer.parseInt(loadGeneratorProperties.getString("maxNumberOfProxies"))];
 	}
 	
 	/**

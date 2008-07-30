@@ -15,26 +15,25 @@ public abstract class Robot implements Runnable {
 
 	protected HashMap<String, String> prefs = new HashMap<String, String>();
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
-	private String _targetDomain;
-	private int _targetPort;
+	private String targetDomain;
+	private int targetPort;
 	private static int defaultWaitStep = 1000;
-	private InputStream _script;
+	private InputStream scriptStream;
 	//Robot ID vars
 	protected String robotID;
 	protected Step currentStep;
 	protected long timeLastStepFinished = 0;
 	protected boolean stopExecuting = false;
-	protected boolean robotCompleted = false;
-	protected Thread t;
+	protected Thread myRobotThread;
 	protected Proxy currentProxy;
 	
 	/**
 	 * Initialize a Robot in its own Thread.
 	 */
 	public final void init() {	
-		t = new Thread(this);
-		t.setDaemon(true);
-		t.start();
+		myRobotThread = new Thread(this);
+		myRobotThread.setDaemon(true);
+		myRobotThread.start();
 	}
 	
 	/**
@@ -46,9 +45,9 @@ public abstract class Robot implements Runnable {
 	 * @param newProxy Proxy recording this Robots actions
 	 */
 	protected Robot(final InputStream script, final Proxy newProxy) {
-		_script = script;
+		scriptStream = script;
 		currentProxy = newProxy;
-		new ScriptReader().run(_script, stepQueue, prefs, this);
+		new ScriptReader().run(scriptStream, stepQueue, prefs, this);
 		this.setDefaultRobotPreferences();
 	}
 
@@ -75,8 +74,8 @@ public abstract class Robot implements Runnable {
 	private void setDefaultRobotPreferences() {
 		defaultWaitStep = Integer.parseInt(prefs.get("waitstep"));
 		robotID = prefs.get("jobID");
-		_targetDomain = prefs.get("domain");
-		_targetPort = Integer.parseInt(prefs.get("remoteport"));
+		targetDomain = prefs.get("domain");
+		targetPort = Integer.parseInt(prefs.get("remoteport"));
 	}
 	
 	/**
@@ -119,18 +118,15 @@ public abstract class Robot implements Runnable {
 		return defaultWaitStep;
 	}
 	public String getTargetDomain() {
-		return _targetDomain;
+		return targetDomain;
 	}
 	public Proxy getCurrentProxy() {
 		return currentProxy;
 	}
-	public boolean isRobotCompleted() {
-		return robotCompleted;
-	}
 	public Thread.State getThreadState() {
-		return t.getState();
+		return myRobotThread.getState();
 	}
 	public int getTargetPort() {
-		return _targetPort;
+		return targetPort;
 	}
 }

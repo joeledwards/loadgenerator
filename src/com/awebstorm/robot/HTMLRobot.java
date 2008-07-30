@@ -67,7 +67,6 @@ public class HTMLRobot extends Robot {
 				
 				stepNum++;
 		}
-		robotCompleted = true;
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug("Robot is closing: " + this.robotID);
 		}		

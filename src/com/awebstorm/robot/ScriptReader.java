@@ -33,7 +33,7 @@ public class ScriptReader extends DefaultHandler {
 	private HashMap<String,String> prefs;
 	private boolean propertiesMode;
 	private int stepCounter;
-	private Robot _myRobotOwner;
+	private Robot stepsRobotOwner;
 
 	/**
 	 * Parse a Script.
@@ -44,7 +44,7 @@ public class ScriptReader extends DefaultHandler {
 	 */
 	public final void run(final InputStream script, final PriorityQueue<Step> newStepQueue, final HashMap<String, String> newPrefs, final Robot myRobotOwner) {
 
-		this._myRobotOwner = myRobotOwner;
+		this.stepsRobotOwner = myRobotOwner;
 		SAXParserFactory newFactory;
 		newFactory = SAXParserFactory.newInstance();
 		SAXParser myXMLParser = null;
@@ -93,10 +93,10 @@ public class ScriptReader extends DefaultHandler {
 			Attributes newList = new AttributesImpl(attributes);
 			consoleLog.debug("Added Step: " + qName + " Value :"
 					+ attributes.getValue(0));
-			if (_myRobotOwner.getClass().getName().equals("HTMLRobot")) {
-				stepQueue.add(new Step(qName, stepCounter, newList, _myRobotOwner));
+			if (stepsRobotOwner.getClass().getName().equals("HTMLRobot")) {
+				stepQueue.add(new Step(qName, stepCounter, newList, stepsRobotOwner));
 			} else {
-				stepQueue.add(new Step(qName, stepCounter, newList, _myRobotOwner));
+				stepQueue.add(new Step(qName, stepCounter, newList, stepsRobotOwner));
 			}
 			stepCounter++;
 		}

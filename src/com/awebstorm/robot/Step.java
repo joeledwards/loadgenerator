@@ -26,7 +26,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 /**
- * Holds the script step information and operations.
+ * Holds the script step information and operations that can be executed by a Robot.
  * Details of a step are stored in an Attributes List
  * @author Cromano
  */
@@ -49,16 +49,16 @@ public class Step implements Comparable<Step> {
 	}
 	
 	private BrowserState _currentBrowserState;
-	private Robot _myRobotOwner;
-	private String _stepName;
-	private int _stepNum;
+	private Robot stepRobotOwner;
+	private String stepName;
+	private int stepNumber;
 	private Attributes _stepAttributeList;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Logger resultLog = Logger.getLogger("com.awebstorm.robot.Step.resultLog");
 	private long replyTime = 0;
 	private long BodyByteAmount = 0; 
-	private String _targetDomain;
-	private Proxy _myProxy;
+	private String targetDomain;
+	private Proxy myProxy;
 
 	/**
 	 * Creates a new Step.
@@ -67,12 +67,12 @@ public class Step implements Comparable<Step> {
 	 * @param list Attributes of the step
 	 * @param myRobotOwner Robot that owns this step
 	 */
-	public Step(final String name, final int value, final Attributes list, final Robot myRobotOwner) {
-		_stepName = name;
-		_stepNum = value;
+	public Step(final String name, final int value, final Attributes list, final Robot robotOwner) {
+		stepName = name;
+		stepNumber = value;
 		_stepAttributeList = list;
-		_myRobotOwner = myRobotOwner;
-		_myProxy = _myRobotOwner.getCurrentProxy();
+		stepRobotOwner = robotOwner;
+		myProxy = stepRobotOwner.getCurrentProxy();
 	}
 	
 	/**
@@ -80,7 +80,7 @@ public class Step implements Comparable<Step> {
 	 * @return Name of this step
 	 */
 	public String getName() {
-		return _stepName;
+		return stepName;
 	}
 	
 	/**
@@ -97,7 +97,7 @@ public class Step implements Comparable<Step> {
 	 * @return Will return negative, 1, or positive if o is greater, equal, or less than this Step
 	 */
 	public int compareTo(final Step o) {
-		return _stepNum - o.getValue();
+		return stepNumber - o.getValue();
 	}
 
 	/**
@@ -106,22 +106,22 @@ public class Step implements Comparable<Step> {
 	 * @param browserState currentState of the robot's browser
 	 */
 	public void execute(final String jobID, BrowserState browserState) {
-		_myProxy.resetProxyCounters();
+		myProxy.resetProxyCounters();
 		replyTime = 0;
 		BodyByteAmount = 0; 
 		_currentBrowserState = browserState;
 		//HTMLRobot handles http protocols
-		_targetDomain = "http://" + _myRobotOwner.getTargetDomain();
-		if (!_myRobotOwner.getTargetDomain().equals(_myProxy.getRemotehost())) {
-			_myProxy.setRemotehost(_myRobotOwner.getTargetDomain());
+		targetDomain = "http://" + stepRobotOwner.getTargetDomain();
+		if (!stepRobotOwner.getTargetDomain().equals(myProxy.getRemotehost())) {
+			myProxy.setRemotehost(stepRobotOwner.getTargetDomain());
 		}
-		if (!(_myRobotOwner.getTargetPort() == (_myProxy.getRemoteport()))) {
-			_myProxy.setRemoteport(_myRobotOwner.getTargetPort());
+		if (!(stepRobotOwner.getTargetPort() == (myProxy.getRemoteport()))) {
+			myProxy.setRemoteport(stepRobotOwner.getTargetPort());
 		}
 		ActionTypes currentType = null;
 		boolean stepReturnStatus = true;
 		try {
-			currentType = ActionTypes.valueOf(_stepName);
+			currentType = ActionTypes.valueOf(stepName);
 		} catch (IllegalArgumentException e) {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
@@ -184,7 +184,7 @@ public class Step implements Comparable<Step> {
 		}
 		WebRequestSettings newSettings = null;
 		HtmlPage postPage = null;
-		String currentPath = _targetDomain + _stepAttributeList.getValue(0);
+		String currentPath = targetDomain + _stepAttributeList.getValue(0);
 		try {
 			newSettings = new WebRequestSettings(new URL(currentPath), SubmitMethod.POST);
 		} catch (MalformedURLException e1) {
@@ -196,7 +196,7 @@ public class Step implements Comparable<Step> {
 		try {
 			tempResponsePage = _currentBrowserState.getVUser().getPage(newSettings);
 		} catch (FailingHttpStatusCodeException e) {
-			consoleLog.error("POST operation, " + _stepName + " has a bad status message.", e);
+			consoleLog.error("POST operation, " + stepName + " has a bad status message.", e);
 			return false;
 		} catch (IOException e) {
 			consoleLog.error("IOException thrown during a POST operation.", e);
@@ -283,7 +283,7 @@ public class Step implements Comparable<Step> {
 	 */
 	private boolean invoke() {
 		String currentPath = _stepAttributeList.getValue(0);
-		currentPath = _targetDomain + currentPath;
+		currentPath = targetDomain + currentPath;
 		HtmlPage invokePage = null;
 		Page tempPage;
 		
@@ -355,17 +355,17 @@ public class Step implements Comparable<Step> {
 				if (tempAttrs.getNamedItem("src") != null) {
 					if (!tempAttr.startsWith("http")) {
 						if (tempAttr.charAt(0) == '/') {
-							tempAttr = _targetDomain + tempAttr;
+							tempAttr = targetDomain + tempAttr;
 						} else if (tempAttr.startsWith("https") 
 								|| tempAttr.startsWith("ftp") 
 								|| tempAttr.startsWith("file") 
 								|| tempAttr.startsWith("jar")) {
 							consoleLog.debug("Bad protocol encountered.");
 						} else {
-							tempAttr = _targetDomain + '/' + tempAttr;
+							tempAttr = targetDomain + '/' + tempAttr;
 						}
 						//In case of domain seperate from the domain for the script
-					} else if (!tempAttr.startsWith(_targetDomain)) {
+					} else if (!tempAttr.startsWith(targetDomain)) {
 						consoleLog.debug("Bad domain encountered: " + tempAttr);
 						_currentBrowserState.addUrlToHistory(tempAttr);
 					}
@@ -391,13 +391,13 @@ public class Step implements Comparable<Step> {
 						aResource = styleResourceList.poll();
 						if (!aResource.startsWith("http")) {
 							if (aResource.charAt(0) == '/') {
-								aResource = _targetDomain 
+								aResource = targetDomain 
 								+ aResource;
 							} else {
-								aResource = _targetDomain 
+								aResource = targetDomain 
 								+ '/' + aResource;
 							}
-						} else if (!aResource.startsWith(_targetDomain)) {
+						} else if (!aResource.startsWith(targetDomain)) {
 							consoleLog.debug("Bad domain encountered: " + aResource);
 							_currentBrowserState.addUrlToHistory(aResource);
 						}
@@ -434,11 +434,11 @@ public class Step implements Comparable<Step> {
 							aResource = tempAttrs.getNamedItem("href").getNodeValue();
 							if (!aResource.startsWith("http")) {
 								if (aResource.charAt(0) == '/') {
-									aResource = _targetDomain + aResource;
+									aResource = targetDomain + aResource;
 								} else {
-									aResource = _targetDomain + '/' + aResource;
+									aResource = targetDomain + '/' + aResource;
 								}
-							} else if (!aResource.startsWith(_targetDomain)) {
+							} else if (!aResource.startsWith(targetDomain)) {
 								consoleLog.debug("Bad domain encountered: " + aResource);
 								_currentBrowserState.addUrlToHistory(aResource);
 							}
@@ -457,9 +457,9 @@ public class Step implements Comparable<Step> {
 									aResource = StyleParser.subDirBuilder(temporary.getUrl()) + styleResourceList.poll();
 									if (!aResource.startsWith("http")) {
 										if (aResource.charAt(0) == '/') {
-											aResource = _targetDomain + aResource;
+											aResource = targetDomain + aResource;
 										} else {
-											aResource = _targetDomain + '/' + aResource;
+											aResource = targetDomain + '/' + aResource;
 										}
 									}
 									if (_currentBrowserState.addUrlToHistory(aResource)) {
@@ -543,16 +543,16 @@ public class Step implements Comparable<Step> {
 	 */
 	private synchronized void report(final boolean stepStatus, final String jobID) {
 
-		long proxyReceiveAmount = _myProxy.getProxyReceiveAmount();
-		long proxySentAmount = _myProxy.getProxySentAmount();
-		long stepProxyTimeStarted = _myProxy.getProxyTimeStarted();
-		long stepProxyTimeResponded = _myProxy.getProxyTimeResponded();
-		long stepProxyTimeEnded = _myProxy.getProxyTimeEnded();
+		long proxyReceiveAmount = myProxy.getProxyReceiveAmount();
+		long proxySentAmount = myProxy.getProxySentAmount();
+		long stepProxyTimeStarted = myProxy.getProxyTimeStarted();
+		long stepProxyTimeResponded = myProxy.getProxyTimeResponded();
+		long stepProxyTimeEnded = myProxy.getProxyTimeEnded();
 
 		StringBuffer tempResult = new StringBuffer();
 		ActionTypes currentType;
 		try {
-			currentType = ActionTypes.valueOf(_stepName);
+			currentType = ActionTypes.valueOf(stepName);
 		} catch (IllegalArgumentException e) {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
@@ -568,9 +568,9 @@ public class Step implements Comparable<Step> {
 			if (resultLog.isDebugEnabled()) {
 				tempResult.append("jobID: " +jobID);
 				tempResult.append('\n');
-				tempResult.append("_stepName: " + _stepName);
+				tempResult.append("stepName: " + stepName);
 				tempResult.append('\n');
-				tempResult.append("_stepNum: " + _stepNum);
+				tempResult.append("stepNumber: " + stepNumber);
 				tempResult.append('\n');
 				tempResult.append("current Time: " + formatTime(System.currentTimeMillis()));
 				tempResult.append('\n');
@@ -605,9 +605,9 @@ public class Step implements Comparable<Step> {
 			tempResult = new StringBuffer();
 			tempResult.append(jobID);
 			tempResult.append(',');
-			tempResult.append(_stepName);
+			tempResult.append(stepName);
 			tempResult.append(',');
-			tempResult.append(_stepNum);
+			tempResult.append(stepNumber);
 			tempResult.append(',');
 			tempResult.append(System.currentTimeMillis());
 			tempResult.append(',');
@@ -645,9 +645,9 @@ public class Step implements Comparable<Step> {
 		case VERIFY_TITLE:
 			tempResult.append(jobID);
 			tempResult.append(',');
-			tempResult.append(_stepName);
+			tempResult.append(stepName);
 			tempResult.append(',');
-			tempResult.append(_stepNum);
+			tempResult.append(stepNumber);
 			tempResult.append(',');
 			tempResult.append(System.currentTimeMillis());
 			tempResult.append(',');
@@ -671,7 +671,7 @@ public class Step implements Comparable<Step> {
 	 * @return The number of this Step
 	 */
 	public final int getValue() {
-		return _stepNum;
+		return stepNumber;
 	}
 
 	/**

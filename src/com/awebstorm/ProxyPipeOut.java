@@ -9,7 +9,7 @@ import java.net.Socket;
 import org.apache.log4j.Logger;
 
 /**
- * Listens to the proxy Socket and counts the bytes received and sent to the Robot.
+ * Listens to the proxy Socket and counts the bytes received and sent to the Proxy.
  * @author Cromano
  *
  */
@@ -19,7 +19,7 @@ public class ProxyPipeOut implements Runnable {
 	private Proxy myProxyOwner;
 
 	/**
-	 * Creates a new ProxyPipeIn to listen on this Socket with the specified Robot owner and pass on any info on in.
+	 * Creates a new ProxyPipeIn to listen on this Socket with the specified Proxy owner and pass on any info on in.
 	 * @param in Socket to listen on
 	 * @param out Socket to write on
 	 * @param myProxy Proxy that created this ProxyPipeOut in order to keep track of bytes and time
