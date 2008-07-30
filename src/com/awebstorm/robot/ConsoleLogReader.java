@@ -6,9 +6,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +19,7 @@ public class ConsoleLogReader {
 	private long fileStart;
 	private long fileEnd;
 	private String filename;
-	private LinkedList<ALine> myLines = new LinkedList<ALine>();
+	private HashMap<String,ALine> myLines = new HashMap<String,ALine>();
 	private boolean consoleLogHasNoErrors;
 	
 	public class ALine {
@@ -122,7 +122,7 @@ public class ConsoleLogReader {
 	 * @return A LinkedList<ALine> containing the values of the special steps that
 	 * should be cross-referenced.
 	 */
-	public LinkedList<ALine> getMyLines() {
+	public HashMap<String,ALine> getMyLines() {
 		return myLines;
 	}
 	
@@ -134,35 +134,38 @@ public class ConsoleLogReader {
 		this.filename = filename;
 		this.fileStart = fileStart;
 		this.fileEnd = fileEnd;
-		byte[] b = new byte[(int)(fileEnd-fileStart)];
+		File consoleFile = new File(filename);
+		FileInputStream results2 = null;
 		consoleLogHasNoErrors = true;
 		try {
-			results = new BufferedReader(new InputStreamReader(new FileInputStream(filename)));
-			FileInputStream results2 = new FileInputStream(filename);
-			results2.read(b, (int)(fileStart+1), (int)(fileEnd-fileStart));
-			results = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(b)));
-			
+			results2 = new FileInputStream(consoleFile);
+			results2.skip(fileStart);
+			results = new BufferedReader(new InputStreamReader(results2));
 		} catch (FileNotFoundException e) {
-			consoleLog.error("Could not find a consoleLog.", e);
+			//consoleLog.error("Could not find a consoleLog.", e);
 			consoleLogHasNoErrors = false;
 		} catch (IOException e) {
-			consoleLog.error("IO error on consoleLog.", e);
+			//consoleLog.error("IO error on consoleLog.", e);
 			consoleLogHasNoErrors = false;
 		}
 		try {
 			String newLine = results.readLine();
 			while (newLine != null) {
-				consoleLogHasNoErrors = consoleLogHasNoErrors && parseALine(newLine);
+				boolean tempStatus = parseALine(newLine);
+				consoleLogHasNoErrors = consoleLogHasNoErrors && tempStatus;
 				newLine = results.readLine();
 			}
 		} catch (IOException e) {
-			consoleLog.error("Could not read a line from the file.", e);
+			//consoleLog.error("Could not read a line from the file.", e);
+			consoleLogHasNoErrors = false;
 		}
 		try {
 			results.close();
+			results2.close();
 			deleteFile(filename);
 		} catch (IOException e) {
-			consoleLog.error("Could not close the stream to the console.log during parsing.", e);
+			//consoleLog.error("Could not close the stream to the console.log during parsing.", e);
+			consoleLogHasNoErrors = false;
 		}
 	}
 	
@@ -174,12 +177,13 @@ public class ConsoleLogReader {
 	public boolean parseALine(String line) {
 		//Remove the leading dots, they indicate tests started
 		int i = 0;
-		while (line != null) {
+		while (true) {
 			char someChar = line.charAt(i);
-			if (someChar == '.') {
+			if (someChar == '.' || someChar == 'F') {
 				i++;
 				continue;
 			}
+			break;
 		}
 		//Parse a consoleLog line to throw errors when a exception was thrown to the output
 		//or if the output values were bad.
@@ -189,7 +193,9 @@ public class ConsoleLogReader {
 			return false;
 		} else if (line.startsWith("[WARN ]", 0)) {
 			return false;
-		} else if (line.startsWith("[INFO ]")) {
+		} else if (line.startsWith("[DEBUG]", 0)) {
+			return true;
+		} else if (line.startsWith("[INFO ]", 0)) {
 			ALine infoLine = new ALine();
 			String subline = line.substring(41);
 			int j = 0;
@@ -207,29 +213,42 @@ public class ConsoleLogReader {
 				}
 			} else if (subline.startsWith("INVOKE")) {
 				subline = subline.substring(7);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setStepNum(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getStepNum().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReportTime(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReportTime().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReplyTime(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReplyTime().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeStarted(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeStarted().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeEnded(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeEnded().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeResponded(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeResponded().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setTimeLength(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getTimeLength().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setBodyBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getBodyBytes().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setReceiveBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getReceiveBytes().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setSentBytes(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getSentBytes().length() + 1);
+				//consoleLog.info(parseCommaEnded(subline));
 				infoLine.setThroughput(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getThroughput().length() + 1);
-				infoLine.setStepStatus(subline);
+				//consoleLog.info(parseCommaEnded(subline));
+				infoLine.setStepStatus(parseCommaEnded(subline));
+				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
 				if (infoLine.getStepStatus().equals("success")) {
 					return true;
 				}
@@ -257,7 +276,8 @@ public class ConsoleLogReader {
 				subline = subline.substring(infoLine.getSentBytes().length() + 1);
 				infoLine.setThroughput(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getThroughput().length() + 1);
-				infoLine.setStepStatus(subline);
+				infoLine.setStepStatus(parseCommaEnded(subline));
+				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
 					if (infoLine.getStepStatus().equals("success")) {
 						return true;
 					}
@@ -271,7 +291,7 @@ public class ConsoleLogReader {
 			}
 
 		}
-		//Random line, probably part of an stack trace
+		//Random line, probably part of a stack trace
 		return true;
 	}
 
@@ -284,7 +304,7 @@ public class ConsoleLogReader {
 	public String parseCommaEnded(String line) {
 		int k = 0;
 		char someChar = line.charAt(0);
-		while (someChar != ',') {
+		while (someChar != ',' && someChar != ' ') {
 			k++;
 			someChar = line.charAt(k);
 		}

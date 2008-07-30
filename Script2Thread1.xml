@@ -17,11 +17,14 @@
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-		<remoteport>80</remoteport></Properties>
+		<remoteport>80</remoteport>
+	</Properties>
 
 	<STEPS>
-		<WAIT length="1000"></WAIT><INVOKE path="/themes/pushbutton/header-a.jpg" /><INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE>
-		<INVOKE path="/themes/pushbutton/header-a.jpg"></INVOKE>
+		<WAIT length="1000" />
+		<INVOKE path="/themes/pushbutton/header-a.jpg" />
+		<INVOKE path="/themes/pushbutton/header-b.jpg" />
+		<INVOKE path="/themes/pushbutton/header-a.jpg" />
 
 
 

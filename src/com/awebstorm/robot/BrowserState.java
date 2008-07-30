@@ -59,19 +59,19 @@ public class BrowserState {
 		if (temp != null) {
 			client.setJavaScriptEnabled(Boolean.parseBoolean(temp));
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "javaScriptEnabled");
 		}
 		temp = _preferences.get("redirectEnabled");
 		if (temp != null) {
 			client.setRedirectEnabled(Boolean.parseBoolean(temp));
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "redirectEnabled");
 		}
 		temp = _preferences.get("throwExceptionOnScriptError");
 		if (temp != null) {
 			client.setThrowExceptionOnScriptError(Boolean.parseBoolean(temp));
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "throwExceptionOnScriptError");
 		}
 		temp = _preferences.get("useInsecureSSL");
 		if (temp != null) {
@@ -82,31 +82,25 @@ public class BrowserState {
 				e.printStackTrace();
 			}
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "useInsecureSSL");
 		}
 		temp = _preferences.get("popupBlockerEnabled");
 		if (temp != null) {
 			client.setPopupBlockerEnabled(Boolean.parseBoolean(temp));
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "popupBlockerEnabled");
 		}
 		temp = _preferences.get("timeout");
 		if (temp != null) {
 			client.setTimeout(Integer.parseInt(temp));
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "timeout");
 		}
 		temp = _preferences.get("cacheSize");
 		if (temp != null) {
 			client.setCache(new Cache());
 		} else {
-			consoleLog.debug("A preference was not set: " + temp);
-		}
-		temp = _preferences.get("throwExceptionOnFailingStatusCode");
-		if (temp != null) {
-			client.setThrowExceptionOnFailingStatusCode(Boolean.parseBoolean(temp));
-		} else {
-			consoleLog.debug("A preference was not set: " + temp);
+			consoleLog.debug("A preference was not set: " + "cacheSize");
 		}
 		vUser = client;
 	}

@@ -54,7 +54,7 @@ public class ProxyPipeIn implements Runnable {
 								+ outgoing.getPort() + " " 
 								+ outgoing.getLocalPort());
 					}
-					//incoming.close();
+					incoming.close();
 					notEnd = false;
 				} else {
 					myProxyOwner.incrementProxyReceiveAmount();

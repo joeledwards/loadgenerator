@@ -54,7 +54,6 @@ public class ProxyPipeOut implements Runnable {
 								+ incoming.getPort());
 					}
 					outgoing.close();
-					incoming.close();
 					notEnd = false;
 				} else {
 					if ( myProxyOwner.getProxyTimeStarted() == 0 )

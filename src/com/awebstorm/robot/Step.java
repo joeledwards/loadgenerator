@@ -600,42 +600,45 @@ public class Step implements Comparable<Step> {
 				} else {
 					tempResult.append("failure");
 				}
-			} else {
-				tempResult.append(jobID);
-				tempResult.append(',');
-				tempResult.append(_stepName);
-				tempResult.append(',');
-				tempResult.append(_stepNum);
-				tempResult.append(',');
-				tempResult.append(System.currentTimeMillis());
-				tempResult.append(',');
-				tempResult.append(replyTime);
-				tempResult.append(',');
-				tempResult.append(stepProxyTimeStarted);
-				tempResult.append(',');
-				tempResult.append(stepProxyTimeEnded);
-				tempResult.append(',');
-				tempResult.append(stepProxyTimeResponded);
-				tempResult.append(',');
-				tempResult.append((stepProxyTimeEnded-replyTime));
-				tempResult.append(',');
-				tempResult.append(BodyByteAmount);
-				tempResult.append(',');
-				tempResult.append(proxyReceiveAmount);
-				tempResult.append(',');
-				tempResult.append(proxySentAmount);
-				tempResult.append(',');
-				if (replyTime == 0) {
-					replyTime = 1;
-				}
-				tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
-				tempResult.append(',');
-				if (stepStatus) {
-					tempResult.append("success");
-				} else {
-					tempResult.append("failure");
-				}
+				resultLog.debug(tempResult);
 			}
+			tempResult = new StringBuffer();
+			tempResult.append(jobID);
+			tempResult.append(',');
+			tempResult.append(_stepName);
+			tempResult.append(',');
+			tempResult.append(_stepNum);
+			tempResult.append(',');
+			tempResult.append(System.currentTimeMillis());
+			tempResult.append(',');
+			tempResult.append(replyTime);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeStarted);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeEnded);
+			tempResult.append(',');
+			tempResult.append(stepProxyTimeResponded);
+			tempResult.append(',');
+			tempResult.append((stepProxyTimeEnded-replyTime));
+			tempResult.append(',');
+			tempResult.append(BodyByteAmount);
+			tempResult.append(',');
+			tempResult.append(proxyReceiveAmount);
+			tempResult.append(',');
+			tempResult.append(proxySentAmount);
+			tempResult.append(',');
+			if (replyTime == 0) {
+				replyTime = 1;
+			}
+			tempResult.append((double)(proxyReceiveAmount + proxySentAmount) / ((double)replyTime / 1000));
+			tempResult.append(',');
+			if (stepStatus) {
+				tempResult.append("success");
+			} else {
+				tempResult.append("failure");
+			}
+			resultLog.info(tempResult);
+			
 			break;
 		case WAIT:
 		case FILL_FORM:
@@ -653,12 +656,14 @@ public class Step implements Comparable<Step> {
 			} else {
 				tempResult.append("failure");
 			}
+			resultLog.info(tempResult);
 			break;
 			default:
 				consoleLog.error("A unknown Step was found during reporting.");
 			break;
+			
 		}
-		resultLog.info(tempResult);
+		
 	}
 
 	/**
