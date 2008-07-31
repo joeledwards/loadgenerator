@@ -49,7 +49,7 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
 		}
 		try {
-			newStreams.add(new FileInputStream("BadStepScript.xml"));
+			newStreams.add(new FileInputStream("example_scripts\\NoWaitBasicHTMLScript.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -89,8 +89,8 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0010-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0010-2").getReceiveBytes().equals("6024"));
+		ensureThat(results.get("0010-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0010-2").getReceiveBytes().equals(String.valueOf(6024+570)));
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		}
 		try {
 			while (newStreams.size() < numberOfRobots) {
-				newStreams.add(new FileInputStream("ScriptThread" + (newStreams.size() + 1) + ".xml"));
+				newStreams.add(new FileInputStream("example_scripts\\BasicHTMLScript" + (newStreams.size() + 1) + ".xml"));
 			}
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Could not find the script file.", e);
@@ -147,8 +147,8 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
+		ensureThat(results.get("0001-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
 	/**
@@ -165,7 +165,7 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
 				HTMLRobot newRobot = new HTMLRobot(
-						new FileInputStream("ScriptThread" + (i + 1) + ".xml"), 
+						new FileInputStream("example_scripts\\BasicHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
 				robots.add(newRobot);
@@ -206,16 +206,16 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
-		ensureThat(results.get("0002-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0002-2").getReceiveBytes().equals("692"));
-		ensureThat(results.get("0003-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0003-2").getReceiveBytes().equals("692"));
-		ensureThat(results.get("0004-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0004-2").getReceiveBytes().equals("692"));
-		ensureThat(results.get("0005-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0005-2").getReceiveBytes().equals("692"));
+		ensureThat(results.get("0001-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
+		ensureThat(results.get("0002-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0002-2").getReceiveBytes().equals(String.valueOf(692+570)));
+		ensureThat(results.get("0003-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0003-2").getReceiveBytes().equals(String.valueOf(692+570)));
+		ensureThat(results.get("0004-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0004-2").getReceiveBytes().equals(String.valueOf(692+570)));
+		ensureThat(results.get("0005-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0005-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
 	/**
@@ -232,7 +232,7 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
 				Robot newRobot = new HTMLRobot(
-						new FileInputStream("Script2Thread" + (i + 1) + ".xml"), 
+						new FileInputStream("example_scripts\\MultiStepHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
 				robots.add(newRobot);
@@ -273,8 +273,8 @@ public class HTMLRobotBehaviour  extends UsingMatchers {
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-2").getSentBytes().equals("222"));
-		ensureThat(results.get("0001-2").getReceiveBytes().equals("692"));
+		ensureThat(results.get("0001-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
 		ensureThat(results.get("0001-3").getSentBytes().equals("222"));
 		ensureThat(results.get("0001-3").getReceiveBytes().equals("6024"));
 		ensureThat(results.get("0001-4").getSentBytes().equals("222"));

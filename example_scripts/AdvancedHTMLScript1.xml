@@ -1,0 +1,41 @@
+<script>
+	<properties>
+		<cacheSize>50</cacheSize>
+		<domain>www.customercentrix.com</domain>
+		<jobID>0001</jobID>
+		<timeout>5000</timeout>
+		<waitstep>1000</waitstep>
+		<proxyHost>localhost</proxyHost>
+		<javaScriptEnabled>false</javaScriptEnabled>
+		<redirectEnabled>true</redirectEnabled>
+		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
+		<useInsecureSSL>false</useInsecureSSL>
+		<popupBlockerEnabled>true</popupBlockerEnabled>
+		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
+		<remoteport>80</remoteport>
+	</properties>
+	<steps>
+		<pause length="3000" />
+		<open url="" />
+		<verifyTitle
+			title="CustomerCentrix | We satisfy your business technology needs" />
+		<pause length="3000" />
+		<open url="/about_us.htm" />
+		<verifyTitle title="About CustomerCentrix | CustomerCentrix" />
+		<pause length="3000" />
+		<open url="/contact.htm" />
+		<verifyTitle title="Contact Information | CustomerCentrix" />
+		<pause length="2000" />
+		<open url="/products.htm" />
+		<verifyTitle title="Products | CustomerCentrix" />
+		<pause length="1000" />
+		<open url="/training.htm" />
+		<verifyTitle title="Training | CustomerCentrix" />
+		<pause length="4000" />
+		<open url="/consulting.htm" />
+		<verifyTitle title="Consulting | CustomerCentrix" />
+		<pause length="2000" />
+		<open url="/testimonials.htm" />
+		<verifyTitle title="Testimonials | CustomerCentrix" />
+	</steps>
+</script>

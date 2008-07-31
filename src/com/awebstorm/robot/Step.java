@@ -3,10 +3,9 @@ package com.awebstorm.robot;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.httpclient.NameValuePair;
+
 import org.apache.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.Attributes;
@@ -15,19 +14,23 @@ import com.awebstorm.Proxy;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.SubmitMethod;
-import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.WebResponse;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 /**
  * Holds the script step information and operations that can be executed by a Robot.
- * Details of a step are stored in an Attributes List
+ * Details of a step are stored in an Attributes List.
+ * To add a new ActionType, simply type the new action enum into the ActionType enum class. Secondly, place a
+ * case statement in the .execute() to tell this step how to act if it is the new action. Thirdly, provide
+ * implementation for the method call that should run the action. Finally, place a case statement
+ * in the report method to tell the step how to report your new action type.
+ * (Additionally, if the action report log output needs to be checked, then the LogDataExtractor in
+ * combination with the HTMLRobotBehaviour may be useful.
+ * 
  * @author Cromano
  */
 public class Step implements Comparable<Step> {
@@ -37,22 +40,19 @@ public class Step implements Comparable<Step> {
 	 * @author Cromano
 	 *
 	 */
-	public static enum ActionTypes {
-		STEPS,
-		INVOKE,
-		VERIFY_TITLE,
-		BUTTON,
-		WAIT,
-		POST,
-		FILL_FORM,
-		CLICK_LINK
+	public static enum ActionType {
+		steps,
+		open,
+		verifyTitle,
+		pause,
+		click
 	}
 	
-	private BrowserState _currentBrowserState;
+	private BrowserState currentBrowserState;
 	private Robot stepRobotOwner;
 	private String stepName;
 	private int stepNumber;
-	private Attributes _stepAttributeList;
+	private Attributes stepAttributeList;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private Logger resultLog = Logger.getLogger("com.awebstorm.robot.Step.resultLog");
 	private long replyTime = 0;
@@ -70,7 +70,7 @@ public class Step implements Comparable<Step> {
 	public Step(final String name, final int value, final Attributes list, final Robot robotOwner) {
 		stepName = name;
 		stepNumber = value;
-		_stepAttributeList = list;
+		stepAttributeList = list;
 		stepRobotOwner = robotOwner;
 		myProxy = stepRobotOwner.getCurrentProxy();
 	}
@@ -88,7 +88,7 @@ public class Step implements Comparable<Step> {
 	 * @return
 	 */
 	public Attributes getList() {
-		return _stepAttributeList;
+		return stepAttributeList;
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class Step implements Comparable<Step> {
 		myProxy.resetProxyCounters();
 		replyTime = 0;
 		BodyByteAmount = 0; 
-		_currentBrowserState = browserState;
+		currentBrowserState = browserState;
 		//HTMLRobot handles http protocols
 		targetDomain = "http://" + stepRobotOwner.getTargetDomain();
 		if (!stepRobotOwner.getTargetDomain().equals(myProxy.getRemotehost())) {
@@ -118,10 +118,10 @@ public class Step implements Comparable<Step> {
 		if (!(stepRobotOwner.getTargetPort() == (myProxy.getRemoteport()))) {
 			myProxy.setRemoteport(stepRobotOwner.getTargetPort());
 		}
-		ActionTypes currentType = null;
+		ActionType currentType = null;
 		boolean stepReturnStatus = true;
 		try {
-			currentType = ActionTypes.valueOf(stepName);
+			currentType = ActionType.valueOf(stepName);
 		} catch (IllegalArgumentException e) {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
@@ -131,29 +131,19 @@ public class Step implements Comparable<Step> {
 		}
 		
 		switch (currentType) {
-		case STEPS:
+		case steps:
 			return;
-		case WAIT:
-			this.waitStep();
+		case pause:
+			this.pause();
 			break;
-		case INVOKE:
-			stepReturnStatus = this.invoke();
+		case open:
+			stepReturnStatus = this.open();
 			break;
-		case VERIFY_TITLE:
+		case verifyTitle:
 			stepReturnStatus = this.verifyTitle();
 			break;
-		case BUTTON:
-			stepReturnStatus = this.button();
-			break;
-		case FILL_FORM:
-			stepReturnStatus = this.fillForm();
-			break;
-		case POST:
-			stepReturnStatus = this.post();
-			break;
-		case CLICK_LINK:
-			stepReturnStatus = this.clickLink();
-			break;
+		case click:
+			stepReturnStatus = this.click();
 		default:
 			consoleLog.warn("Unknown Step type found.");
 			stepReturnStatus = false;
@@ -162,133 +152,97 @@ public class Step implements Comparable<Step> {
 		
 		report(stepReturnStatus, jobID);
 	}
-	
-	/**
-	 * Click a link on a webpage. CLICK_LINK STEP
-	 * Not Yet Implemented
-	 * @return The step status
-	 */
-	private boolean clickLink() {
-		return false;
-	}
 
 	/**
-	 * Standard POST STEP using the parameters stored in the postList.
-	 * @return Success?
+	 * Click on the Element indicated by the locator stored in the first element of the AttributeList.
+	 * This step could qualify as an entirely new page load, so it is reported like an open
+	 * @return Step Status
 	 */
-	private boolean post() {
-		
-		List<NameValuePair> postList = new LinkedList<NameValuePair>();
-		for (int i = 1; i < _stepAttributeList.getLength(); i++) {
-			postList.add(new NameValuePair(_stepAttributeList.getLocalName(i), _stepAttributeList.getValue(i)));
-		}
-		WebRequestSettings newSettings = null;
-		HtmlPage postPage = null;
-		String currentPath = targetDomain + _stepAttributeList.getValue(0);
+	private boolean click() {
+		HtmlElement targetElement = null;
 		try {
-			newSettings = new WebRequestSettings(new URL(currentPath), SubmitMethod.POST);
-		} catch (MalformedURLException e1) {
-			consoleLog.error("Bad URL passed to a POST operation.", e1);
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
 			return false;
 		}
-		newSettings.setRequestParameters(postList);
-		Page tempResponsePage;
-		try {
-			tempResponsePage = _currentBrowserState.getVUser().getPage(newSettings);
-		} catch (FailingHttpStatusCodeException e) {
-			consoleLog.error("POST operation, " + stepName + " has a bad status message.", e);
-			return false;
-		} catch (IOException e) {
-			consoleLog.error("IOException thrown during a POST operation.", e);
+		if (targetElement == null) {
 			return false;
 		}
-		
-		if (tempResponsePage.getClass() == HtmlPage.class) {
-			postPage = (HtmlPage) tempResponsePage;
-			_currentBrowserState.setCurrentPage(postPage);
-			postList.clear();
-			replyTime = postPage.getWebResponse().getLoadTimeInMilliSeconds();
+		Page newPage = targetElement.mouseDown();
+		if (!(newPage == currentBrowserState.getCurrentPage())) {
+			return collectResources((HtmlPage)newPage);
+		} else if (newPage.getClass().isInstance(HtmlPage.class)) {
+			replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
 			try {
-				BodyByteAmount = postPage.getWebResponse().getContentAsStream().available();
+				BodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
 			} catch (IOException e1) {
 				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
 			}
-			return collectResources(postPage);
+			currentBrowserState.setCurrentPage((HtmlPage)newPage);
+			return collectResources((HtmlPage)newPage);
 		} else {
-			replyTime = tempResponsePage.getWebResponse().getLoadTimeInMilliSeconds();
+			replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
 			try {
-				BodyByteAmount = tempResponsePage.getWebResponse().getContentAsStream().available();
+				BodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
 			} catch (IOException e1) {
 				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
 			}
-			if (tempResponsePage.getWebResponse().getStatusCode() < 200
-					|| tempResponsePage.getWebResponse().getStatusCode() > 399) {
-				return false;
-			}
-			return true;
+			return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 		}
-
 	}
 	
 	/**
-	 * Fill a Form with information. Usually followed by a BUTTON or CLICK.
-	 * Not Yet Implemented.
-	 * @return Step status
+	 * Determines the appropriate action to find a particular resource in an HtmlPage
+	 * indicated by the first Attribute in the AttributeList.
+	 * @return The first HtmlElement that was located
+	 * @throws ElementNotFoundException If the Element was not found
 	 */
-	private boolean fillForm() {
-		boolean tempStatus = true;
-		return tempStatus;
-	}
-
-	/**
-	 * Press the button whose name is given.
-	 * @return Step status
-	 */
-	private boolean button() {
-		HtmlButton tempButton = null;
-		if (_currentBrowserState.getCurrentPage() == null) {
-			return false;
-		}
-		List<HtmlForm> tempForms = _currentBrowserState.getCurrentPage().getForms();
-		
-		if (tempForms == null) {
-			consoleLog.debug("No Forms to search for buttons.");
-			return false;
-		}
-		for (HtmlForm i : tempForms) {
-			try {
-				tempButton = i.getButtonByName(_stepAttributeList.getValue(0));
-			} catch (ElementNotFoundException e) {
-				consoleLog.debug("No such Button exists");
-				return false;
+	private final HtmlElement locator() throws ElementNotFoundException {
+		String name = stepAttributeList.getQName(0);
+		if (name.equals("xpath")) {
+			Object tempNode = currentBrowserState.getCurrentPage().getFirstByXPath(stepAttributeList.getValue(0));
+			if (tempNode.getClass().isInstance(HtmlElement.class)) {
+				return (HtmlElement)tempNode;
+			} else {
+				return null;
 			}
+		} else if (name.equals("link")) {
+			List<HtmlAnchor> tempListAnchors = currentBrowserState.getCurrentPage().getAnchors();
+			HtmlAnchor[] tempArrayAnchors = (HtmlAnchor[]) tempListAnchors.toArray();
+			for (int i = 0; i < tempArrayAnchors.length; i++) {
+				String textContent = tempArrayAnchors[i].getTextContent();
+					if (textContent.equals(stepAttributeList.getValue(0))) {
+						return tempArrayAnchors[i];
+					}
+			}
+			return null;
+		} else if (name.equals("identifier")) {
+			HtmlElement tempElement = currentBrowserState.getCurrentPage().getHtmlElementById(stepAttributeList.getValue(0));
+			if (tempElement == null) {
+				return currentBrowserState.getCurrentPage().getHtmlElementsByName(stepAttributeList.getValue(0)).get(0);
+			}
+			return tempElement;
+		} else if (name.equals("id")) {
+			return currentBrowserState.getCurrentPage().getHtmlElementById(stepAttributeList.getValue(0));
+		} else if (name.equals("name")) {
+			return currentBrowserState.getCurrentPage().getHtmlElementsByName(stepAttributeList.getValue(0)).get(0);
+		} else {
+			return null;
 		}
-		if (tempButton == null) {
-			consoleLog.debug("No Button to click.");
-			return false;
-		}
-		try {
-			tempButton.click();
-		} catch (IOException e) {
-			consoleLog.debug("Bad Button Clicked.");
-			e.printStackTrace();
-			return false;
-		}
-		return true;
 	}
 
 	/**
 	 * Standard GET STEP.
 	 * @return Step status
 	 */
-	private boolean invoke() {
-		String currentPath = _stepAttributeList.getValue(0);
+	private boolean open() {
+		String currentPath = stepAttributeList.getValue(0);
 		currentPath = targetDomain + currentPath;
 		HtmlPage invokePage = null;
 		Page tempPage;
 		
 		try {
-			tempPage = _currentBrowserState.getVUser().getPage(currentPath);
+			tempPage = currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
 			consoleLog.error("Bad Status Code.", e);
 			return false;
@@ -305,7 +259,7 @@ public class Step implements Comparable<Step> {
 		
 		if (tempPage.getClass() == HtmlPage.class) {
 			invokePage = (HtmlPage) tempPage;
-			_currentBrowserState.setCurrentPage(invokePage);
+			currentBrowserState.setCurrentPage(invokePage);
 			replyTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
 			try {
 				BodyByteAmount = invokePage.getWebResponse().getContentAsStream().available();
@@ -314,17 +268,36 @@ public class Step implements Comparable<Step> {
 			}
 			return collectResources(invokePage);
 		} else {
+			boolean tempStatus = true;
 			replyTime = tempPage.getWebResponse().getLoadTimeInMilliSeconds();
 			try {
 				BodyByteAmount = tempPage.getWebResponse().getContentAsStream().available();
 			} catch (IOException e1) {
 				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
 			}
+			if (currentBrowserState.addUrlToHistory("/favicon.ico")) {
+				try {
+					WebResponse temporary = currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
+					replyTime += temporary.getLoadTimeInMilliSeconds();
+					BodyByteAmount += temporary.getResponseBody().length;
+				} catch (SocketTimeoutException e) {
+					consoleLog.debug("Socket Timed Out from licit/illicit factors.");
+				} catch (FailingHttpStatusCodeException e) {
+					consoleLog.error("Bad Status Code.", e);
+				} catch (MalformedURLException e) {
+					consoleLog.error("MalformedURL", e);
+					tempStatus = false;
+				} catch (IOException e) {
+					consoleLog.error("IO Error during Invoke.", e);
+					tempStatus = false;
+				}
+
+			}
 			if (tempPage.getWebResponse().getStatusCode() < 200
 					|| tempPage.getWebResponse().getStatusCode() > 399) {
 				return false;
 			}
-			return true;
+			return tempStatus;
 		}
 	}
 	
@@ -337,9 +310,26 @@ public class Step implements Comparable<Step> {
 	private boolean collectResources(HtmlPage invokePage) {
 		
 		boolean tempStatus = true;
+		currentBrowserState.getVUser().setCurrentWindow(currentBrowserState.getResourceWindow());
 		if (invokePage.getWebResponse().getStatusCode() < 200
-				|| invokePage.getWebResponse().getStatusCode() > 399) {
+				|| invokePage.getWebResponse().getStatusCode() > 299) {
 			tempStatus = false;
+		}
+		if (currentBrowserState.addUrlToHistory("/favicon.ico")) {
+			try {
+				currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
+			} catch (SocketTimeoutException e) {
+				consoleLog.debug("Socket Timed Out from licit/illicit factors.");
+			} catch (FailingHttpStatusCodeException e) {
+				consoleLog.error("Bad Status Code.", e);
+				tempStatus = false;
+			} catch (MalformedURLException e) {
+				consoleLog.error("MalformedURL", e);
+				tempStatus = false;
+			} catch (IOException e) {
+				consoleLog.error("IO Error during Invoke.", e);
+				tempStatus = false;
+			}
 		}
 		Iterable<HtmlElement> tempList = 
 			invokePage.getDocumentElement().getAllHtmlChildElements();
@@ -367,17 +357,17 @@ public class Step implements Comparable<Step> {
 						//In case of domain seperate from the domain for the script
 					} else if (!tempAttr.startsWith(targetDomain)) {
 						consoleLog.debug("Bad domain encountered: " + tempAttr);
-						_currentBrowserState.addUrlToHistory(tempAttr);
+						currentBrowserState.addUrlToHistory(tempAttr);
 					}
-					if (_currentBrowserState.addUrlToHistory(tempAttr)) {
-						temporary = _currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
+					if (currentBrowserState.addUrlToHistory(tempAttr)) {
+						temporary = currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
 						if (consoleLog.isDebugEnabled()) {
 							resourcesCollector.append("Resources obtained: " 
 								+ tempAttr + '\n');
 						}
 						replyTime += temporary.getLoadTimeInMilliSeconds();
 						BodyByteAmount += temporary.getResponseBody().length;
-						if (temporary.getStatusCode() != 200) {
+						if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
 							tempStatus = false;
 						}
 					}
@@ -399,17 +389,17 @@ public class Step implements Comparable<Step> {
 							}
 						} else if (!aResource.startsWith(targetDomain)) {
 							consoleLog.debug("Bad domain encountered: " + aResource);
-							_currentBrowserState.addUrlToHistory(aResource);
+							currentBrowserState.addUrlToHistory(aResource);
 						}
-						if (_currentBrowserState.addUrlToHistory(aResource)) {
-							temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
+						if (currentBrowserState.addUrlToHistory(aResource)) {
+							temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 							if (consoleLog.isDebugEnabled()) {
 								resourcesCollector.append("Import resources obtained: "
 									+ aResource + '\n');
 							}
 							replyTime += temporary.getLoadTimeInMilliSeconds();
 							BodyByteAmount += temporary.getResponseBody().length;
-							if (temporary.getStatusCode() != 200 ) {
+							if (temporary.getStatusCode() < 200 ||  temporary.getStatusCode() > 299) {
 								tempStatus = false;
 							}
 							if (aResource.endsWith(".css")) {
@@ -440,16 +430,16 @@ public class Step implements Comparable<Step> {
 								}
 							} else if (!aResource.startsWith(targetDomain)) {
 								consoleLog.debug("Bad domain encountered: " + aResource);
-								_currentBrowserState.addUrlToHistory(aResource);
+								currentBrowserState.addUrlToHistory(aResource);
 							}
-							if (_currentBrowserState.addUrlToHistory(aResource)) {
-								temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
+							if (currentBrowserState.addUrlToHistory(aResource)) {
+								temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 								if (consoleLog.isDebugEnabled()) {
 									resourcesCollector.append("Link Resources obtained: " + aResource + '\n');
 								}
 								replyTime += temporary.getLoadTimeInMilliSeconds();
 								BodyByteAmount += temporary.getResponseBody().length;
-								if (temporary.getStatusCode() != 200) {
+								if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
 									tempStatus = false;
 								}
 								LinkedList<String> styleResourceList = StyleParser.grabStyleSheetText(temporary.getContentAsString());
@@ -462,14 +452,14 @@ public class Step implements Comparable<Step> {
 											aResource = targetDomain + '/' + aResource;
 										}
 									}
-									if (_currentBrowserState.addUrlToHistory(aResource)) {
-										temporary = _currentBrowserState.getVUser().getPage(aResource).getWebResponse();
+									if (currentBrowserState.addUrlToHistory(aResource)) {
+										temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 										if (consoleLog.isDebugEnabled()) {
 											resourcesCollector.append("Style Sheet Pic Resources obtained: " + aResource + '\n');
 										}
 										replyTime += temporary.getLoadTimeInMilliSeconds();
 										BodyByteAmount += temporary.getResponseBody().length;
-										if (temporary.getStatusCode() != 200) {
+										if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
 											tempStatus = false;
 										}
 									}
@@ -492,6 +482,7 @@ public class Step implements Comparable<Step> {
 		if (consoleLog.isDebugEnabled()) {
 			consoleLog.debug(resourcesCollector.toString());
 		}
+		currentBrowserState.getVUser().setCurrentWindow(currentBrowserState.getMainWindow());
 		return tempStatus;
 	}
 
@@ -500,11 +491,11 @@ public class Step implements Comparable<Step> {
 	 * @return True if title is correct, else false
 	 */
 	private boolean verifyTitle() {
-		if (_currentBrowserState.getCurrentPage() != null) {
+		if (currentBrowserState.getCurrentPage() != null) {
 			if (consoleLog.isDebugEnabled()) {
-				consoleLog.debug(_currentBrowserState.getCurrentPage().getTitleText());
+				consoleLog.debug(currentBrowserState.getCurrentPage().getTitleText());
 			}
-			return _currentBrowserState.getCurrentPage().getTitleText().equals(_stepAttributeList.getValue(0));
+			return currentBrowserState.getCurrentPage().getTitleText().equals(stepAttributeList.getValue(0));
 		}
 		return false;
 	}
@@ -512,8 +503,8 @@ public class Step implements Comparable<Step> {
 	/**
 	 * Instruct this thread to wait for a given period of time as this is a WAIT STEP.
 	 */
-	private void waitStep() {
-		if (_stepAttributeList.getValue(0).equals("")) {
+	private void pause() {
+		if (stepAttributeList.getValue(0).equals("")) {
 			try {
 				Thread.sleep(Robot.getDefaultWaitStep());
 			} catch (InterruptedException e) {
@@ -521,7 +512,7 @@ public class Step implements Comparable<Step> {
 			}
 		} else {
 			try {
-				Thread.sleep(Integer.parseInt(_stepAttributeList.getValue(0)));
+				Thread.sleep(Integer.parseInt(stepAttributeList.getValue(0)));
 			} catch (NumberFormatException e) {
 				consoleLog.error("Could not determine the wait length during a WAIT Step", e);
 				try {
@@ -550,9 +541,9 @@ public class Step implements Comparable<Step> {
 		long stepProxyTimeEnded = myProxy.getProxyTimeEnded();
 
 		StringBuffer tempResult = new StringBuffer();
-		ActionTypes currentType;
+		ActionType currentType;
 		try {
-			currentType = ActionTypes.valueOf(stepName);
+			currentType = ActionType.valueOf(stepName);
 		} catch (IllegalArgumentException e) {
 			consoleLog.error("Unknown Step type found.",e);
 			return;
@@ -561,10 +552,8 @@ public class Step implements Comparable<Step> {
 			return;
 		}
 		switch (currentType) {
-		case INVOKE:
-		case POST:
-		case BUTTON:
-		case CLICK_LINK:
+		case open:
+		case click:
 			if (resultLog.isDebugEnabled()) {
 				tempResult.append("jobID: " +jobID);
 				tempResult.append('\n');
@@ -640,9 +629,8 @@ public class Step implements Comparable<Step> {
 			resultLog.info(tempResult);
 			
 			break;
-		case WAIT:
-		case FILL_FORM:
-		case VERIFY_TITLE:
+		case pause:
+		case verifyTitle:
 			tempResult.append(jobID);
 			tempResult.append(',');
 			tempResult.append(stepName);
@@ -679,7 +667,7 @@ public class Step implements Comparable<Step> {
 	 * @param newState The new state of the Browser
 	 */
 	public final void setState(BrowserState newState) {
-		this._currentBrowserState = newState;
+		this.currentBrowserState = newState;
 	}
 	
 	/**

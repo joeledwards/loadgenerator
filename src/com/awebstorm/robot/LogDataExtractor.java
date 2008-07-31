@@ -315,41 +315,11 @@ public class LogDataExtractor {
 			subline = subline.substring(j + 1);
 			infoLine.setJobID(subline.substring(0, 4));
 			subline = subline.substring(5);
-			if (subline.startsWith("WAIT")) {
+			if (subline.startsWith("pause")) {
 				if (subline.contains("success")) {
 					return true;
 				}
-			} else if (subline.startsWith("INVOKE")) {
-				subline = subline.substring(7);
-				//Extract Data params
-				infoLine.setStepNum(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getStepNum().length() + 1);
-				infoLine.setReportTime(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getReportTime().length() + 1);
-				infoLine.setReplyTime(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getReplyTime().length() + 1);
-				infoLine.setTimeStarted(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getTimeStarted().length() + 1);
-				infoLine.setTimeEnded(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getTimeEnded().length() + 1);
-				infoLine.setTimeResponded(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getTimeResponded().length() + 1);
-				infoLine.setTimeLength(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getTimeLength().length() + 1);
-				infoLine.setBodyBytes(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getBodyBytes().length() + 1);
-				infoLine.setReceiveBytes(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getReceiveBytes().length() + 1);
-				infoLine.setSentBytes(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getSentBytes().length() + 1);
-				infoLine.setThroughput(parseCommaEnded(subline));
-				subline = subline.substring(infoLine.getThroughput().length() + 1);
-				infoLine.setStepStatus(parseCommaEnded(subline));
-				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
-				if (infoLine.getStepStatus().equals("success")) {
-					return true;
-				}
-			} else if (subline.startsWith("POST")) {
+			} else if (subline.startsWith("open")) {
 				subline = subline.substring(5);
 				//Extract Data params
 				infoLine.setStepNum(parseCommaEnded(subline));
@@ -379,7 +349,7 @@ public class LogDataExtractor {
 				if (infoLine.getStepStatus().equals("success")) {
 					return true;
 				}
-			} else if (subline.startsWith("VERIFY_TITLE")) {
+			} else if (subline.startsWith("verifyTitle")) {
 				if (subline.contains("success")) {
 					return true;
 				}

@@ -1,13 +1,8 @@
-<MyScript>
-
-
-
-
-
-	<Properties>
+<script>
+	<properties>
 		<cacheSize>50</cacheSize>
 		<domain>www.customercentrix.com</domain>
-		<jobID>0001</jobID>
+		<jobID>0010</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
 		<proxyHost>localhost</proxyHost>
@@ -18,16 +13,9 @@
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
 		<remoteport>80</remoteport>
-	</Properties>
-
-	<STEPS>
-		<WAIT length="1000" />
-		<INVOKE path="/themes/pushbutton/header-a.jpg" />
-		<INVOKE path="/themes/pushbutton/header-b.jpg" />
-		<INVOKE path="/themes/pushbutton/header-a.jpg" />
-
-
-
-	</STEPS>
-
-</MyScript>
+	</properties>
+	<steps>
+		<pause waitTime="0" />
+		<open url="/themes/pushbutton/header-b.jpg" />
+	</steps>
+</script>

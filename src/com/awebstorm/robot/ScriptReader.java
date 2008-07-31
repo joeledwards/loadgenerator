@@ -124,7 +124,7 @@ public class ScriptReader extends DefaultHandler {
 			final String qName) throws SAXException {
 
 		if (propertiesMode) {
-			if (qName.equals("Properties")) {
+			if (qName.equals("properties")) {
 				propertiesMode = false;
 				return;
 			}

@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.Cache;
+import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.WebWindow;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 /**
@@ -19,6 +21,8 @@ public class BrowserState {
 
 	private WebClient vUser = new WebClient();
 	private HtmlPage currentPage;
+	private WebWindow mainWindow = new TopLevelWindow("Main Window", vUser);
+	private WebWindow resourceWindow = new TopLevelWindow("Side Window", vUser);
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> statePreferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
@@ -103,6 +107,7 @@ public class BrowserState {
 			consoleLog.debug("A preference was not set: " + "cacheSize");
 		}
 		vUser = client;
+		vUser.setCurrentWindow(mainWindow);
 	}
 	
 	/**
@@ -142,6 +147,14 @@ public class BrowserState {
 	 */
 	public int getProxyPort() {
 		return localProxyPort;
+	}
+
+	public WebWindow getMainWindow() {
+		return mainWindow;
+	}
+
+	public WebWindow getResourceWindow() {
+		return resourceWindow;
 	}
 	
 }
