@@ -1,0 +1,21 @@
+<script>
+	<properties>
+		<cacheSize>50</cacheSize>
+		<domain>www.customercentrix.com</domain>
+		<jobID>0011</jobID>
+		<timeout>5000</timeout>
+		<waitstep>1000</waitstep>
+		<proxyHost>localhost</proxyHost>
+		<javaScriptEnabled>false</javaScriptEnabled>
+		<redirectEnabled>true</redirectEnabled>
+		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
+		<useInsecureSSL>false</useInsecureSSL>
+		<popupBlockerEnabled>true</popupBlockerEnabled>
+		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
+		<remoteport>80</remoteport>
+	</properties>
+	<steps>
+		<pause waitTime="0" />
+		<open url="/themes/pushbutton/header-c.jpg" />
+	</steps>
+</script>

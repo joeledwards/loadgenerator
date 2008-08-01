@@ -41,6 +41,7 @@ public class LogDataExtractor {
 		private String throughput;
 		private String stepStatus;
 		private String jobID;
+		private String resultMessage;
 		
 		/**
 		 * step number getter.
@@ -224,6 +225,20 @@ public class LogDataExtractor {
 		public final void setJobID(final String jobID) {
 			this.jobID = jobID;
 		}
+		/**
+		 * The step's result message yext getter
+		 * @return Result message text
+		 */
+		public String getResultMessage() {
+			return resultMessage;
+		}
+		/**
+		 * The step's result message text setter
+		 * @param resultMessage the result message text
+		 */
+		public void setResultMessage(String resultMessage) {
+			this.resultMessage = resultMessage;
+		}
 	}
 	
 	/**
@@ -316,9 +331,17 @@ public class LogDataExtractor {
 			infoLine.setJobID(subline.substring(0, 4));
 			subline = subline.substring(5);
 			if (subline.startsWith("pause")) {
-				if (subline.contains("success")) {
-					return true;
-				}
+				subline = subline.substring(6);
+				//Extract Data params
+				infoLine.setStepNum(parseCommaEnded(subline));
+				subline = subline.substring(infoLine.getStepNum().length() + 1);
+				infoLine.setReportTime(parseCommaEnded(subline));
+				subline = subline.substring(infoLine.getReportTime().length() + 1);
+				infoLine.setStepStatus(parseCommaEnded(subline));
+				subline = subline.substring(infoLine.getStepStatus().length() + 1);
+				infoLine.setResultMessage(parseCommaEnded(subline));
+				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
+				return true;
 			} else if (subline.startsWith("open")) {
 				subline = subline.substring(5);
 				//Extract Data params
@@ -345,18 +368,15 @@ public class LogDataExtractor {
 				infoLine.setThroughput(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getThroughput().length() + 1);
 				infoLine.setStepStatus(parseCommaEnded(subline));
+				subline = subline.substring(infoLine.getStepStatus().length() + 1);
+				infoLine.setResultMessage(parseCommaEnded(subline));
 				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
-				if (infoLine.getStepStatus().equals("success")) {
-					return true;
-				}
+				return true;
 			} else if (subline.startsWith("verifyTitle")) {
-				if (subline.contains("success")) {
-					return true;
-				}
+				return true;
 			} else {
 				return true;
 			}
-
 		}
 		//Random line, probably part of a stack trace
 		return true;
@@ -370,12 +390,12 @@ public class LogDataExtractor {
 	 */
 	public final String parseCommaEnded(final String line) {
 		int k = 0;
-		char someChar = line.charAt(0);
-		while (someChar != ',' && someChar != ' ') {
-			k++;
+		char someChar = 'a';
+		while (someChar != ',' && k < line.length()) {
 			someChar = line.charAt(k);
+			k++;
 		}
-		return line.substring(0, k);
+		return line.substring(0, k-1);
 	}
 	
 	/**

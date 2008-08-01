@@ -23,6 +23,7 @@ public class BrowserState {
 	private HtmlPage currentPage;
 	private WebWindow mainWindow = new TopLevelWindow("Main Window", vUser);
 	private WebWindow resourceWindow = new TopLevelWindow("Side Window", vUser);
+	private HashSet<String> browserCached = new HashSet<String>();
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> statePreferences;
 	private Logger consoleLog = Logger.getLogger(this.getClass());
@@ -57,6 +58,7 @@ public class BrowserState {
 		}
 		
 		client.setThrowExceptionOnFailingStatusCode(false);
+		client.setPrintContentOnFailingStatusCode(false);
 		
 		String temp = "";
 		temp = statePreferences.get("javaScriptEnabled");
@@ -134,10 +136,20 @@ public class BrowserState {
 	/**
 	 * Add a URL to the list of previously obtained resources.
 	 * @param resource New resource to index
-	 * @return True if browser history does not contain the
-	 *  resource, else if browser history already contains the resource
+	 * @return True if browser cache does not contain the
+	 *  resource, else false if browser cache already contains the resource
 	 */
-	public final boolean addUrlToHistory(final String resource) {
+	public final boolean addUrlToCached(final String resource) {
+		return browserCached.add(resource);
+	}
+	
+	/**
+	 * Add a URL to the list of previous History.
+	 * @param resource New resource to Index
+	 * @return True if the browser history does not contain the
+	 * resource, else false if browser history already contains the resource 
+	 */
+	public final boolean addURLToHistory(final String resource) {
 		return browserHistory.add(resource);
 	}
 

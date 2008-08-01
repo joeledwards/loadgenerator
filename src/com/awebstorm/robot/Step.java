@@ -16,9 +16,12 @@ import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
+import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 /**
@@ -45,7 +48,8 @@ public class Step implements Comparable<Step> {
 		open,
 		verifyTitle,
 		pause,
-		click
+		click,
+		check
 	}
 	
 	private BrowserState currentBrowserState;
@@ -59,6 +63,7 @@ public class Step implements Comparable<Step> {
 	private long BodyByteAmount = 0; 
 	private String targetDomain;
 	private Proxy myProxy;
+	private String resultMessage = null;
 
 	/**
 	 * Creates a new Step.
@@ -144,6 +149,8 @@ public class Step implements Comparable<Step> {
 			break;
 		case click:
 			stepReturnStatus = this.click();
+		case check:
+			stepReturnStatus = this.check();
 		default:
 			consoleLog.warn("Unknown Step type found.");
 			stepReturnStatus = false;
@@ -169,7 +176,7 @@ public class Step implements Comparable<Step> {
 			return false;
 		}
 		Page newPage = targetElement.mouseDown();
-		if (!(newPage == currentBrowserState.getCurrentPage())) {
+		if (newPage.equals(currentBrowserState.getCurrentPage())) {
 			return collectResources((HtmlPage)newPage);
 		} else if (newPage.getClass().isInstance(HtmlPage.class)) {
 			replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
@@ -190,6 +197,79 @@ public class Step implements Comparable<Step> {
 			return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 		}
 	}
+	
+	/**
+	 * Check the checkbox indicated by the locator stored in the first entry of the AttributeList.
+	 * This does not act as clicking the check box, rather the box will remain clicked if this
+	 * method is called.
+	 * @return Step success status
+	 */
+	private boolean check() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			return false;
+		}
+		if (targetElement == null) {
+			return false;
+		}
+		if (targetElement.getClass().equals(HtmlCheckBoxInput.class)) {
+			((HtmlCheckBoxInput)targetElement).setChecked(true);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+/*	private boolean addSelection() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			return false;
+		}
+		if (targetElement == null) {
+			return false;
+		}
+		if (targetElement.getClass().equals(HtmlSelect.class)) {
+			if (((HtmlSelect)targetElement).getSelectedOptions().size() >= 1) {
+				if (((HtmlSelect)targetElement).isMultipleSelectEnabled()) {
+					((HtmlSelect)targetElement)
+				} else {
+					
+				}
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}*/
+	
+/*	private HtmlOption optionLocator(HtmlSelect select) {
+		String name = stepAttributeList.getQName(1);
+		if (name.equals("label")) {
+			//select.get
+			return null;
+		} else if (name.equals("value")) {
+
+			return null;
+		} else if (name.equals("index")) {
+			String index = stepAttributeList.getValue(1);
+			if (index == null)
+				return null;
+			try {
+				if (Integer.parseInt(index) >= select.getOptionSize())
+					return null;
+				HtmlOption option = select.getOption(Integer.parseInt(index));
+			} catch (NumberFormatException e) {
+				consoleLog.warn("Bad Option Index.", e);
+			} catch ()
+			return null;
+		} else {
+			return null;
+		}
+	}*/
 	
 	/**
 	 * Determines the appropriate action to find a particular resource in an HtmlPage
@@ -240,23 +320,30 @@ public class Step implements Comparable<Step> {
 		currentPath = targetDomain + currentPath;
 		HtmlPage invokePage = null;
 		Page tempPage;
-		
+
 		try {
 			tempPage = currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
+			//Should be impossible due to settings on the WebClient
 			consoleLog.error("Bad Status Code.", e);
 			return false;
 		} catch (MalformedURLException e) {
+			if (resultMessage == null)
+				resultMessage = "Bad Script - Malformed URL for " + currentPath;
 			consoleLog.error("MalformedURL", e);
 			return false;
 		} catch (SocketTimeoutException e) {
+			if (resultMessage == null)
+				resultMessage = "Socket Timeout";
 			consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 			return false;
 		} catch (IOException e) {
+			if (resultMessage == null)
+				resultMessage = "IO Error";
 			consoleLog.error("IO Error during Invoke.", e);
 			return false;
 		}
-		
+
 		if (tempPage.getClass() == HtmlPage.class) {
 			invokePage = (HtmlPage) tempPage;
 			currentBrowserState.setCurrentPage(invokePage);
@@ -275,26 +362,40 @@ public class Step implements Comparable<Step> {
 			} catch (IOException e1) {
 				consoleLog.error("IOException while reading content as from post stream to count BodyByteAmount.", e1);
 			}
-			if (currentBrowserState.addUrlToHistory("/favicon.ico")) {
+			if (currentBrowserState.addUrlToCached("/favicon.ico")) {
 				try {
 					WebResponse temporary = currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
 					replyTime += temporary.getLoadTimeInMilliSeconds();
 					BodyByteAmount += temporary.getResponseBody().length;
+					if (tempPage.getWebResponse().getStatusCode() < 200
+							|| tempPage.getWebResponse().getStatusCode() > 399) {
+						if (resultMessage == null)
+							resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + targetDomain + "/favicon.ico";
+						return false;
+					}
 				} catch (SocketTimeoutException e) {
+					if (resultMessage == null)
+						resultMessage = "Socket Timeout";
 					consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 				} catch (FailingHttpStatusCodeException e) {
+					//Should be impossible
 					consoleLog.error("Bad Status Code.", e);
 				} catch (MalformedURLException e) {
+					if (resultMessage == null)
+						resultMessage = "Bad Script - Malformed URL for " + targetDomain + "/favicon.ico";
 					consoleLog.error("MalformedURL", e);
 					tempStatus = false;
 				} catch (IOException e) {
+					if (resultMessage == null)
+						resultMessage = "IO Error retrieving favicon";
 					consoleLog.error("IO Error during Invoke.", e);
 					tempStatus = false;
 				}
-
 			}
 			if (tempPage.getWebResponse().getStatusCode() < 200
 					|| tempPage.getWebResponse().getStatusCode() > 399) {
+				if (resultMessage == null)
+					resultMessage = "Bad Status Code " + tempPage.getWebResponse().getStatusCode() + " for " + currentPath;
 				return false;
 			}
 			return tempStatus;
@@ -313,11 +414,20 @@ public class Step implements Comparable<Step> {
 		currentBrowserState.getVUser().setCurrentWindow(currentBrowserState.getResourceWindow());
 		if (invokePage.getWebResponse().getStatusCode() < 200
 				|| invokePage.getWebResponse().getStatusCode() > 299) {
+			if (resultMessage == null)
+				resultMessage = "Bad Status Code " + invokePage.getWebResponse().getStatusCode() + " for " + invokePage.getWebResponse().getUrl().toExternalForm();
 			tempStatus = false;
 		}
-		if (currentBrowserState.addUrlToHistory("/favicon.ico")) {
+		if (currentBrowserState.addUrlToCached("/favicon.ico")) {
 			try {
-				currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
+				WebResponse iconResponse = currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
+				replyTime += iconResponse.getLoadTimeInMilliSeconds();
+				BodyByteAmount += iconResponse.getResponseBody().length;
+				if (iconResponse.getStatusCode() < 200 || iconResponse.getStatusCode() > 299) {
+					tempStatus = false;
+					if (resultMessage == null)
+						resultMessage = "Bad Status Code " + iconResponse.getStatusCode() + " for " + targetDomain + "/favicon.ico";
+				}
 			} catch (SocketTimeoutException e) {
 				consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 			} catch (FailingHttpStatusCodeException e) {
@@ -338,68 +448,88 @@ public class Step implements Comparable<Step> {
 		WebResponse temporary;
 		NamedNodeMap tempAttrs;
 		for (HtmlElement temp : tempList) {
-			try {
-				temporary = null;
-				tempAttrs = temp.getAttributes();
-				tempAttr = temp.getAttribute("src");
-				if (tempAttrs.getNamedItem("src") != null) {
-					if (!tempAttr.startsWith("http")) {
-						if (tempAttr.charAt(0) == '/') {
-							tempAttr = targetDomain + tempAttr;
-						} else if (tempAttr.startsWith("https") 
-								|| tempAttr.startsWith("ftp") 
-								|| tempAttr.startsWith("file") 
-								|| tempAttr.startsWith("jar")) {
-							consoleLog.debug("Bad protocol encountered.");
-						} else {
-							tempAttr = targetDomain + '/' + tempAttr;
-						}
-						//In case of domain seperate from the domain for the script
-					} else if (!tempAttr.startsWith(targetDomain)) {
-						consoleLog.debug("Bad domain encountered: " + tempAttr);
-						currentBrowserState.addUrlToHistory(tempAttr);
+			temporary = null;
+			tempAttrs = temp.getAttributes();
+			tempAttr = temp.getAttribute("src");
+			if (tempAttrs.getNamedItem("src") != null) {
+				if (!tempAttr.startsWith("http")) {
+					if (tempAttr.charAt(0) == '/') {
+						tempAttr = targetDomain + tempAttr;
+					} else if (tempAttr.startsWith("https") 
+							|| tempAttr.startsWith("ftp") 
+							|| tempAttr.startsWith("file") 
+							|| tempAttr.startsWith("jar")) {
+						consoleLog.debug("Bad protocol encountered.");
+					} else {
+						tempAttr = targetDomain + '/' + tempAttr;
 					}
-					if (currentBrowserState.addUrlToHistory(tempAttr)) {
+					//In case of domain seperate from the domain for the script
+				} else if (!tempAttr.startsWith(targetDomain)) {
+					consoleLog.debug("Bad domain encountered: " + tempAttr);
+					currentBrowserState.addUrlToCached(tempAttr);
+				}
+				if (currentBrowserState.addUrlToCached(tempAttr)) {
+					try {
 						temporary = currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
 						if (consoleLog.isDebugEnabled()) {
 							resourcesCollector.append("Resources obtained: " 
-								+ tempAttr + '\n');
+									+ tempAttr + '\n');
 						}
 						replyTime += temporary.getLoadTimeInMilliSeconds();
 						BodyByteAmount += temporary.getResponseBody().length;
 						if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
+							if (resultMessage == null)
+								resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + tempAttr;
 							tempStatus = false;
 						}
+					} catch (FailingHttpStatusCodeException e) {
+						//Should be impossible
+						consoleLog.error("Bad Status Code.", e);
+						tempStatus = false;
+					} catch (MalformedURLException e) {
+						if (resultMessage == null)
+							resultMessage = "Bad Script - Malformed URL";
+						consoleLog.error("Bad URL Entered during resource retrieval.", e);
+						tempStatus = false;
+					} catch (IOException e) {
+						if (resultMessage == null)
+							resultMessage = "IO Error";
+						consoleLog.error("IO Error Occured during resource retrieval.", e);
+						tempStatus = false;
 					}
-				} else if (temp.getClass() == HtmlStyle.class) {
-					tempAttrs = ((HtmlStyle) temp).getAttributes();
-					tempAttr = ((HtmlStyle) temp).getTextContent();
-					LinkedList<String> styleResourceList = 
-						StyleParser.grabStyleElementText(tempAttr);
-					String aResource;
-					while (!styleResourceList.isEmpty()){
-						aResource = styleResourceList.poll();
-						if (!aResource.startsWith("http")) {
-							if (aResource.charAt(0) == '/') {
-								aResource = targetDomain 
-								+ aResource;
-							} else {
-								aResource = targetDomain 
-								+ '/' + aResource;
-							}
-						} else if (!aResource.startsWith(targetDomain)) {
-							consoleLog.debug("Bad domain encountered: " + aResource);
-							currentBrowserState.addUrlToHistory(aResource);
+				}
+			} else if (temp.getClass() == HtmlStyle.class) {
+				tempAttrs = ((HtmlStyle) temp).getAttributes();
+				tempAttr = ((HtmlStyle) temp).getTextContent();
+				LinkedList<String> styleResourceList = 
+					StyleParser.grabStyleElementText(tempAttr);
+				String aResource;
+				while (!styleResourceList.isEmpty()){
+					aResource = styleResourceList.poll();
+					if (!aResource.startsWith("http")) {
+						if (aResource.charAt(0) == '/') {
+							aResource = targetDomain 
+							+ aResource;
+						} else {
+							aResource = targetDomain 
+							+ '/' + aResource;
 						}
-						if (currentBrowserState.addUrlToHistory(aResource)) {
+					} else if (!aResource.startsWith(targetDomain)) {
+						consoleLog.debug("Bad domain encountered: " + aResource);
+						currentBrowserState.addUrlToCached(aResource);
+					}
+					if (currentBrowserState.addUrlToCached(aResource)) {
+						try {
 							temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 							if (consoleLog.isDebugEnabled()) {
 								resourcesCollector.append("Import resources obtained: "
-									+ aResource + '\n');
+										+ aResource + '\n');
 							}
 							replyTime += temporary.getLoadTimeInMilliSeconds();
 							BodyByteAmount += temporary.getResponseBody().length;
 							if (temporary.getStatusCode() < 200 ||  temporary.getStatusCode() > 299) {
+								if (resultMessage == null)
+									resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + aResource;
 								tempStatus = false;
 							}
 							if (aResource.endsWith(".css")) {
@@ -414,25 +544,41 @@ public class Step implements Comparable<Step> {
 									styleResourceList.add(path + tempHolder.poll());
 								}
 							}
+						} catch (FailingHttpStatusCodeException e) {
+							//Should be impossible
+							consoleLog.error("Bad Status Code.", e);
+							tempStatus = false;
+						} catch (MalformedURLException e) {
+							if (resultMessage == null)
+								resultMessage = "Bad Script - Malformed URL";
+							consoleLog.error("Bad URL Entered during resource retrieval.", e);
+							tempStatus = false;
+						} catch (IOException e) {
+							if (resultMessage == null)
+								resultMessage = "IO Error";
+							consoleLog.error("IO Error Occured during resource retrieval.", e);
+							tempStatus = false;
 						}
 					}
-				} else if (temp.getClass() == HtmlLink.class) {
-					String aResource;
-					tempAttrs = ((HtmlLink) temp).getAttributes();
-					for (int i = 0; i < tempAttrs.getLength(); i++) {
-						if (tempAttrs.getNamedItem("rel").getNodeValue().equals("stylesheet")) {
-							aResource = tempAttrs.getNamedItem("href").getNodeValue();
-							if (!aResource.startsWith("http")) {
-								if (aResource.charAt(0) == '/') {
-									aResource = targetDomain + aResource;
-								} else {
-									aResource = targetDomain + '/' + aResource;
-								}
-							} else if (!aResource.startsWith(targetDomain)) {
-								consoleLog.debug("Bad domain encountered: " + aResource);
-								currentBrowserState.addUrlToHistory(aResource);
+				}
+			} else if (temp.getClass() == HtmlLink.class) {
+				String aResource;
+				tempAttrs = ((HtmlLink) temp).getAttributes();
+				for (int i = 0; i < tempAttrs.getLength(); i++) {
+					if (tempAttrs.getNamedItem("rel").getNodeValue().equals("stylesheet")) {
+						aResource = tempAttrs.getNamedItem("href").getNodeValue();
+						if (!aResource.startsWith("http")) {
+							if (aResource.charAt(0) == '/') {
+								aResource = targetDomain + aResource;
+							} else {
+								aResource = targetDomain + '/' + aResource;
 							}
-							if (currentBrowserState.addUrlToHistory(aResource)) {
+						} else if (!aResource.startsWith(targetDomain)) {
+							consoleLog.debug("Bad domain encountered: " + aResource);
+							currentBrowserState.addUrlToCached(aResource);
+						}
+						if (currentBrowserState.addUrlToCached(aResource)) {
+							try {
 								temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 								if (consoleLog.isDebugEnabled()) {
 									resourcesCollector.append("Link Resources obtained: " + aResource + '\n');
@@ -440,6 +586,8 @@ public class Step implements Comparable<Step> {
 								replyTime += temporary.getLoadTimeInMilliSeconds();
 								BodyByteAmount += temporary.getResponseBody().length;
 								if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
+									if (resultMessage == null)
+										resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + aResource;
 									tempStatus = false;
 								}
 								LinkedList<String> styleResourceList = StyleParser.grabStyleSheetText(temporary.getContentAsString());
@@ -452,31 +600,54 @@ public class Step implements Comparable<Step> {
 											aResource = targetDomain + '/' + aResource;
 										}
 									}
-									if (currentBrowserState.addUrlToHistory(aResource)) {
-										temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
-										if (consoleLog.isDebugEnabled()) {
-											resourcesCollector.append("Style Sheet Pic Resources obtained: " + aResource + '\n');
-										}
-										replyTime += temporary.getLoadTimeInMilliSeconds();
-										BodyByteAmount += temporary.getResponseBody().length;
-										if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
+									if (currentBrowserState.addUrlToCached(aResource)) {
+										try {
+											temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
+											if (consoleLog.isDebugEnabled()) {
+												resourcesCollector.append("Style Sheet Pic Resources obtained: " + aResource + '\n');
+											}
+											replyTime += temporary.getLoadTimeInMilliSeconds();
+											BodyByteAmount += temporary.getResponseBody().length;
+											if (temporary.getStatusCode() < 200 || temporary.getStatusCode() > 299) {
+												if (resultMessage == null)
+													resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + aResource;
+												tempStatus = false;
+											}
+										} catch (FailingHttpStatusCodeException e) {
+											//Should be impossible
+											consoleLog.error("Bad Status Code.", e);
+											tempStatus = false;
+										} catch (MalformedURLException e) {
+											if (resultMessage == null)
+												resultMessage = "Bad Script - Malformed URL";
+											consoleLog.error("Bad URL Entered during resource retrieval.", e);
+											tempStatus = false;
+										} catch (IOException e) {
+											if (resultMessage == null)
+												resultMessage = "IO Error";
+											consoleLog.error("IO Error Occured during resource retrieval.", e);
 											tempStatus = false;
 										}
 									}
 								}
+							} catch (FailingHttpStatusCodeException e) {
+								//Should be impossible
+								consoleLog.error("Bad Status Code.", e);
+								tempStatus = false;
+							} catch (MalformedURLException e) {
+								if (resultMessage == null)
+									resultMessage = "Bad Script - Malformed URL";
+								consoleLog.error("Bad URL Entered during resource retrieval.", e);
+								tempStatus = false;
+							} catch (IOException e) {
+								if (resultMessage == null)
+									resultMessage = "IO Error";
+								consoleLog.error("IO Error Occured during resource retrieval.", e);
+								tempStatus = false;
 							}
 						}
 					}
 				}
-			} catch (FailingHttpStatusCodeException e) {
-				consoleLog.error("Bad Status Code.", e);
-				tempStatus = false;
-			} catch (MalformedURLException e) {
-				consoleLog.error("Bad URL Entered during resource retrieval.", e);
-				tempStatus = false;
-			} catch (IOException e) {
-				consoleLog.error("IO Error Occured during resource retrieval.", e);
-				tempStatus = false;
 			}
 		}
 		if (consoleLog.isDebugEnabled()) {
@@ -497,6 +668,8 @@ public class Step implements Comparable<Step> {
 			}
 			return currentBrowserState.getCurrentPage().getTitleText().equals(stepAttributeList.getValue(0));
 		}
+		if (resultMessage == null)
+			resultMessage = "Current page is null";
 		return false;
 	}
 
@@ -508,20 +681,27 @@ public class Step implements Comparable<Step> {
 			try {
 				Thread.sleep(Robot.getDefaultWaitStep());
 			} catch (InterruptedException e) {
+				if (resultMessage == null)
+					resultMessage = "Interrupted";
 				consoleLog.error("Interrupted Exception during a default WAIT step", e);
 			}
 		} else {
 			try {
 				Thread.sleep(Integer.parseInt(stepAttributeList.getValue(0)));
 			} catch (NumberFormatException e) {
+				if (resultMessage == null)
+					resultMessage = "Bad Script - Bad waitTime";
 				consoleLog.error("Could not determine the wait length during a WAIT Step", e);
 				try {
 					Thread.sleep(Robot.getDefaultWaitStep());
 				} catch (InterruptedException e1) {
+					if (resultMessage == null)
+						resultMessage = "Interrupted";
 					consoleLog.error("Interrupted Exception during a WAIT step", e);
 				}
-				e.printStackTrace();
 			} catch (InterruptedException e) {
+				if (resultMessage == null)
+					resultMessage = "Interrupted";
 				consoleLog.error("Interrupted Exception during a WAIT step", e);
 			}
 		}
@@ -626,11 +806,15 @@ public class Step implements Comparable<Step> {
 			} else {
 				tempResult.append("failure");
 			}
+			tempResult.append(',');
+			tempResult.append(resultMessage);
+			tempResult.append(',');
 			resultLog.info(tempResult);
 			
 			break;
 		case pause:
 		case verifyTitle:
+		case check:
 			tempResult.append(jobID);
 			tempResult.append(',');
 			tempResult.append(stepName);
@@ -644,10 +828,13 @@ public class Step implements Comparable<Step> {
 			} else {
 				tempResult.append("failure");
 			}
+			tempResult.append(',');
+			tempResult.append(resultMessage);
+			tempResult.append(',');
 			resultLog.info(tempResult);
 			break;
 			default:
-				consoleLog.error("A unknown Step was found during reporting.");
+				consoleLog.error("An unknown Step was found during reporting.");
 			break;
 			
 		}
