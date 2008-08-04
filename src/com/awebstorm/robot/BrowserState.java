@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.Cache;
+import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -49,17 +50,19 @@ public class BrowserState {
 		String browVersionString = statePreferences.get("htmlRobotBrowserVersion");
 		String proxyHost = statePreferences.get("proxyHost");
 		
-		if (proxyHost == null) {
+		if (browVersionString != null) {
 			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
-		} else if (browVersionString != null && proxyHost != null) {
-			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, localProxyPort);
 		} else {
 			client = new WebClient();
 		}
-		
+
 		client.setThrowExceptionOnFailingStatusCode(false);
 		client.setPrintContentOnFailingStatusCode(false);
-		client.set
+/*		if (proxyHost != null) {
+			ProxyConfig proxyConfig = new ProxyConfig(proxyHost, localProxyPort);
+			client.setProxyConfig(proxyConfig);
+		}*/
+		//client.getPa
 		
 		String temp = "";
 		temp = statePreferences.get("javaScriptEnabled");

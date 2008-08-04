@@ -16,6 +16,6 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/themes/pushbutton/header-c.jpg" />
+		<open url="/" />
 	</steps>
 </script>

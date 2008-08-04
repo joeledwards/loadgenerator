@@ -96,9 +96,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0011-2").getReceiveBytes().equals(String.valueOf(73270)));
 	}
 	
-	/**
+/*	*//**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
-	 */
+	 *//*
 	public final void shouldGenARobotWithNoWait() {
 		
 		numberOfRobots = 1;
@@ -156,9 +156,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0010-2").getReceiveBytes().equals(String.valueOf(6024+570)));
 	}
 	
-	/**
+	*//**
 	 * Test 1 Threaded Robot on 1 Threaded proxy making a good request.
-	 */
+	 *//*
 	public final void shouldGenARobotOnProxy() {
 
 		numberOfRobots = 1;
@@ -218,9 +218,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
-	/**
+	*//**
 	 * Test 5 Threaded Robots on 5 Threaded Proxies making requests on a single known target
-	 */
+	 *//*
 	public final void shouldGen5RobotsOnProxy() {
 
 		numberOfRobots = 5;
@@ -295,9 +295,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0005-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
-	/**
+	*//**
 	 * Test 1 Threaded Robots on 1 Threaded proxies with multiple steps per Robot.
-	 */
+	 *//*
 	public final void shouldGen1RobotsOn1ProxyMultiStep() {
 
 		numberOfRobots = 1;
@@ -362,7 +362,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0001-4").getResultMessage().equals("null"));
 		ensureThat(results.get("0001-4").getSentBytes().equals("222"));
 		ensureThat(results.get("0001-4").getReceiveBytes().equals("692"));
-	}
+	}*/
 
 	/**
 	 * Setup general operations before each test.

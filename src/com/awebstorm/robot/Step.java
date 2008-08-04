@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +16,9 @@ import org.xml.sax.Attributes;
 import com.awebstorm.Proxy;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
@@ -320,11 +323,15 @@ public class Step implements Comparable<Step> {
 	private boolean open() {
 		String currentPath = stepAttributeList.getValue(0);
 		currentPath = targetDomain + currentPath;
+		
 		HtmlPage invokePage = null;
 		Page tempPage;
 
 		try {
-			tempPage = currentBrowserState.getVUser().getPage(currentPath);
+			WebRequestSettings newSettings = new WebRequestSettings(new URL(currentPath),HttpMethod.GET);
+			newSettings.setProxyHost("localhost");
+			newSettings.setProxyPort(myProxy.getLocalport());
+			tempPage = currentBrowserState.getVUser().getPage(newSettings);
 		} catch (FailingHttpStatusCodeException e) {
 			//Should be impossible due to settings on the WebClient
 			consoleLog.error("Bad Status Code.", e);
