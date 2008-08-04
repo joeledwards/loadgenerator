@@ -5,14 +5,14 @@
 		<jobID>0001</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
-		<proxyHost>localhost</proxyHost>
+		<proxyHost>127.0.0.1</proxyHost>
 		<javaScriptEnabled>false</javaScriptEnabled>
 		<redirectEnabled>true</redirectEnabled>
 		<throwExceptionOnScriptError>true</throwExceptionOnScriptError>
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-		<remoteport>8080</remoteport>
+		<remoteport>21000</remoteport>
 	</properties>
 	<steps>
 		<pause waitTime="0" />

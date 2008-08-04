@@ -181,7 +181,7 @@ public class LoadGenerator {
 			if (consoleLog.isDebugEnabled()) {
 				consoleLog.debug("Robot found, trying to kill it...");
 			}
-			aliveRobotList.poll().setStopExecuting(true);
+			aliveRobotList.poll().setEnd(true);
 		}
 		
 	}

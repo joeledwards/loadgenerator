@@ -45,7 +45,10 @@ public class HTMLRobot extends Robot {
 	public final void run() {
 		int stepNum = 0;
 		while (!stepQueue.isEmpty()) {
-			if (stopExecuting) {
+			if (this.isEnd()) {
+				if (consoleLog.isDebugEnabled())
+					consoleLog.debug("HTMLRobot exiting prematurely.");
+				
 				return;
 			}
 			Step tempStep = stepQueue.poll();

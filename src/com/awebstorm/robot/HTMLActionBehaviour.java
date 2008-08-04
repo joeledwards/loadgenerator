@@ -37,7 +37,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 	/**
 	 * Test Submit by name
 	 */
-/*	public final void shouldSubmitByName() {
+	public final void shouldSubmitByName() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\SubmitByName.xml"));
 		} catch (FileNotFoundException e) {
@@ -51,34 +51,11 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains(tableSuccess));
-		outFile.delete();
 	}
 	
-	*//**
+/*	*//**
 	 * Test Submit by xpath
 	 *//*
 	public final void shouldSubmitByXPath() {
@@ -95,31 +72,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains(tableSuccess));
-		outFile.delete();
 	}
 	
 	*//**
@@ -139,31 +93,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains(tableSuccess));
-		outFile.delete();
 	}
 	
 	*//**
@@ -183,31 +114,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains(tableSuccess));
-		outFile.delete();
 	}
 	
 	*//**
@@ -228,31 +136,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("textBox=typeOneLine"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -273,31 +158,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("checkBox=true"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -318,31 +180,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("checkBox=true"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -363,31 +202,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("checkBox=false"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -408,33 +224,10 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("select=value1"));
 		ensureThat(outputTable.contains("select=value2"));
 		ensureThat(outputTable.contains("select=value3"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -455,32 +248,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
-		File outFile = null;
-		InputStream output = null;
-		StringBuffer readBuffer = new StringBuffer();
-		
-		try {
-			outFile = new File("output.log");
-			output = new FileInputStream(outFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		try {
-			int readOne = output.read();
-			while (readOne != -1) {
-				readBuffer.append((char)readOne);
-				readOne = output.read();
-			}
-			output.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			ensureThat(false);
-		}
-		String outputTable = readBuffer.toString();
+		String outputTable = readOutputFile();
 		ensureThat(outputTable.contains("select=value1"));
 		ensureThat(outputTable.contains("select=value2"));
-		outFile.delete();
 	}
 	
 	*//**
@@ -503,13 +273,33 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0001-4").getReceiveBytes().equals(results.get("0001-2").getReceiveBytes()));
-	}*/
+	}
+	
+	*//**
+	 * Test the connection exception received from a non-existing server.
+	 */
+	public final void shouldConnectionExceptionFromNonExistingServer() {
+		try {
+			newStreams.add(new FileInputStream("example_scripts\\ConnectionException.xml"));
+		} catch (FileNotFoundException e) {
+			consoleLog.error("Script File not found.", e);
+		}
+		for (int i = 0;!newStreams.isEmpty();i++) {
+			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			robots.add(newRobot);
+			newRobot.init();
+		}
+		tearDown();
+		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
+		ensureThat(reader.isConsoleLogHasNoErrors());
+		HashMap<String,ALineData> results = reader.getMyLines();
+		ensureThat(results.get("0013-2").getResultMessage().equals("Server could not be contacted."));
+	}
 	
 	/**
-	 * Test Connection Reset
-	 */
-	public final void shouldConnectReset() {
-		tearDown();
+	 * Test the connection exception received from an invalid or unusable port.
+	 *//*
+	public final void shouldConnectionExceptionFromBadPort() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\ConnectionReset.xml"));
 		} catch (FileNotFoundException e) {
@@ -520,10 +310,38 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			robots.add(newRobot);
 			newRobot.init();
 		}
+		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
-		ensureThat(!reader.isConsoleLogHasNoErrors());
+		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-2").getResultMessage().equals("Socket Reset"));
+		ensureThat(results.get("0012-2").getResultMessage().equals("Server could not be contacted."));
+	}*/
+	
+	public String readOutputFile() {
+		File outFile = null;
+		InputStream output = null;
+		StringBuffer readBuffer = new StringBuffer();
+		
+		try {
+			outFile = new File("output.log");
+			output = new FileInputStream(outFile);
+		} catch (FileNotFoundException e) {
+			ensureThat(false);
+		}
+		try {
+			int readOne = output.read();
+			while (readOne != -1) {
+				readBuffer.append((char)readOne);
+				readOne = output.read();
+			}
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			ensureThat(false);
+		}
+		outFile.delete();
+		return readBuffer.toString();
+		
 	}
 	
 	/**

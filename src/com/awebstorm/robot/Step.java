@@ -1,11 +1,13 @@
 package com.awebstorm.robot;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.httpclient.NoHttpResponseException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.xml.sax.Attributes;
@@ -48,8 +50,8 @@ public class Step implements Comparable<Step> {
 		open,
 		verifyTitle,
 		pause,
-		click,
-		check
+		//click,
+		//check
 	}
 	
 	private BrowserState currentBrowserState;
@@ -128,7 +130,7 @@ public class Step implements Comparable<Step> {
 		try {
 			currentType = ActionType.valueOf(stepName);
 		} catch (IllegalArgumentException e) {
-			consoleLog.error("Unknown Step type found.",e);
+				consoleLog.error("Unknown Step type found.",e);
 			return;
 		}
 		if (currentType == null) {
@@ -147,10 +149,10 @@ public class Step implements Comparable<Step> {
 		case verifyTitle:
 			stepReturnStatus = this.verifyTitle();
 			break;
-		case click:
-			stepReturnStatus = this.click();
-		case check:
-			stepReturnStatus = this.check();
+		//case click:
+		//	stepReturnStatus = this.click();
+		//case check:
+		//	stepReturnStatus = this.check();
 		default:
 			consoleLog.warn("Unknown Step type found.");
 			stepReturnStatus = false;
@@ -165,7 +167,7 @@ public class Step implements Comparable<Step> {
 	 * This step could qualify as an entirely new page load, so it is reported like an open
 	 * @return Step Status
 	 */
-	private boolean click() {
+/*	private boolean click() {
 		HtmlElement targetElement = null;
 		try {
 			targetElement = locator();
@@ -196,7 +198,7 @@ public class Step implements Comparable<Step> {
 			}
 			return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 		}
-	}
+	}*/
 	
 	/**
 	 * Check the checkbox indicated by the locator stored in the first entry of the AttributeList.
@@ -204,7 +206,7 @@ public class Step implements Comparable<Step> {
 	 * method is called.
 	 * @return Step success status
 	 */
-	private boolean check() {
+/*	private boolean check() {
 		HtmlElement targetElement = null;
 		try {
 			targetElement = locator();
@@ -220,7 +222,7 @@ public class Step implements Comparable<Step> {
 		} else {
 			return false;
 		}
-	}
+	}*/
 	
 /*	private boolean addSelection() {
 		HtmlElement targetElement = null;
@@ -335,7 +337,24 @@ public class Step implements Comparable<Step> {
 		} catch (SocketTimeoutException e) {
 			if (resultMessage == null)
 				resultMessage = "Socket Timeout";
-			consoleLog.debug("Socket Timed Out from licit/illicit factors.");
+				if (consoleLog.isDebugEnabled())
+					consoleLog.debug("Socket Timed Out from licit/illicit factors.");
+				if (myProxy.getThreadState().compareTo(Thread.State.BLOCKED) == 0) {
+					consoleLog.error("Server is unresponsive for" + currentPath);
+					if (resultMessage == null)
+						resultMessage = "Server is unresponsive for " + currentPath;
+				}
+			return false;
+		} catch (ConnectException e) {
+			if (resultMessage == null)
+				resultMessage = "Server could not be contacted.";
+			if (consoleLog.isDebugEnabled())
+				consoleLog.debug("Server could not be contacted. Exiting step sequence.", e);
+			stepRobotOwner.setEnd(true);
+			return false;
+		} catch (NoHttpResponseException e) {
+			if (resultMessage == null)
+				resultMessage = myProxy.getProxyMessage();
 			return false;
 		} catch (IOException e) {
 			if (resultMessage == null)
@@ -343,8 +362,13 @@ public class Step implements Comparable<Step> {
 			consoleLog.error("IO Error during Invoke.", e);
 			return false;
 		}
-
-		if (tempPage.getClass() == HtmlPage.class) {
+		
+		if (tempPage == null) {
+			if (consoleLog.isDebugEnabled()) {
+				consoleLog.debug("Opened Page is null.");
+			}
+			return false;
+		} else if (tempPage.getClass() == HtmlPage.class) {
 			invokePage = (HtmlPage) tempPage;
 			currentBrowserState.setCurrentPage(invokePage);
 			replyTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
@@ -365,13 +389,11 @@ public class Step implements Comparable<Step> {
 			if (currentBrowserState.addUrlToCached("/favicon.ico")) {
 				try {
 					WebResponse temporary = currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
-					replyTime += temporary.getLoadTimeInMilliSeconds();
-					BodyByteAmount += temporary.getResponseBody().length;
 					if (tempPage.getWebResponse().getStatusCode() < 200
 							|| tempPage.getWebResponse().getStatusCode() > 399) {
-						if (resultMessage == null)
-							resultMessage = "Bad Status Code " + temporary.getStatusCode() + " for " + targetDomain + "/favicon.ico";
-						return false;
+					} else {
+						replyTime += temporary.getLoadTimeInMilliSeconds();
+						BodyByteAmount += temporary.getResponseBody().length;
 					}
 				} catch (SocketTimeoutException e) {
 					if (resultMessage == null)
@@ -421,16 +443,16 @@ public class Step implements Comparable<Step> {
 		if (currentBrowserState.addUrlToCached("/favicon.ico")) {
 			try {
 				WebResponse iconResponse = currentBrowserState.getVUser().getPage(targetDomain + "/favicon.ico").getWebResponse();
-				replyTime += iconResponse.getLoadTimeInMilliSeconds();
-				BodyByteAmount += iconResponse.getResponseBody().length;
 				if (iconResponse.getStatusCode() < 200 || iconResponse.getStatusCode() > 299) {
-					tempStatus = false;
-					if (resultMessage == null)
-						resultMessage = "Bad Status Code " + iconResponse.getStatusCode() + " for " + targetDomain + "/favicon.ico";
+				} else {
+					replyTime += iconResponse.getLoadTimeInMilliSeconds();
+					BodyByteAmount += iconResponse.getResponseBody().length;
 				}
 			} catch (SocketTimeoutException e) {
+				//Socket timeouts may be normal if the server is under load.
 				consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 			} catch (FailingHttpStatusCodeException e) {
+				//Should be impossible
 				consoleLog.error("Bad Status Code.", e);
 				tempStatus = false;
 			} catch (MalformedURLException e) {
@@ -469,6 +491,7 @@ public class Step implements Comparable<Step> {
 					currentBrowserState.addUrlToCached(tempAttr);
 				}
 				if (currentBrowserState.addUrlToCached(tempAttr)) {
+					consoleLog.debug("Collecting resource: " + tempAttr);
 					try {
 						temporary = currentBrowserState.getVUser().getPage(tempAttr).getWebResponse();
 						if (consoleLog.isDebugEnabled()) {
@@ -506,6 +529,7 @@ public class Step implements Comparable<Step> {
 				String aResource;
 				while (!styleResourceList.isEmpty()){
 					aResource = styleResourceList.poll();
+					
 					if (!aResource.startsWith("http")) {
 						if (aResource.charAt(0) == '/') {
 							aResource = targetDomain 
@@ -519,6 +543,7 @@ public class Step implements Comparable<Step> {
 						currentBrowserState.addUrlToCached(aResource);
 					}
 					if (currentBrowserState.addUrlToCached(aResource)) {
+						consoleLog.debug("Collecting resource: " + aResource);
 						try {
 							temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 							if (consoleLog.isDebugEnabled()) {
@@ -578,6 +603,7 @@ public class Step implements Comparable<Step> {
 							currentBrowserState.addUrlToCached(aResource);
 						}
 						if (currentBrowserState.addUrlToCached(aResource)) {
+							consoleLog.debug("Collecting resource: " + aResource);
 							try {
 								temporary = currentBrowserState.getVUser().getPage(aResource).getWebResponse();
 								if (consoleLog.isDebugEnabled()) {
@@ -733,7 +759,7 @@ public class Step implements Comparable<Step> {
 		}
 		switch (currentType) {
 		case open:
-		case click:
+		//case click:
 			if (resultLog.isDebugEnabled()) {
 				tempResult.append("jobID: " +jobID);
 				tempResult.append('\n');
@@ -814,7 +840,7 @@ public class Step implements Comparable<Step> {
 			break;
 		case pause:
 		case verifyTitle:
-		case check:
+		//case check:
 			tempResult.append(jobID);
 			tempResult.append(',');
 			tempResult.append(stepName);

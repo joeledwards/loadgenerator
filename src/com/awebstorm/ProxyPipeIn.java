@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.apache.log4j.Logger;
 
@@ -65,6 +66,9 @@ public class ProxyPipeIn implements Runnable {
 					toLocal.write(numberRead);
 				}
 			}
+		} catch (SocketException e) {
+			if (consoleLog.isDebugEnabled())
+				consoleLog.error("Socket Exception", e);
 		} catch (IOException e) {
 			consoleLog.error("Could not accept a connection", e);
 		} catch (ArrayIndexOutOfBoundsException e) {

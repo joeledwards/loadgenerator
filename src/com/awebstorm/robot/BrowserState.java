@@ -59,6 +59,7 @@ public class BrowserState {
 		
 		client.setThrowExceptionOnFailingStatusCode(false);
 		client.setPrintContentOnFailingStatusCode(false);
+		client.set
 		
 		String temp = "";
 		temp = statePreferences.get("javaScriptEnabled");
@@ -95,12 +96,6 @@ public class BrowserState {
 			client.setPopupBlockerEnabled(Boolean.parseBoolean(temp));
 		} else {
 			consoleLog.debug("A preference was not set: " + "popupBlockerEnabled");
-		}
-		temp = statePreferences.get("timeout");
-		if (temp != null) {
-			client.setTimeout(Integer.parseInt(temp));
-		} else {
-			consoleLog.debug("A preference was not set: " + "timeout");
 		}
 		temp = statePreferences.get("cacheSize");
 		if (temp != null) {

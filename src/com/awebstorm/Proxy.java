@@ -1,5 +1,9 @@
 package com.awebstorm;
 import java.io.IOException;
+import java.net.BindException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.PortUnreachableException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -26,6 +30,7 @@ public class Proxy implements Runnable {
 	private long proxyTimeEnded;
 	private long proxyTimeStarted;
 	private ServerSocket proxyServerSocket;
+	private String proxyMessage = null;
 	
 	/**
 	 * Proxy Constructor.
@@ -37,7 +42,7 @@ public class Proxy implements Runnable {
 		this.targetport = remoteport;
     	// Check for valid remote port and hostname not null
     	if (consoleLog.isDebugEnabled()) {
-    		consoleLog.debug("Opening a Proxy at " + targethost + " Port " + remoteport);
+    		consoleLog.debug("Opening a Proxy to " + targethost + " Port " + remoteport);
     	}
     	if (remoteport <= 0) {
     		consoleLog.error("Error: Invalid Remote Port Specification " + "\n");
@@ -89,9 +94,11 @@ public class Proxy implements Runnable {
     		    		consoleLog.debug("Closing a Proxy at " + proxyServerSocket.getLocalPort());
     		    	}
         			if (localSocket != null && consoleLog.isDebugEnabled()) {
-            			consoleLog.debug("Local Socket is Closed: " + localSocket.isClosed());
+            			if (!localSocket.isClosed())
+            				localSocket.close();
             			if (targetSocket != null)
-            				consoleLog.debug("Target Socket is Closed: " + targetSocket.isClosed());
+            				if (!targetSocket.isClosed())
+            					targetSocket.close();
         			}
     		    	break;
     			}
@@ -113,11 +120,29 @@ public class Proxy implements Runnable {
     			}
     			thread2.start();
     		} catch (UnknownHostException e) {
-    			consoleLog.fatal("Error: Unknown Host " + targethost, e);
-    			System.exit(-1);
+    			consoleLog.fatal("Unknown Host " + targethost, e);
+    			this.proxyMessage = "Unknown Host " + targethost;
+    		} catch (BindException e) {
+    			consoleLog.fatal("Could not bind to remoteport: " + targetport, e);
+    			this.proxyMessage = "Could not bind to remoteport: " + targetport;
+    		} catch (ConnectException e) {
+    			consoleLog.fatal("Could not connect to: " + targethost + ":" + targetport, e);
+    			this.proxyMessage = "Could not connect to: " + targethost + ":" + targetport;
+    		} catch (NoRouteToHostException e) {
+    			consoleLog.fatal("Could not find a route to remote host: " + targethost, e);
+    			this.proxyMessage = "Could not find a route to remote host: " + targethost;
+    		} catch (PortUnreachableException e) {
+    			consoleLog.fatal("Could not reach the remote port: " + targetport, e);
+    			this.proxyMessage = "Could not reach the remote port: " + targetport;
     		} catch (IOException e) {
-    			consoleLog.fatal("IOException when accepting new connection.", e);
-    			System.exit(-2);
+    			consoleLog.error("IOException when accepting new connection.", e);
+    			this.proxyMessage = "IO Error";
+    		} finally {
+/*    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}*/
     		}
     	}
     }
@@ -137,7 +162,8 @@ public class Proxy implements Runnable {
      * Shutdown the proxy.
      */
     public final void shutdown() throws IOException {
-    	proxyServerSocket.close();
+    	if (!proxyServerSocket.isClosed())
+    		proxyServerSocket.close();
     }
     
 	public String getRemotehost() {
@@ -201,6 +227,9 @@ public class Proxy implements Runnable {
 	 */
 	public int getLocalport() {
 		return localport;
+	}
+	public String getProxyMessage() {
+		return proxyMessage;
 	}
 }
 

@@ -20,10 +20,10 @@ public class BehaviourContainer implements Behaviours {
 	@SuppressWarnings("unchecked")
 	public final Class[] getBehaviours() {
 		return new Class[] { 
-			(new StyleParserBehaviour()).getClass(),
+			//(new StyleParserBehaviour()).getClass(),
 			(new HTMLRobotBehaviour()).getClass(),
-			(new HTMLActionBehaviour()).getClass(),
-			(new ProxyBehaviour()).getClass(),
+			//(new HTMLActionBehaviour()).getClass(),
+			//(new ProxyBehaviour()).getClass(),
 		};
 	}
 

@@ -23,9 +23,9 @@ public abstract class Robot implements Runnable {
 	protected String robotID;
 	protected Step currentStep;
 	protected long timeLastStepFinished = 0;
-	protected boolean stopExecuting = false;
 	protected Thread myRobotThread;
 	protected Proxy currentProxy;
+	private boolean end;
 	
 	/**
 	 * Initialize a Robot in its own Thread.
@@ -50,14 +50,6 @@ public abstract class Robot implements Runnable {
 		new ScriptReader().run(scriptStream, stepQueue, prefs, this);
 		this.setDefaultRobotPreferences();
 	}
-
-	/**
-	 * Get the value of the stop thread boolean.
-	 * @return stop thread value
-	 */
-	public final synchronized boolean getStopExecuting() {
-		return stopExecuting;
-	}
 	
 	/**
 	 * Method must be called by extending classes, 
@@ -76,14 +68,6 @@ public abstract class Robot implements Runnable {
 		robotID = prefs.get("jobID");
 		targetDomain = prefs.get("domain");
 		targetPort = Integer.parseInt(prefs.get("remoteport"));
-	}
-	
-	/**
-	 * Set the value of the stop thread boolean.
-	 * @param value New value
-	 */
-	public final synchronized void setStopExecuting(final boolean value) {
-		this.stopExecuting = value;
 	}
 
 	/**
@@ -128,5 +112,19 @@ public abstract class Robot implements Runnable {
 	}
 	public int getTargetPort() {
 		return targetPort;
+	}
+	/**
+	 * Allows the Robot to know when to exit its sequence of Steps prematurely.
+	 * @param b True if the Robot should end asap, else continue executing
+	 */
+	public void setEnd(boolean b) {
+		this.end = b;
+	}
+	/**
+	 * Classes extending the Robot class will be able to tell if they should exit prematurely.
+	 * @return True if the Robot should exit prematurely, else false
+	 */
+	protected boolean isEnd() {
+		return this.end;
 	}
 }
