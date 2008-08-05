@@ -17,9 +17,9 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.html" />
-		<select name="select" label="option1" />
-		<select name="select" value="value2" />
-		<select name="select" index="2" />
-		<submit name="form1" />
+		<select name="States" id="nm" />
+		<select name="computerbrands" value="IBM" />
+		<select name="countries2" value="3" />
+		<submit name="test_form" />
 	</steps>
 </script>

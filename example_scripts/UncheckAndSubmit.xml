@@ -17,7 +17,7 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.html" />
-		<uncheck name="checkBox" />
-		<submit name="form1" />
+		<uncheck name="checkbox2" />
+		<submit name="test_form" />
 	</steps>
 </script>

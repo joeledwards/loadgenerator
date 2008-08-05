@@ -17,6 +17,6 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.html" />
-		<submit name="form1" />
+		<submit name="test_form" />
 	</steps>
 </script>

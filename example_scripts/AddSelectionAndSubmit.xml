@@ -16,9 +16,9 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/testform.htm" />
-		<select name="select" label="option1" />
-		<addSelection name="select" label="option2" />
-		<submit name="form1" />
+		<open url="/form.html" />
+		<select name="computerbrands" label="IBM" />
+		<addSelection name="computerbrands" label="HP" />
+		<submit name="test_form" />
 	</steps>
 </script>

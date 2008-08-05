@@ -17,7 +17,7 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.html" />
-		<type name="textBox" value="typeOneLine" />
-		<submit name="form1" />
+		<type name="comments" value="Type One Line" />
+		<submit name="test_form" />
 	</steps>
 </script>

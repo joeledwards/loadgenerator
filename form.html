@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 <body>
-<form action="http://localhost/server.jsp" name="test_form" method="post" >
+<form action="http://localhost/server.jsp" name="test_form" id="one" method="post" >
 <p>
 First Name: <input type="text" name="FirstName" value="" size="15" maxlength="15" />
 </p>
@@ -44,10 +44,10 @@ Password:<input type="password" value="" name="mypassword" maxlength="10" size="
 <input type="checkbox" name="checkbox1"  />Check this box out!<br />
 <input type="checkbox" name="checkbox2" checked="checked"  />Check out this 2nd box<br />
 <select name="States">
-   <option>NM</option>
-   <option>Texas</option>
-   <option>Arizona</option>
-   <option selected="selected">California</option>
+   <option id="nm">NM</option>
+   <option id="texas">Texas</option>
+   <option id="arizona">Arizona</option>
+   <option id="cali" selected="selected">California</option>
 </select>
 <select name="menuitems">
 <optgroup id="opt1" label="food">

@@ -16,8 +16,8 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
-		<click name="checkBox" />
-		<submit name="form1" />
+		<open url="form.html" />
+		<click name="checkbox1" />
+		<click name="test_form" />
 	</steps>
 </script>
