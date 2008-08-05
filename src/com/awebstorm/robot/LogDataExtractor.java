@@ -300,7 +300,7 @@ public class LogDataExtractor {
 	public final boolean parseALine(String line) {
 		//Remove the leading dots, they indicate tests started
 		int i = 0;
-		while (true) {
+		while (line.length() > i) {
 			char someChar = line.charAt(i);
 			if (someChar == '.' || someChar == 'F') {
 				i++;
@@ -320,7 +320,7 @@ public class LogDataExtractor {
 			return true;
 		} else if (line.startsWith("[INFO ]", 0)) {
 			ALineData infoLine = new ALineData();
-			String subline = line.substring(41);
+			String subline = line.substring(34);
 			int j = 0;
 			newChar = subline.charAt(j);
 			while (newChar != ' ') {

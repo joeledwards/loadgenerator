@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
 
-import com.awebstorm.robot.HTMLRobot;
+import com.awebstorm.robot.HtmlRobot;
 import com.awebstorm.robot.Robot;
 
 
@@ -150,7 +150,7 @@ public class LoadGenerator {
 	 * @return
 	 */
 	private Robot selectRobotType(InputStream script, Proxy newProxy) {
-			return new HTMLRobot(script,10000,newProxy);
+			return new HtmlRobot(script,10000,newProxy);
 	}
 	
 	/**

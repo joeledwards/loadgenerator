@@ -1,8 +1,8 @@
 <script>
 	<properties>
 		<cacheSize>50</cacheSize>
-		<domain>localhost</domain>
-		<jobID>0001</jobID>
+		<domain>127.0.0.1</domain>
+		<jobID>2007</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
 		<proxyHost>localhost</proxyHost>

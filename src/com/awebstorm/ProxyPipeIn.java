@@ -4,8 +4,14 @@ package com.awebstorm;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.BindException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.PortUnreachableException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 
@@ -66,11 +72,68 @@ public class ProxyPipeIn implements Runnable {
 					toLocal.write(numberRead);
 				}
 			}
+		} catch (SocketTimeoutException e) {
+			if (consoleLog.isDebugEnabled()) {
+				consoleLog.debug("Socket Timed Out", e);
+			}
+			myProxyOwner.setProxyMessage("SocketTimeoutException");
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
+		} catch (UnknownHostException e) {
+			consoleLog.fatal("UnknownHostException " + incoming.getInetAddress(), e);
+			myProxyOwner.setProxyMessage("UnknownHostException " + incoming.getInetAddress());
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
+		} catch (BindException e) {
+			consoleLog.fatal("BindException to remoteport: " + incoming.getPort(), e);
+			myProxyOwner.setProxyMessage("BindException to remoteport: " + incoming.getPort());
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
+		} catch (ConnectException e) {
+			consoleLog.fatal("ConnectException to: " + incoming.getInetAddress() + ":" + incoming.getPort(), e);
+			myProxyOwner.setProxyMessage("ConnectException to: " + incoming.getInetAddress() + ":" + incoming.getPort());
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
+		} catch (NoRouteToHostException e) {
+			consoleLog.fatal("NoRouteToHostException to remote host: " + incoming.getInetAddress(), e);
+			myProxyOwner.setProxyMessage("NoRouteToHostException to remote host: " + incoming.getInetAddress());
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
+		} catch (PortUnreachableException e) {
+			consoleLog.fatal("PortUnreachableException to remote port: " + incoming.getPort(), e);
+			myProxyOwner.setProxyMessage("PortUnreachableException to remote port: " + incoming.getPort());
+			try {
+				incoming.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
 		} catch (SocketException e) {
-			if (consoleLog.isDebugEnabled())
-				consoleLog.error("Socket Exception", e);
+			consoleLog.fatal("SocketException to remote port: " + incoming.getPort(), e);
+			myProxyOwner.setProxyMessage("SocketException to remote port: " + incoming.getPort());
+			try {
+				incoming.close();
+				outgoing.close();
+			} catch (IOException e1) {
+				consoleLog.error("Could not close the local socket.", e1);
+			}
 		} catch (IOException e) {
-			consoleLog.error("Could not accept a connection", e);
+			consoleLog.error("IOException when accepting new connection.", e);
+			myProxyOwner.setProxyMessage("IO Error");
 		} catch (ArrayIndexOutOfBoundsException e) {
 			consoleLog.error("Buffer Overflow on " + numberRead, e);
 		}

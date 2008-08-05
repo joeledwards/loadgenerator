@@ -20,11 +20,11 @@ import com.awebstorm.Proxy;
 import com.awebstorm.robot.LogDataExtractor.ALineData;
 
 /**
- * Test the behaviour of the HTMLRobot class.
+ * Test the behaviour of the HtmlRobot class.
  * @author Cromano
  *
  */
-public class HTMLRobotBehaviour extends UsingMatchers {
+public class HtmlRobotBehaviour extends UsingMatchers {
 	
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
@@ -39,7 +39,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 	/**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
 	 */
-	public final void shouldGenARobotFor404Request() {
+	public final void shouldGenA404Request() {
 		
 		numberOfRobots = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
@@ -48,12 +48,14 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
 		}
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\404ResponseHTMLScript.xml"));
+			newStreams.add(new FileInputStream("example_scripts" 
+					+ System.getProperty("file.separator") 
+					+ "404ResponseHTMLScript.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -86,19 +88,19 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 			}
 		}
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
-		ensureThat(!reader.isConsoleLogHasNoErrors());
+		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0011-1").getResultMessage().equals("null"));
 		ensureThat(results.get("0011-1").getStepStatus().equals("success"));
-		ensureThat(results.get("0011-2").getResultMessage().equals("Bad Status Code 404 for http://www.customercentrix.com/themes/pushbutton/header-c.jpg"));
+		ensureThat(results.get("0011-2").getResultMessage().equals("Bad Status Code 404 for http://www.customercentrix.com/none.htm"));
 		ensureThat(results.get("0011-2").getStepStatus().equals("failure"));
-		ensureThat(results.get("0011-2").getSentBytes().equals(String.valueOf(10373)));
-		ensureThat(results.get("0011-2").getReceiveBytes().equals(String.valueOf(73270)));
+		ensureThat(results.get("0011-2").getSentBytes().equals(String.valueOf(10351)));
+		ensureThat(results.get("0011-2").getReceiveBytes().equals(String.valueOf(73244)));
 	}
 	
-/*	*//**
+	/**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
-	 *//*
+	 */
 	public final void shouldGenARobotWithNoWait() {
 		
 		numberOfRobots = 1;
@@ -113,7 +115,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -156,9 +158,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0010-2").getReceiveBytes().equals(String.valueOf(6024+570)));
 	}
 	
-	*//**
+	/**
 	 * Test 1 Threaded Robot on 1 Threaded proxy making a good request.
-	 *//*
+	 */
 	public final void shouldGenARobotOnProxy() {
 
 		numberOfRobots = 1;
@@ -176,7 +178,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 			consoleLog.error("Could not find the script file.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -218,9 +220,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
-	*//**
+	/**
 	 * Test 5 Threaded Robots on 5 Threaded Proxies making requests on a single known target
-	 *//*
+	 */
 	public final void shouldGen5RobotsOnProxy() {
 
 		numberOfRobots = 5;
@@ -231,7 +233,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		}
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
-				HTMLRobot newRobot = new HTMLRobot(
+				HtmlRobot newRobot = new HtmlRobot(
 						new FileInputStream("example_scripts\\BasicHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
@@ -295,9 +297,9 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0005-2").getReceiveBytes().equals(String.valueOf(692+570)));
 	}
 	
-	*//**
+	/**
 	 * Test 1 Threaded Robots on 1 Threaded proxies with multiple steps per Robot.
-	 *//*
+	 */
 	public final void shouldGen1RobotsOn1ProxyMultiStep() {
 
 		numberOfRobots = 1;
@@ -308,7 +310,7 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		}
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
-				Robot newRobot = new HTMLRobot(
+				Robot newRobot = new HtmlRobot(
 						new FileInputStream("example_scripts\\MultiStepHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
@@ -350,19 +352,19 @@ public class HTMLRobotBehaviour extends UsingMatchers {
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-2").getStepStatus().equals("success"));
-		ensureThat(results.get("0001-2").getResultMessage().equals("null"));
-		ensureThat(results.get("0001-2").getSentBytes().equals(String.valueOf(222+203)));
-		ensureThat(results.get("0001-2").getReceiveBytes().equals(String.valueOf(692+570)));
-		ensureThat(results.get("0001-3").getStepStatus().equals("success"));
-		ensureThat(results.get("0001-3").getResultMessage().equals("null"));
-		ensureThat(results.get("0001-3").getSentBytes().equals("222"));
-		ensureThat(results.get("0001-3").getReceiveBytes().equals("6024"));
-		ensureThat(results.get("0001-4").getStepStatus().equals("success"));
-		ensureThat(results.get("0001-4").getResultMessage().equals("null"));
-		ensureThat(results.get("0001-4").getSentBytes().equals("222"));
-		ensureThat(results.get("0001-4").getReceiveBytes().equals("692"));
-	}*/
+		ensureThat(results.get("0111-2").getStepStatus().equals("success"));
+		ensureThat(results.get("0111-2").getResultMessage().equals("null"));
+		ensureThat(results.get("0111-2").getSentBytes().equals(String.valueOf(222+203)));
+		ensureThat(results.get("0111-2").getReceiveBytes().equals(String.valueOf(692+570)));
+		ensureThat(results.get("0111-3").getStepStatus().equals("success"));
+		ensureThat(results.get("0111-3").getResultMessage().equals("null"));
+		ensureThat(results.get("0111-3").getSentBytes().equals("222"));
+		ensureThat(results.get("0111-3").getReceiveBytes().equals("6024"));
+		ensureThat(results.get("0111-4").getStepStatus().equals("success"));
+		ensureThat(results.get("0111-4").getResultMessage().equals("null"));
+		ensureThat(results.get("0111-4").getSentBytes().equals("222"));
+		ensureThat(results.get("0111-4").getReceiveBytes().equals("692"));
+	}
 
 	/**
 	 * Setup general operations before each test.

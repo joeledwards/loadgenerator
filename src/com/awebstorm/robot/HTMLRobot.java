@@ -12,7 +12,7 @@ import com.awebstorm.Proxy;
  * @version 1.0
  *
  */
-public class HTMLRobot extends Robot {
+public class HtmlRobot extends Robot {
 	
 	private Logger consoleLog = Logger.getLogger(this.getClass());
 	private BrowserState currentState;
@@ -23,11 +23,11 @@ public class HTMLRobot extends Robot {
 	 * @param proxyPort Port on which to contact the local proxy
 	 * @param newProxy Proxy that will be used to record throughput information
 	 */
-	public HTMLRobot(final InputStream script, final int proxyPort, final Proxy newProxy) {
+	public HtmlRobot(final InputStream script, final int proxyPort, final Proxy newProxy) {
 		super(script, newProxy);
 		currentState = new BrowserState(prefs, proxyPort);
 		if (consoleLog.isDebugEnabled()) {
-			consoleLog.debug("Built an HTMLRobot on" + this.robotID);
+			consoleLog.debug("Built an HtmlRobot on" + this.robotID);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class HTMLRobot extends Robot {
 		while (!stepQueue.isEmpty()) {
 			if (this.isEnd()) {
 				if (consoleLog.isDebugEnabled())
-					consoleLog.debug("HTMLRobot exiting prematurely.");
+					consoleLog.debug("HtmlRobot exiting prematurely.");
 				
 				return;
 			}
@@ -65,7 +65,7 @@ public class HTMLRobot extends Robot {
 				try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					consoleLog.error("HTMLRobot interrupted during sleep.", e);
+					consoleLog.error("HtmlRobot interrupted during sleep.", e);
 				}
 				
 				stepNum++;

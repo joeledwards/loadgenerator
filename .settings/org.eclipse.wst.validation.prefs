@@ -1,6 +1,6 @@
-#Mon Jul 14 14:39:52 MDT 2008
+#Tue Aug 05 11:37:24 MDT 2008
 DELEGATES_PREFERENCE=delegateValidatorListorg.eclipse.wst.xsd.core.internal.validation.eclipse.XSDDelegatingValidator\=org.eclipse.wst.xsd.core.internal.validation.eclipse.Validator;
-USER_BUILD_PREFERENCE=enabledBuildValidatorListorg.eclipse.wst.xsd.core.internal.validation.eclipse.XSDDelegatingValidator;org.eclipse.wst.xml.core.internal.validation.eclipse.Validator;org.eclipse.wst.dtd.core.internal.validation.eclipse.Validator;
-USER_MANUAL_PREFERENCE=enabledManualValidatorListorg.eclipse.wst.xsd.core.internal.validation.eclipse.XSDDelegatingValidator;org.eclipse.wst.xml.core.internal.validation.eclipse.Validator;org.eclipse.wst.dtd.core.internal.validation.eclipse.Validator;
+USER_BUILD_PREFERENCE=enabledBuildValidatorListorg.eclipse.wst.xml.core.internal.validation.eclipse.Validator;org.eclipse.wst.dtd.core.internal.validation.eclipse.Validator;org.eclipse.wst.xsd.core.internal.validation.eclipse.XSDDelegatingValidator;
+USER_MANUAL_PREFERENCE=enabledManualValidatorListorg.eclipse.wst.xml.core.internal.validation.eclipse.Validator;org.eclipse.wst.dtd.core.internal.validation.eclipse.Validator;org.eclipse.wst.xsd.core.internal.validation.eclipse.XSDDelegatingValidator;
 USER_PREFERENCE=overrideGlobalPreferencesfalse
 eclipse.preferences.version=1

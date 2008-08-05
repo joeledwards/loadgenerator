@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,17 +15,12 @@ import org.xml.sax.Attributes;
 import com.awebstorm.Proxy;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.WebRequestSettings;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlLink;
-import com.gargoylesoftware.htmlunit.html.HtmlOption;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import com.gargoylesoftware.htmlunit.html.HtmlStyle;
 
 /**
@@ -37,7 +31,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlStyle;
  * implementation for the method call that should run the action. Finally, place a case statement
  * in the report method to tell the step how to report your new action type.
  * (Additionally, if the action report log output needs to be checked, then the LogDataExtractor in
- * combination with the HTMLRobotBehaviour may be useful.
+ * combination with the HtmlRobotBehaviour may be useful.
  * 
  * @author Cromano
  */
@@ -120,7 +114,7 @@ public class Step implements Comparable<Step> {
 		replyTime = 0;
 		BodyByteAmount = 0; 
 		currentBrowserState = browserState;
-		//HTMLRobot handles http protocols
+		//HtmlRobot handles http protocols
 		targetDomain = "http://" + stepRobotOwner.getTargetDomain();
 		if (!stepRobotOwner.getTargetDomain().equals(myProxy.getRemotehost())) {
 			myProxy.setRemotehost(stepRobotOwner.getTargetDomain());
@@ -328,20 +322,19 @@ public class Step implements Comparable<Step> {
 		Page tempPage;
 
 		try {
-			WebRequestSettings newSettings = new WebRequestSettings(new URL(currentPath),HttpMethod.GET);
-			newSettings.setProxyHost("localhost");
-			newSettings.setProxyPort(myProxy.getLocalport());
-			tempPage = currentBrowserState.getVUser().getPage(newSettings);
+			tempPage = currentBrowserState.getVUser().getPage(currentPath);
 		} catch (FailingHttpStatusCodeException e) {
 			//Should be impossible due to settings on the WebClient
 			consoleLog.error("Bad Status Code.", e);
 			return false;
 		} catch (MalformedURLException e) {
+			//This should only occur if the HtmlRobot is passed a bad script
 			if (resultMessage == null)
 				resultMessage = "Bad Script - Malformed URL for " + currentPath;
 			consoleLog.error("MalformedURL", e);
 			return false;
 		} catch (SocketTimeoutException e) {
+			//Only possible if there is a problem with the proxy
 			if (resultMessage == null)
 				resultMessage = "Socket Timeout";
 				if (consoleLog.isDebugEnabled())
@@ -351,8 +344,10 @@ public class Step implements Comparable<Step> {
 					if (resultMessage == null)
 						resultMessage = "Server is unresponsive for " + currentPath;
 				}
+			stepRobotOwner.setEnd(true);
 			return false;
 		} catch (ConnectException e) {
+			//Only possible if there is a problem with the proxy
 			if (resultMessage == null)
 				resultMessage = "Server could not be contacted.";
 			if (consoleLog.isDebugEnabled())
@@ -360,13 +355,17 @@ public class Step implements Comparable<Step> {
 			stepRobotOwner.setEnd(true);
 			return false;
 		} catch (NoHttpResponseException e) {
+			//Should be the normal catch response if there is a problem with the target
+			//The proxy will close the socket and will pass the error reason back to the Robot
 			if (resultMessage == null)
 				resultMessage = myProxy.getProxyMessage();
 			return false;
 		} catch (IOException e) {
+			//Only possible if there is a problem with the proxy
 			if (resultMessage == null)
 				resultMessage = "IO Error";
 			consoleLog.error("IO Error during Invoke.", e);
+			stepRobotOwner.setEnd(true);
 			return false;
 		}
 		
@@ -843,7 +842,21 @@ public class Step implements Comparable<Step> {
 			tempResult.append(resultMessage);
 			tempResult.append(',');
 			resultLog.info(tempResult);
-			
+			//Check to see if this is the end of the sequence
+			if (!stepStatus) {
+				if (!resultMessage.startsWith("IOException") && !resultMessage.startsWith("SocketTimeoutException")) {
+					tempResult = new StringBuffer();
+					tempResult.append(jobID);
+					tempResult.append(',');
+					tempResult.append(stepNumber);
+					tempResult.append(',');
+					tempResult.append(System.currentTimeMillis());
+					tempResult.append(',');
+					resultLog.fatal(tempResult.toString() + "Robot is exiting due to critical errors");
+					tempResult.append(',');
+					stepRobotOwner.setEnd(true);
+				}
+			}
 			break;
 		case pause:
 		case verifyTitle:

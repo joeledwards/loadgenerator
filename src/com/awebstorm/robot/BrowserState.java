@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.Cache;
-import com.gargoylesoftware.htmlunit.ProxyConfig;
 import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebWindow;
@@ -22,8 +21,8 @@ public class BrowserState {
 
 	private WebClient vUser = new WebClient();
 	private HtmlPage currentPage;
-	private WebWindow mainWindow = new TopLevelWindow("Main Window", vUser);
-	private WebWindow resourceWindow = new TopLevelWindow("Side Window", vUser);
+	private WebWindow mainWindow;
+	private WebWindow resourceWindow;
 	private HashSet<String> browserCached = new HashSet<String>();
 	private HashSet<String> browserHistory = new HashSet<String>();
 	private HashMap<String,String> statePreferences;
@@ -47,15 +46,17 @@ public class BrowserState {
 	private void configureState() {
 		
 		WebClient client = null;
-		String browVersionString = statePreferences.get("htmlRobotBrowserVersion");
+		//String browVersionString = statePreferences.get("htmlRobotBrowserVersion");
 		String proxyHost = statePreferences.get("proxyHost");
 		
-		if (browVersionString != null) {
+/*		if (browVersionString != null) {
 			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
 		} else {
 			client = new WebClient();
-		}
-
+		}*/
+		client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, localProxyPort);
+		mainWindow = new TopLevelWindow("Main Window", client);
+		resourceWindow = new TopLevelWindow("Side Window", client);
 		client.setThrowExceptionOnFailingStatusCode(false);
 		client.setPrintContentOnFailingStatusCode(false);
 /*		if (proxyHost != null) {

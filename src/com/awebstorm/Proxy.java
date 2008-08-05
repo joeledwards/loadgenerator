@@ -7,13 +7,14 @@ import java.net.PortUnreachableException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import com.awebstorm.ProxyPipeIn;
 import org.apache.log4j.Logger;
 
 /**
- * Proxy server to count bytes coming through.
+ * Proxy server for establishing connections and counting bytes coming through.
  * @author Cromano
  *
  */
@@ -119,30 +120,62 @@ public class Proxy implements Runnable {
     				consoleLog.debug("Spawning ProxyPipeIn: " + thread2.getName());
     			}
     			thread2.start();
-    		} catch (UnknownHostException e) {
-    			consoleLog.fatal("Unknown Host " + targethost, e);
-    			this.proxyMessage = "Unknown Host " + targethost;
-    		} catch (BindException e) {
-    			consoleLog.fatal("Could not bind to remoteport: " + targetport, e);
-    			this.proxyMessage = "Could not bind to remoteport: " + targetport;
-    		} catch (ConnectException e) {
-    			consoleLog.fatal("Could not connect to: " + targethost + ":" + targetport, e);
-    			this.proxyMessage = "Could not connect to: " + targethost + ":" + targetport;
-    		} catch (NoRouteToHostException e) {
-    			consoleLog.fatal("Could not find a route to remote host: " + targethost, e);
-    			this.proxyMessage = "Could not find a route to remote host: " + targethost;
-    		} catch (PortUnreachableException e) {
-    			consoleLog.fatal("Could not reach the remote port: " + targetport, e);
-    			this.proxyMessage = "Could not reach the remote port: " + targetport;
-    		} catch (IOException e) {
-    			consoleLog.error("IOException when accepting new connection.", e);
-    			this.proxyMessage = "IO Error";
-    		} finally {
-/*    			try {
+    			
+    		} catch (SocketTimeoutException e) {
+    			//Semi-normal
+    			if (consoleLog.isDebugEnabled()) {
+    				consoleLog.debug("Socket Timed Out", e);
+    			}
+    			this.proxyMessage = "SocketTimeoutException";
+    			try {
 					localSocket.close();
 				} catch (IOException e1) {
 					consoleLog.error("Could not close the local socket.", e1);
-				}*/
+				}
+    		} catch (UnknownHostException e) {
+    			consoleLog.fatal("UnknownHostException " + targethost, e);
+    			this.proxyMessage = "UnknownHostException " + targethost;
+    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}
+    		} catch (BindException e) {
+    			consoleLog.fatal("BindException to remoteport: " + targetport, e);
+    			this.proxyMessage = "BindException to remoteport: " + targetport;
+    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}
+    		} catch (ConnectException e) {
+    			consoleLog.fatal("ConnectException to: " + targethost + ":" + targetport, e);
+    			this.proxyMessage = "ConnectException to: " + targethost + ":" + targetport;
+    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}
+    		} catch (NoRouteToHostException e) {
+    			consoleLog.fatal("NoRouteToHostException to remote host: " + targethost, e);
+    			this.proxyMessage = "NoRouteToHostException to remote host: " + targethost;
+    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}
+    		} catch (PortUnreachableException e) {
+    			consoleLog.fatal("PortUnreachableException to remote port: " + targetport, e);
+    			this.proxyMessage = "PortUnreachableException to remote port: " + targetport;
+    			try {
+					localSocket.close();
+				} catch (IOException e1) {
+					consoleLog.error("Could not close the local socket.", e1);
+				}
+    		} catch (IOException e) {
+    			//May be normal
+    			consoleLog.error("IOException when accepting new connection.", e);
+    			this.proxyMessage = "IO Error";
     		}
     	}
     }
@@ -228,8 +261,19 @@ public class Proxy implements Runnable {
 	public int getLocalport() {
 		return localport;
 	}
+	/**
+	 * Get the reason for the proxy failure
+	 * @return The reason that the proxy failed.
+	 */
 	public String getProxyMessage() {
 		return proxyMessage;
+	}
+	/**
+	 * Set the reason for the proxy failure
+	 * @param string Proxy Failure message
+	 */
+	public void setProxyMessage(String string) {
+		this.proxyMessage = string;
 	}
 }
 

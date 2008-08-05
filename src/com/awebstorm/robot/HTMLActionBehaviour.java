@@ -19,7 +19,7 @@ import org.jbehave.core.mock.UsingMatchers;
 import com.awebstorm.Proxy;
 import com.awebstorm.robot.LogDataExtractor.ALineData;
 
-public class HTMLActionBehaviour extends UsingMatchers{
+public class HtmlActionBehaviour extends UsingMatchers{
 	
 	private PropertyResourceBundle loadGeneratorProperties;
 	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
@@ -44,7 +44,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -55,9 +55,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-/*	*//**
+	/**
 	 * Test Submit by xpath
-	 *//*
+	 */
 	public final void shouldSubmitByXPath() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\SubmitByXPath.xml"));
@@ -65,7 +65,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -76,9 +76,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	*//**
+	/**
 	 * Test Submit by id
-	 *//*
+	 */
 	public final void shouldSubmitById() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\SubmitByID.xml"));
@@ -86,7 +86,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -97,9 +97,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	*//**
+	/**
 	 * Test Submit by identifier
-	 *//*
+	 */
 	public final void shouldSubmitByIdentifier() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\SubmitByIdentifier.xml"));
@@ -107,7 +107,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -118,9 +118,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	*//**
+	/**
 	 * Test Type
-	 *//*
+	 */
 	public final void shouldTypeAndSubmit() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\TypeAndSubmit.xml"));
@@ -128,7 +128,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -140,9 +140,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("textBox=typeOneLine"));
 	}
 	
-	*//**
+	/**
 	 * Test Click
-	 *//*
+	 */
 	public final void shouldClick() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\Click.xml"));
@@ -150,7 +150,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -162,9 +162,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("checkBox=true"));
 	}
 	
-	*//**
+	/**
 	 * Test Check
-	 *//*
+	 */
 	public final void shouldCheckAndSubmit() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\CheckAndSubmit.xml"));
@@ -172,7 +172,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -184,9 +184,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("checkBox=true"));
 	}
 	
-	*//**
+	/**
 	 * Test Uncheck
-	 *//*
+	 */
 	public final void shouldUncheckAndSubmit() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\UncheckAndSubmit.xml"));
@@ -194,7 +194,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -206,9 +206,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("checkBox=false"));
 	}
 	
-	*//**
+	/**
 	 * Test Select
-	 *//*
+	 */
 	public final void shouldSelectAndSubmit() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\SelectAndSubmit.xml"));
@@ -216,7 +216,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -230,9 +230,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("select=value3"));
 	}
 	
-	*//**
+	/**
 	 * Test addSelection
-	 *//*
+	 */
 	public final void shouldAddSelectionAndSubmit() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\AddSelectionAndSubmit.xml"));
@@ -240,7 +240,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -253,9 +253,9 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("select=value2"));
 	}
 	
-	*//**
+	/**
 	 * Test Refresh
-	 *//*
+	 */
 	public final void shouldRefresh() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\Refresh.xml"));
@@ -263,7 +263,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -272,10 +272,10 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0001-4").getReceiveBytes().equals(results.get("0001-2").getReceiveBytes()));
+		ensureThat(results.get("2011-4").getReceiveBytes().equals(results.get("0001-2").getReceiveBytes()));
 	}
 	
-	*//**
+	/**
 	 * Test the connection exception received from a non-existing server.
 	 */
 	public final void shouldConnectionExceptionFromNonExistingServer() {
@@ -285,7 +285,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -293,12 +293,12 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0013-2").getResultMessage().equals("Server could not be contacted."));
+		ensureThat(results.get("2012-2").getResultMessage().startsWith("ConnectException"));
 	}
 	
 	/**
 	 * Test the connection exception received from an invalid or unusable port.
-	 *//*
+	 */
 	public final void shouldConnectionExceptionFromBadPort() {
 		try {
 			newStreams.add(new FileInputStream("example_scripts\\ConnectionReset.xml"));
@@ -306,7 +306,7 @@ public class HTMLActionBehaviour extends UsingMatchers{
 			consoleLog.error("Script File not found.", e);
 		}
 		for (int i = 0;!newStreams.isEmpty();i++) {
-			HTMLRobot newRobot = new HTMLRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
+			HtmlRobot newRobot = new HtmlRobot(newStreams.poll(), loadGenProxyArray[i].getLocalport(), loadGenProxyArray[i]);
 			robots.add(newRobot);
 			newRobot.init();
 		}
@@ -314,8 +314,8 @@ public class HTMLActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("0012-2").getResultMessage().equals("Server could not be contacted."));
-	}*/
+		ensureThat(results.get("2013-2").getResultMessage().startsWith("ConnectException"));
+	}
 	
 	public String readOutputFile() {
 		File outFile = null;

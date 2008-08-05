@@ -16,6 +16,6 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/" />
+		<open url="/none.htm" />
 	</steps>
 </script>

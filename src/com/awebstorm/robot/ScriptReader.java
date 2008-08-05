@@ -93,7 +93,7 @@ public class ScriptReader extends DefaultHandler {
 			Attributes newList = new AttributesImpl(attributes);
 			consoleLog.debug("Added Step: " + qName + " Value :"
 					+ attributes.getValue(0));
-			if (stepsRobotOwner.getClass().getName().equals("HTMLRobot")) {
+			if (stepsRobotOwner.getClass().getName().equals("HtmlRobot")) {
 				stepQueue.add(new Step(qName, stepCounter, newList, stepsRobotOwner));
 			} else {
 				stepQueue.add(new Step(qName, stepCounter, newList, stepsRobotOwner));
