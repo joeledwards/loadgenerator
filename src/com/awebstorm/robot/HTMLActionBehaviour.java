@@ -39,7 +39,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldSubmitByName() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\SubmitByName.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitByName.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -60,7 +60,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldSubmitByXPath() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\SubmitByXPath.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitByXPath.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -81,7 +81,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldSubmitById() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\SubmitByID.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitByID.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -102,7 +102,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldSubmitByIdentifier() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\SubmitByIdentifier.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitByIdentifier.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -123,7 +123,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldTypeAndSubmit() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\TypeAndSubmit.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "TypeAndSubmit.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -145,7 +145,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldClick() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\Click.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "Click.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -167,7 +167,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldCheckAndSubmit() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\CheckAndSubmit.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "CheckAndSubmit.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -189,7 +189,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldUncheckAndSubmit() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\UncheckAndSubmit.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "UncheckAndSubmit.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -211,7 +211,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldSelectAndSubmit() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\SelectAndSubmit.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SelectAndSubmit.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -235,7 +235,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldAddSelectionAndSubmit() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\AddSelectionAndSubmit.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "AddSelectionAndSubmit.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -258,7 +258,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldRefresh() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\Refresh.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "Refresh.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -280,7 +280,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldConnectionExceptionFromNonExistingServer() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\ConnectionException.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "ConnectionException.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -301,7 +301,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	 */
 	public final void shouldConnectionExceptionFromBadPort() {
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\ConnectionReset.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "ConnectionReset.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}

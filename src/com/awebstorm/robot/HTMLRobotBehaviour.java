@@ -110,7 +110,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 			loadGenProxyArray[i] = new Proxy(remotehost, remoteport);
 		}
 		try {
-			newStreams.add(new FileInputStream("example_scripts\\NoWaitBasicHTMLScript.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "NoWaitBasicHTMLScript.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -172,7 +172,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 		}
 		try {
 			while (newStreams.size() < numberOfRobots) {
-				newStreams.add(new FileInputStream("example_scripts\\BasicHTMLScript" + (newStreams.size() + 1) + ".xml"));
+				newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "BasicHTMLScript" + (newStreams.size() + 1) + ".xml"));
 			}
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Could not find the script file.", e);
@@ -234,7 +234,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
 				HtmlRobot newRobot = new HtmlRobot(
-						new FileInputStream("example_scripts\\BasicHTMLScript" + (i + 1) + ".xml"), 
+						new FileInputStream("example_scripts" + System.getProperty("file.separator") + "BasicHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
 				robots.add(newRobot);
@@ -311,7 +311,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 		try {
 			for (int i = 0; i < numberOfRobots; i++) {
 				Robot newRobot = new HtmlRobot(
-						new FileInputStream("example_scripts\\MultiStepHTMLScript" + (i + 1) + ".xml"), 
+						new FileInputStream("example_scripts" + System.getProperty("file.separator") + "MultiStepHTMLScript" + (i + 1) + ".xml"), 
 						loadGenProxyArray[i].getLocalport(), 
 						loadGenProxyArray[i]);
 				robots.add(newRobot);
