@@ -137,7 +137,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("textBox=typeOneLine"));
+		ensureThat(outputTable.contains("comments=Type One Line"));
 	}
 	
 	/**
@@ -159,7 +159,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("checkBox=true"));
+		ensureThat(outputTable.contains("checkbox2=Check out this 2nd box"));
 	}
 	
 	/**
@@ -181,7 +181,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("checkBox=true"));
+		ensureThat(outputTable.contains("checkbox1=Check this box out!"));
 	}
 	
 	/**
@@ -203,7 +203,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("checkBox=false"));
+		ensureThat(!outputTable.contains("Check out this 2nd box"));
 	}
 	
 	/**
@@ -225,9 +225,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("select=value1"));
-		ensureThat(outputTable.contains("select=value2"));
-		ensureThat(outputTable.contains("select=value3"));
+		ensureThat(outputTable.contains("States=NM"));
+		ensureThat(outputTable.contains("computerbrands=IBM"));
+		ensureThat(outputTable.contains("countries2=Aruba"));
 	}
 	
 	/**
@@ -249,8 +249,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("select=value1"));
-		ensureThat(outputTable.contains("select=value2"));
+		ensureThat(outputTable.contains("computerbrands=IBM"));
+		ensureThat(outputTable.contains("computerbrands=DELL"));
+		ensureThat(outputTable.contains("computerbrands=HP"));
 	}
 	
 	/**
@@ -272,7 +273,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		ensureThat(results.get("2011-4").getReceiveBytes().equals(results.get("0001-2").getReceiveBytes()));
+		ensureThat(results.get("2011-4").getReceiveBytes().equals(results.get("2011-2").getReceiveBytes()));
 	}
 	
 	/**
