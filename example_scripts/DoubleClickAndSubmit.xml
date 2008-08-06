@@ -16,11 +16,9 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<setSpeed value="2000" />
 		<open url="/form.html" />
-		<select name="States" id="nm" />
-		<select name="computerbrands" value="IBM" />
-		<select name="countries2" value="3" />
+		<doubleClick name="checkbox1" />
+		<verifyNotChecked name="checkbox1" />
 		<submit name="test_form" />
 	</steps>
 </script>

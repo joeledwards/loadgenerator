@@ -63,6 +63,7 @@ public class ProxyPipeOut implements Runnable {
 				}
 			}
 		} catch(IOException e) {
+			//Local Socket between Proxy and Proxy user, should not throw unless serious problem
 			consoleLog.error("Could not accept a connection", e);
 		} catch(ArrayIndexOutOfBoundsException e) {
 			consoleLog.error("Buffer Overflow on " + numberRead,e);

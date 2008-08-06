@@ -12,6 +12,8 @@ import org.apache.log4j.Logger;
 
 /**
  * Contains the utility class and methods to parse the console.log file from a Robot.
+ * Reads the console.log to the end of file, so any parsing for consoleLog correctness should be done
+ * immediately after the Behavioural test is run.
  * @author Cromano
  *
  */

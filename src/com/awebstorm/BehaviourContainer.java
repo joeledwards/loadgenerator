@@ -24,6 +24,7 @@ public class BehaviourContainer implements Behaviours {
 			//(new HtmlRobotBehaviour()).getClass(),
 			(new HtmlActionBehaviour()).getClass(),
 			//(new ProxyBehaviour()).getClass(),
+			//(new HtmlVerifyBehaviour()).getClass(),
 		};
 	}
 

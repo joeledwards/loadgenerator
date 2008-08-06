@@ -37,10 +37,45 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 	private long fileStart;
 	
 	/**
+	 * Setup general operations before each test.
+	 */
+	public final void setUp() {
+		File consoleFile = new File("console.log");
+		fileStart = consoleFile.length();
+		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
+		loadGeneratorProperties = 
+			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
+
+		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
+		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
+		loadGenProxyArray = new Proxy[Integer.parseInt(loadGeneratorProperties.getString("maxNumberOfProxies"))];
+	}
+	
+	/**
+	 * Take down everything after tests.
+	 */
+	public final void tearDown() {
+		for (int i = 0; i < numberOfRobots; i++) {
+			try {
+				loadGenProxyArray[i].shutdown();
+			} catch (IOException e) {
+				consoleLog.error("Could not shutdown a Proxy.", e);
+			}
+			while (loadGenProxyArray[i].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					consoleLog.error("Interrupted sleep.", e);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
 	 */
 	public final void shouldGenA404Request() {
-		
+		consoleLog.info("shouldGenA404Request");
 		numberOfRobots = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
@@ -102,7 +137,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 	 * Test 1 Threaded Robot on 1 Threaded Proxy making a bad request.
 	 */
 	public final void shouldGenARobotWithNoWait() {
-		
+		consoleLog.info("shouldGenARobotWithNoWait");
 		numberOfRobots = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
@@ -162,7 +197,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 	 * Test 1 Threaded Robot on 1 Threaded proxy making a good request.
 	 */
 	public final void shouldGenARobotOnProxy() {
-
+		consoleLog.info("shouldGenARobotOnProxy");
 		numberOfRobots = 1;
 		Queue<InputStream> newStreams = new LinkedList<InputStream>();
 		LinkedList<Robot> robots = new LinkedList<Robot>();
@@ -224,7 +259,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 	 * Test 5 Threaded Robots on 5 Threaded Proxies making requests on a single known target
 	 */
 	public final void shouldGen5RobotsOnProxy() {
-
+		consoleLog.info("shouldGen5RobotsOnProxy");
 		numberOfRobots = 5;
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
@@ -301,7 +336,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 	 * Test 1 Threaded Robots on 1 Threaded proxies with multiple steps per Robot.
 	 */
 	public final void shouldGen1RobotsOn1ProxyMultiStep() {
-
+		consoleLog.info("shouldGen1RobotsOn1ProxyMultiStep");
 		numberOfRobots = 1;
 		LinkedList<Robot> robots = new LinkedList<Robot>();
 		
@@ -364,41 +399,6 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 		ensureThat(results.get("0111-4").getResultMessage().equals("null"));
 		ensureThat(results.get("0111-4").getSentBytes().equals("222"));
 		ensureThat(results.get("0111-4").getReceiveBytes().equals("692"));
-	}
-
-	/**
-	 * Setup general operations before each test.
-	 */
-	public final void setUp() {
-		File consoleFile = new File("console.log");
-		fileStart = consoleFile.length();
-		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
-		loadGeneratorProperties = 
-			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
-
-		remotehost = loadGeneratorProperties.getString("proxyDefaultRemoteTarget");
-		remoteport = Integer.parseInt(loadGeneratorProperties.getString("proxyDefaultRemotePort"));
-		loadGenProxyArray = new Proxy[Integer.parseInt(loadGeneratorProperties.getString("maxNumberOfProxies"))];
-	}
-	
-	/**
-	 * Take down everything after tests.
-	 */
-	public final void tearDown() {
-		for (int i = 0; i < numberOfRobots; i++) {
-			try {
-				loadGenProxyArray[i].shutdown();
-			} catch (IOException e) {
-				consoleLog.error("Could not shutdown a Proxy.", e);
-			}
-			while (loadGenProxyArray[i].getThreadState().compareTo(Thread.State.TERMINATED) != 0) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					consoleLog.error("Interrupted sleep.", e);
-				}
-			}
-		}
 	}
 
 }

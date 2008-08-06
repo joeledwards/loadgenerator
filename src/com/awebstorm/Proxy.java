@@ -122,7 +122,7 @@ public class Proxy implements Runnable {
     			thread2.start();
     			
     		} catch (SocketTimeoutException e) {
-    			//Semi-normal
+    			//Semi-normal, not a major exception
     			if (consoleLog.isDebugEnabled()) {
     				consoleLog.debug("Socket Timed Out", e);
     			}
@@ -133,6 +133,7 @@ public class Proxy implements Runnable {
 					consoleLog.error("Could not close the local socket.", e1);
 				}
     		} catch (UnknownHostException e) {
+    			//Major exception
     			consoleLog.fatal("UnknownHostException " + targethost, e);
     			this.proxyMessage = "UnknownHostException " + targethost;
     			try {
@@ -141,6 +142,7 @@ public class Proxy implements Runnable {
 					consoleLog.error("Could not close the local socket.", e1);
 				}
     		} catch (BindException e) {
+    			//Major exception
     			consoleLog.fatal("BindException to remoteport: " + targetport, e);
     			this.proxyMessage = "BindException to remoteport: " + targetport;
     			try {
@@ -149,6 +151,7 @@ public class Proxy implements Runnable {
 					consoleLog.error("Could not close the local socket.", e1);
 				}
     		} catch (ConnectException e) {
+    			//Major exception
     			consoleLog.fatal("ConnectException to: " + targethost + ":" + targetport, e);
     			this.proxyMessage = "ConnectException to: " + targethost + ":" + targetport;
     			try {
@@ -157,6 +160,7 @@ public class Proxy implements Runnable {
 					consoleLog.error("Could not close the local socket.", e1);
 				}
     		} catch (NoRouteToHostException e) {
+    			//Major exception
     			consoleLog.fatal("NoRouteToHostException to remote host: " + targethost, e);
     			this.proxyMessage = "NoRouteToHostException to remote host: " + targethost;
     			try {
@@ -165,6 +169,7 @@ public class Proxy implements Runnable {
 					consoleLog.error("Could not close the local socket.", e1);
 				}
     		} catch (PortUnreachableException e) {
+    			//Major exception
     			consoleLog.fatal("PortUnreachableException to remote port: " + targetport, e);
     			this.proxyMessage = "PortUnreachableException to remote port: " + targetport;
     			try {
@@ -181,7 +186,7 @@ public class Proxy implements Runnable {
     }
     
     /**
-     * Reset the Timers and byte counters.
+     * Reset the Timers and Byte counters.
      */
     public final void resetProxyCounters() {
     	this.proxyTimeResponded = 0;
@@ -192,25 +197,44 @@ public class Proxy implements Runnable {
     }
     
     /**
-     * Shutdown the proxy.
+     * Shutdown the Proxy.
      */
     public final void shutdown() throws IOException {
     	if (!proxyServerSocket.isClosed())
     		proxyServerSocket.close();
     }
-    
+    /**
+     * Get the remote host the Proxy will contact.
+     * @return The remote host the Proxy will contact
+     */
 	public String getRemotehost() {
 		return targethost;
 	}
+	/**
+	 * Set the remote host the Proxy will contact.
+	 * @param remotehost The remote host the Proxy will contact
+	 */
 	public void setRemotehost(String remotehost) {
 		this.targethost = remotehost;
 	}
+	/**
+	 * Get the remote port the Proxy will contact.
+	 * @return The remote port the Proxy will contact
+	 */
 	public int getRemoteport() {
 		return targetport;
 	}
+	/**
+	 * Set the remote port the Proxy will contact.
+	 * @param remoteport The remote port the Proxy will contact
+	 */
 	public void setRemoteport(int remoteport) {
 		this.targetport = remoteport;
 	}
+	/**
+	 * Set the time that the Proxy received a response after sending a request.
+	 * @param currentTimeMillis The time the Proxy received a response after sending a request
+	 */
 	public void setProxyTimeResponded(long currentTimeMillis) {
 		this.proxyTimeResponded=currentTimeMillis;
 	}
@@ -226,24 +250,52 @@ public class Proxy implements Runnable {
 	public synchronized void incrementProxySentAmount() {
 		this.proxySentAmount++;
 	}
+	/**
+	 * Set the time that the Proxy finished reading the response after sending a request.
+	 * @param currentTimeMillis The time the Proxy finished reading a response after sending a request
+	 */
 	public void setProxyTimeEnded(long currentTimeMillis) {
 		this.proxyTimeEnded=currentTimeMillis;
 	}
+	/**
+	 * Get the time that the Proxy finished reading the response after sending a request.
+	 * @return The time that the Proxy finished reading the response after sending a request
+	 */
 	public long getProxyTimeEnded() {
 		return proxyTimeEnded;
 	}
+	/**
+	 * Get the time that the Proxy received a response after sending a request.
+	 * @return The time the Proxy received a response after sending a request
+	 */
 	public long getProxyTimeResponded() {
 		return proxyTimeResponded;
 	}
+	/**
+	 * Set the time that the Proxy started sending a request.
+	 * @param currentTimeMillis The time that the Proxy started sending a request
+	 */
 	public void setProxyTimeStarted(long currentTimeMillis) {
 		this.proxyTimeStarted=currentTimeMillis;
 	}
+	/**
+	 * Get the amount of bytes received by the Proxy.
+	 * @return The amount of bytes received by the Proxy
+	 */
 	public long getProxyReceiveAmount() {
 		return proxyReceiveAmount;
 	}
+	/**
+	 * Get the amount of bytes sent by the Proxy.
+	 * @return The amount of bytes sent by the Proxy
+	 */
 	public long getProxySentAmount() {
 		return proxySentAmount;
 	}
+	/**
+	 * Get the time that the Proxy started sending a request.
+	 * @return The time that the Proxy started sending a request
+	 */
 	public long getProxyTimeStarted() {
 		return proxyTimeStarted;
 	}
@@ -256,20 +308,20 @@ public class Proxy implements Runnable {
 	}
 	/**
 	 * Retrieves the local port on which the ServerSocket is listening.
-	 * @return ServerSocket on which the proxy is listening
+	 * @return ServerSocket on which the Proxy is listening
 	 */
 	public int getLocalport() {
 		return localport;
 	}
 	/**
-	 * Get the reason for the proxy failure
+	 * Get the reason for the Proxy failure
 	 * @return The reason that the proxy failed.
 	 */
 	public String getProxyMessage() {
 		return proxyMessage;
 	}
 	/**
-	 * Set the reason for the proxy failure
+	 * Set the reason for the Proxy failure
 	 * @param string Proxy Failure message
 	 */
 	public void setProxyMessage(String string) {

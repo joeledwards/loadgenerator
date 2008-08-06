@@ -73,6 +73,7 @@ public class ProxyPipeIn implements Runnable {
 				}
 			}
 		} catch (SocketTimeoutException e) {
+			//Normal exception
 			if (consoleLog.isDebugEnabled()) {
 				consoleLog.debug("Socket Timed Out", e);
 			}
@@ -83,6 +84,7 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (UnknownHostException e) {
+			//Fatal Exception
 			consoleLog.fatal("UnknownHostException " + incoming.getInetAddress(), e);
 			myProxyOwner.setProxyMessage("UnknownHostException " + incoming.getInetAddress());
 			try {
@@ -91,6 +93,7 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (BindException e) {
+			//Fatal Exception
 			consoleLog.fatal("BindException to remoteport: " + incoming.getPort(), e);
 			myProxyOwner.setProxyMessage("BindException to remoteport: " + incoming.getPort());
 			try {
@@ -99,6 +102,7 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (ConnectException e) {
+			//Fatal Exception
 			consoleLog.fatal("ConnectException to: " + incoming.getInetAddress() + ":" + incoming.getPort(), e);
 			myProxyOwner.setProxyMessage("ConnectException to: " + incoming.getInetAddress() + ":" + incoming.getPort());
 			try {
@@ -107,6 +111,7 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (NoRouteToHostException e) {
+			//Fatal Exception
 			consoleLog.fatal("NoRouteToHostException to remote host: " + incoming.getInetAddress(), e);
 			myProxyOwner.setProxyMessage("NoRouteToHostException to remote host: " + incoming.getInetAddress());
 			try {
@@ -115,6 +120,7 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (PortUnreachableException e) {
+			//Fatal Exception
 			consoleLog.fatal("PortUnreachableException to remote port: " + incoming.getPort(), e);
 			myProxyOwner.setProxyMessage("PortUnreachableException to remote port: " + incoming.getPort());
 			try {
@@ -123,6 +129,8 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (SocketException e) {
+			//Occurs when a connection resets on a bad port
+			//Fatal Exception
 			consoleLog.fatal("SocketException to remote port: " + incoming.getPort(), e);
 			myProxyOwner.setProxyMessage("SocketException to remote port: " + incoming.getPort());
 			try {
@@ -132,9 +140,11 @@ public class ProxyPipeIn implements Runnable {
 				consoleLog.error("Could not close the local socket.", e1);
 			}
 		} catch (IOException e) {
+			//Normal Exception
 			consoleLog.error("IOException when accepting new connection.", e);
 			myProxyOwner.setProxyMessage("IO Error");
 		} catch (ArrayIndexOutOfBoundsException e) {
+			//Buffer overflow, should be impossible
 			consoleLog.error("Buffer Overflow on " + numberRead, e);
 		}
 	}

@@ -46,25 +46,12 @@ public class BrowserState {
 	private void configureState() {
 		
 		WebClient client = null;
-		//String browVersionString = statePreferences.get("htmlRobotBrowserVersion");
 		String proxyHost = statePreferences.get("proxyHost");
-		
-/*		if (browVersionString != null) {
-			client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0);
-		} else {
-			client = new WebClient();
-		}*/
 		client = new WebClient(BrowserVersion.INTERNET_EXPLORER_7_0, proxyHost, localProxyPort);
 		mainWindow = new TopLevelWindow("Main Window", client);
 		resourceWindow = new TopLevelWindow("Side Window", client);
 		client.setThrowExceptionOnFailingStatusCode(false);
 		client.setPrintContentOnFailingStatusCode(false);
-/*		if (proxyHost != null) {
-			ProxyConfig proxyConfig = new ProxyConfig(proxyHost, localProxyPort);
-			client.setProxyConfig(proxyConfig);
-		}*/
-		//client.getPa
-		
 		String temp = "";
 		temp = statePreferences.get("javaScriptEnabled");
 		if (temp != null) {
@@ -159,11 +146,17 @@ public class BrowserState {
 	public int getProxyPort() {
 		return localProxyPort;
 	}
-
+	/**
+	 * Get the main window used to open the Html Pages
+	 * @return The main window
+	 */
 	public WebWindow getMainWindow() {
 		return mainWindow;
 	}
-
+	/**
+	 * Get the resource window used to load Html resources such as images, javascript, and other external files 
+	 * @return The resource window
+	 */
 	public WebWindow getResourceWindow() {
 		return resourceWindow;
 	}
