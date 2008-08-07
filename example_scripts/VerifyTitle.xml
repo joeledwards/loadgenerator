@@ -16,7 +16,9 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
+		<open url="/form.htm" />
 		<verifyTitle pattern="HtmlRobot Action Test Form" />
+		<submit identifier="test_form" />
+		<verifyTitle pattern="Test page" />
 	</steps>
 </script>

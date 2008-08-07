@@ -16,8 +16,8 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
-		<openWindow url="/form.html" />
+		<open url="/form.htm" />
+		<openWindow url="/form.htm" />
 		<submit id="one" />
 	</steps>
 </script>

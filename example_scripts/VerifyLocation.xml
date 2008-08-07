@@ -16,7 +16,9 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
-		<verifyLocation url="http://localhost/form.html"  />
+		<open url="/form.htm" />
+		<verifyLocation url="http://my.ccx01.info/form.htm"  />
+		<submit id="one" />
+		<verifyLocation url="http://my.ccx01.info/server.jsp" />
 	</steps>
 </script>

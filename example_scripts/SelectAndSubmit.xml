@@ -16,10 +16,9 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
+		<open url="/form.htm" />
 		<select name="States" id="nm" />
 		<select name="computerbrands" value="IBM" />
-		<select name="countries2" value="3" />
 		<submit name="test_form" />
 	</steps>
 </script>

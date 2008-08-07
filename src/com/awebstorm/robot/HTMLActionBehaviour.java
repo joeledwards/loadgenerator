@@ -32,7 +32,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	private long fileStart;
 	private Queue<InputStream> newStreams;
 	private LinkedList<Robot> robots;
-	private final String tableSuccess = "Table Successfully Submitted";
+	private final String tableSuccess = "Request method: POST";
 	
 	/**
 	 * Setup general operations before each test.
@@ -205,7 +205,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("comments=Type One Line"));
+		ensureThat(outputTable.contains("Type One Line"));
 	}
 	
 	/**
@@ -228,7 +228,8 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("checkbox2=Check out this 2nd box"));
+		ensureThat(outputTable.contains("checkbox1"));
+		ensureThat(outputTable.contains("checkbox2"));
 	}
 	
 	/**
@@ -251,7 +252,8 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("checkbox1=Check this box out!"));
+		ensureThat(outputTable.contains("checkbox1"));
+		ensureThat(outputTable.contains("checkbox2"));
 	}
 	
 	/**
@@ -274,7 +276,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(!outputTable.contains("Check out this 2nd box"));
+		ensureThat(!outputTable.contains("checkbox2"));
 	}
 	
 	/**
@@ -297,9 +299,8 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("States=NM"));
-		ensureThat(outputTable.contains("computerbrands=IBM"));
-		ensureThat(outputTable.contains("countries2=Aruba"));
+		ensureThat(outputTable.contains("NM"));
+		ensureThat(outputTable.contains("IBM"));
 	}
 	
 	/**
@@ -322,9 +323,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(outputTable.contains("computerbrands=IBM"));
-		ensureThat(outputTable.contains("computerbrands=DELL"));
-		ensureThat(outputTable.contains("computerbrands=HP"));
+		ensureThat(outputTable.contains("IBM"));
+		ensureThat(outputTable.contains("DELL"));
+		ensureThat(outputTable.contains("HP"));
 	}
 	
 	/**
@@ -369,7 +370,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(!outputTable.contains("Check this box out!"));
+		ensureThat(!outputTable.contains("checkbox1"));
 	}
 	/**
 	 * Remove a selection, thus removing it form the namevaluepairs returned.
@@ -391,7 +392,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		String outputTable = readOutputFile();
-		ensureThat(!outputTable.contains("computerbrands=IBM"));
+		ensureThat(!outputTable.contains("IBM"));
 	}
 	/**
 	 * Open the page in a new window.

@@ -16,7 +16,7 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
+		<open url="/form.htm" />
 		<uncheck name="checkbox2" />
 		<submit name="test_form" />
 	</steps>

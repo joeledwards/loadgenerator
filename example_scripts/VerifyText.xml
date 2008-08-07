@@ -16,7 +16,7 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
+		<open url="/form.htm" />
 		<verifyText value="mr" pattern="Positive" />
 	</steps>
 </script>

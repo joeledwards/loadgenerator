@@ -16,7 +16,8 @@
 	</properties>
 	<steps>
 		<pause waitTime="0" />
-		<open url="/form.html" />
-		<verifyCookiePresent name="cookie"  />
+		<open url="/form.htm" />
+		<submit name="test_form" />
+		<verifyCookiePresent name="JSESSIONID"  />
 	</steps>
 </script>
