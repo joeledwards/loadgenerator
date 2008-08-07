@@ -121,7 +121,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	
 	/**
 	 * Test Submit by xpath.
-	 */
+	 *//*
 	public final void shouldSubmitByXPath() {
 		consoleLog.info("shouldSubmitByXPath");
 		try {
@@ -141,9 +141,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	/**
+	*//**
 	 * Test Submit by id.
-	 */
+	 *//*
 	public final void shouldSubmitById() {
 		consoleLog.info("shouldSubmitById");
 		try {
@@ -163,9 +163,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	/**
+	*//**
 	 * Test Submit by identifier.
-	 */
+	 *//*
 	public final void shouldSubmitByIdentifier() {
 		consoleLog.info("shouldSubmitByIdentifier");
 		try {
@@ -185,9 +185,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains(tableSuccess));
 	}
 	
-	/**
+	*//**
 	 * Test Type.
-	 */
+	 *//*
 	public final void shouldTypeAndSubmit() {
 		consoleLog.info("shouldTypeAndSubmit");
 		try {
@@ -208,9 +208,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("Type One Line"));
 	}
 	
-	/**
+	*//**
 	 * Test Click.
-	 */
+	 *//*
 	public final void shouldClick() {
 		consoleLog.info("shouldClick");
 		try {
@@ -232,9 +232,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("checkbox2"));
 	}
 	
-	/**
+	*//**
 	 * Test Check.
-	 */
+	 *//*
 	public final void shouldCheckAndSubmit() {
 		consoleLog.info("shouldCheckAndSubmit");
 		try {
@@ -256,9 +256,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("checkbox2"));
 	}
 	
-	/**
+	*//**
 	 * Test Uncheck.
-	 */
+	 *//*
 	public final void shouldUncheckAndSubmit() {
 		consoleLog.info("shouldUncheckAndSubmit");
 		try {
@@ -279,9 +279,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(!outputTable.contains("checkbox2"));
 	}
 	
-	/**
+	*//**
 	 * Test Select.
-	 */
+	 *//*
 	public final void shouldSelectAndSubmit() {
 		consoleLog.info("shouldSelectAndSubmit");
 		try {
@@ -303,9 +303,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("IBM"));
 	}
 	
-	/**
+	*//**
 	 * Test addSelection.
-	 */
+	 *//*
 	public final void shouldAddSelectionAndSubmit() {
 		consoleLog.info("shouldAddSelectionAndSubmit");
 		try {
@@ -328,9 +328,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(outputTable.contains("HP"));
 	}
 	
-	/**
+	*//**
 	 * Test Refresh.
-	 */
+	 *//*
 	public final void shouldRefresh() {
 		consoleLog.info("shouldRefresh");
 		try {
@@ -350,9 +350,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("2011-4").getReceiveBytes().equals(results.get("2011-2").getReceiveBytes()));
 	}
-	/**
+	*//**
 	 * Double-click an element and Submit it.
-	 */
+	 *//*
 	public final void shouldDoubleClick() {
 		consoleLog.info("shouldDoubleClick");
 		try {
@@ -372,9 +372,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		String outputTable = readOutputFile();
 		ensureThat(!outputTable.contains("checkbox1"));
 	}
-	/**
+	*//**
 	 * Remove a selection, thus removing it form the namevaluepairs returned.
-	 */
+	 *//*
 	public final void shouldRemoveSelection() {
 		consoleLog.info("shouldRemoveSelection");
 		try {
@@ -394,10 +394,10 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		String outputTable = readOutputFile();
 		ensureThat(!outputTable.contains("IBM"));
 	}
-	/**
+	*//**
 	 * Open the page in a new window.
 	 * Give the window a new name to verify against
-	 */
+	 *//*
 	public final void shouldOpenWindow() {
 		consoleLog.info("shouldOpenWindow");
 		try {
@@ -417,10 +417,10 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("2003-2").getReceiveBytes().equals(results.get("2003-3").getReceiveBytes()));
 	}
-	/**
+	*//**
 	 * Set the speed of the steps. A time param will ensure that the
 	 * test took a certain amount of time.
-	 */
+	 *//*
 	public final void shouldSetSpeed() {
 		consoleLog.info("shouldSetSpeed");
 		try {
@@ -441,9 +441,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat((System.currentTimeMillis()-currentTime)>16000);
 	}
 	
-	/**
+	*//**
 	 * Test the connection exception received from a non-existing server.
-	 */
+	 *//*
 	public final void shouldConnectionExceptionFromNonExistingServer() {
 		consoleLog.info("shouldConnectionExceptionFromNonExistingServer");
 		try {
@@ -463,9 +463,9 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(results.get("2012-2").getResultMessage().startsWith("ConnectException"));
 	}
 	
-	/**
+	*//**
 	 * Test the connection exception received from an invalid or unusable port.
-	 */
+	 *//*
 	public final void shouldConnectionExceptionFromBadPort() {
 		consoleLog.info("shouldConnectionExceptionFromBadPort");
 		try {
@@ -483,7 +483,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("2013-2").getResultMessage().startsWith("ConnectException"));
-	}
+	}*/
 	
 	public String readOutputFile() {
 		File outFile = null;

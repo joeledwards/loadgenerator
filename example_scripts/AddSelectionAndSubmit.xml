@@ -12,7 +12,7 @@
 		<useInsecureSSL>false</useInsecureSSL>
 		<popupBlockerEnabled>true</popupBlockerEnabled>
 		<htmlRobotBrowserVersion>none</htmlRobotBrowserVersion>
-		<remoteport>8080</remoteport>
+		<remoteport>80</remoteport>
 	</properties>
 	<steps>
 		<pause waitTime="0" />

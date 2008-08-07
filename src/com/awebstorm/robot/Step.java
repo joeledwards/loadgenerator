@@ -7,7 +7,9 @@ import java.net.SocketTimeoutException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.NoHttpResponseException;
 import org.apache.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
@@ -53,6 +55,14 @@ public class Step implements Comparable<Step> {
 		steps,
 		open,
 		verifyTitle,
+		verifyChecked,
+		verifyNotChecked,
+		verifySelected,
+		verifyNotSelected,
+		verifyTextPresent,
+		verifyText,
+		verifyCookiePresent,
+		verifyLocation,
 		pause,
 		click,
 		check,
@@ -62,7 +72,10 @@ public class Step implements Comparable<Step> {
 		removeSelection,
 		submit,
 		refresh,
-		type
+		type,
+		doubleClick,
+		openWindow,
+		setSpeed
 	}
 	
 	private BrowserState currentBrowserState;
@@ -161,6 +174,30 @@ public class Step implements Comparable<Step> {
 		case verifyTitle:
 			stepReturnStatus = this.verifyTitle();
 			break;
+		case verifyChecked:
+			stepReturnStatus = this.verifyChecked();
+			break;
+		case verifyNotChecked:
+			stepReturnStatus = this.verifyNotChecked();
+			break;
+		case verifySelected:
+			stepReturnStatus = this.verifySelected();
+			break;
+		case verifyNotSelected:
+			stepReturnStatus = this.verifyNotSelected();
+			break;
+		case verifyTextPresent:
+			stepReturnStatus = this.verifyTextPresent();
+			break;
+		case verifyText:
+			stepReturnStatus = this.verifyText();
+			break;
+		case verifyCookiePresent:
+			stepReturnStatus = this.verifyCookiePresent();
+			break;
+		case verifyLocation:
+			stepReturnStatus = this.verifyLocation();
+			break;
 		case type:
 			stepReturnStatus = this.type();
 			break;
@@ -195,6 +232,242 @@ public class Step implements Comparable<Step> {
 		}
 		
 		report(stepReturnStatus, jobID);
+	}
+
+	/**
+	 * Verify that the URL stored in the attributes list is 
+	 * EXACTLY the same as the currently focused page's URL.toExternalForm().
+	 * @return Step return status
+	 */
+	private boolean verifyLocation() {
+		String url = stepAttributeList.getValue(0);
+		if (url == null || url.equals("")) {
+			resultMessage = "URL checker was passed null or an empty string";
+			return false;	
+		}
+		if (url.equals(currentBrowserState.getCurrentPage().getWebResponse().getUrl().toExternalForm())) {
+			return true;
+		} else {
+			resultMessage = "Location indicated is not " + currentBrowserState.getCurrentPage().getWebResponse().getUrl().toExternalForm();
+			return false;
+		}
+	}
+	
+	/**
+	 * Checks the current page response headers for the cookie headers and then extracts the cookie to check against.
+	 * Basic implementation does not check attributes, only checks if the cookie name exists.
+	 * @return
+	 */
+	private boolean verifyCookiePresent() {
+		String cookieName = stepAttributeList.getValue(0);
+		if (cookieName == null) {
+			resultMessage = "Cookie name was empty";
+			return false;
+		} else if (cookieName.equals("")) {
+			resultMessage = "Cookie name was empty string";
+			return false;
+		}
+		List<NameValuePair> headers = currentBrowserState.getCurrentPage().getWebResponse().getResponseHeaders();
+		if (headers == null) {
+			resultMessage = "No headers";
+			return false;
+		}
+		ListIterator<NameValuePair> iterator = headers.listIterator();
+		while (iterator.hasNext()) {
+			NameValuePair next = iterator.next();
+			if ("Set-Cookie".equals(next.getName())) {
+				//New cookie
+				String nextValue = next.getValue();
+				int stop = nextValue.indexOf('=');
+				if (stop != -1 && nextValue.substring(0, stop).trim().equals(cookieName)) {
+					return true;
+				}
+			}
+		}
+		resultMessage = "Cookie was not found";
+		return false;
+	}
+
+	/**
+	 * Verifies the text pattern against the visible text returned by HtmlElement.asText().
+	 * @return Step return status
+	 */
+	private boolean verifyText() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the element";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the element";
+			return false;
+		}
+		String pattern = stepAttributeList.getValue(1);
+		if (pattern == null) {
+			resultMessage = "Pattern was null";
+			return false;
+		}
+		if (pattern.equals(targetElement.asText())) {
+			return true;
+		} else {
+			resultMessage = "Pattern did not match the text content";
+			return false;
+		}
+	}
+
+	/**
+	 * Checks the entire page to see if the given text pattern is present.
+	 * @return Step return status
+	 */
+	private boolean verifyTextPresent() {
+		String pattern = stepAttributeList.getValue(0);
+		if (pattern == null || pattern.equals("")) {
+			resultMessage = "Pattern is null or empty string";
+			return false;
+		}
+		if (currentBrowserState.getCurrentPage().asXml().contains(pattern)) {
+			return true;
+		}
+		resultMessage = "Pattern was not found";
+		return false;
+	}
+
+	/**
+	 * Check if the element at the locator is a select and if so, check if the indicated option is not selected.
+	 * @return Step Return status
+	 */
+	private boolean verifySelected() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (HtmlSelect.class.isAssignableFrom(targetElement.getClass())) {
+			HtmlSelect tempSelect = ((HtmlSelect)targetElement);
+			HtmlOption tempOption = optionLocator(tempSelect);
+			if (tempOption == null) {
+				if (tempSelect.getOptionSize() > 0) {
+					tempOption = tempSelect.getOption(0);
+				} else {
+					resultMessage = "No options to use";
+					return false;
+				}
+			}
+			if (tempOption.isSelected()) {
+				return true;
+			} else {
+				resultMessage = "Option was not selected";
+				return false;
+			}
+		} else {
+			resultMessage = "Element is not a select Element";
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if the element at the locator is a select and if so, check if the indicated option is selected.
+	 * @return Step Return status
+	 */
+	private boolean verifyNotSelected() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (HtmlSelect.class.isAssignableFrom(targetElement.getClass())) {
+			HtmlSelect tempSelect = ((HtmlSelect)targetElement);
+			HtmlOption tempOption = optionLocator(tempSelect);
+			if (tempOption == null) {
+				if (tempSelect.getOptionSize() > 0) {
+					tempOption = tempSelect.getOption(0);
+				} else {
+					resultMessage = "No options to use";
+					return false;
+				}
+			}
+			if (!tempOption.isSelected()) {
+				return true;
+			} else {
+				resultMessage = "Option was selected";
+				return false;
+			}
+		} else {
+			resultMessage = "Element is not a select Element";
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if the element at the locator is a checkbox and if so, check if it is not checked.
+	 * @return Step Return status
+	 */
+	private boolean verifyNotChecked() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the checkbox";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the checkbox";
+			return false;
+		}
+		if (HtmlCheckBoxInput.class.isAssignableFrom(targetElement.getClass())) {
+			if (!((HtmlCheckBoxInput)targetElement).isChecked()) {
+				return true;
+			} else {
+				resultMessage = "Element was checked";
+				return false;
+			}
+		} else {
+			resultMessage = "Element is not a checkbox";
+			return false;
+		}
+	}
+
+	/**
+	 * Check if the element at the locator is a checkbox and if so, check if it is checked.
+	 * @return Step Return status
+	 */
+	private boolean verifyChecked() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the checkbox";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the checkbox";
+			return false;
+		}
+		if (HtmlCheckBoxInput.class.isAssignableFrom(targetElement.getClass())) {
+			if (((HtmlCheckBoxInput)targetElement).isChecked()) {
+				return true;
+			} else {
+				resultMessage = "Element was not checked";
+				return false;
+			}
+		} else {
+			resultMessage = "Element is not a checkbox";
+			return false;
+		}
 	}
 
 	/**
@@ -535,54 +808,58 @@ public class Step implements Comparable<Step> {
 			HtmlSelect tempSelect = ((HtmlSelect)targetElement);
 			HtmlOption tempOption = optionLocator(tempSelect);
 			if (tempOption == null) {
-				return false;
-			} else {
-				boolean tempStatus = true;
-				try {
-					Iterator<HtmlOption> selectedOptions = tempSelect.getSelectedOptions().iterator();
-					while (selectedOptions.hasNext()) {
-						HtmlOption nextSelectedOption = selectedOptions.next();
-						if (!nextSelectedOption.equals(tempOption)) {
-							Page newPage = tempOption.setSelected(false);
-							if (newPage == null) {
-								resultMessage = "Returned a null page";
-								return false;
-							} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
-								tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-							} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-								replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-								bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-								currentBrowserState.setCurrentPage((HtmlPage)newPage);
-								tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-							} else {
-								replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-								bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-								tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
-							}
+				if (tempSelect.getOptionSize() > 0) {
+					tempOption = tempSelect.getOption(0);
+				} else {
+					resultMessage = "No options to use";
+					return false;
+				}
+			}
+			boolean tempStatus = true;
+			try {
+				Iterator<HtmlOption> selectedOptions = tempSelect.getSelectedOptions().iterator();
+				while (selectedOptions.hasNext()) {
+					HtmlOption nextSelectedOption = selectedOptions.next();
+					if (!nextSelectedOption.equals(tempOption)) {
+						Page newPage = tempOption.setSelected(false);
+						if (newPage == null) {
+							resultMessage = "Returned a null page";
+							return false;
+						} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
+							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+						} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+							replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+							bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+							currentBrowserState.setCurrentPage((HtmlPage)newPage);
+							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+						} else {
+							replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+							bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+							tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 						}
 					}
-					Page newPage = tempOption.setSelected(true);
-					if (newPage == null) {
-						resultMessage = "Returned a null page";
-						return false;
-					} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
-						tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-					} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-						currentBrowserState.setCurrentPage((HtmlPage)newPage);
-						tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-					} else {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-						tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
-					}
-				} catch (IOException e1) {
-					consoleLog.error("IOException during a select.", e1);
-					resultMessage = "IOException - Select operation failed";
 				}
-				return tempStatus;
+				Page newPage = tempOption.setSelected(true);
+				if (newPage == null) {
+					resultMessage = "Returned a null page";
+					return false;
+				} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
+					tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+				} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					currentBrowserState.setCurrentPage((HtmlPage)newPage);
+					tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+				} else {
+					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
+				}
+			} catch (IOException e1) {
+				consoleLog.error("IOException during a select.", e1);
+				resultMessage = "IOException - Select operation failed";
 			}
+			return tempStatus;
 		} else {
 			resultMessage = "Element is not a select Element";
 			return false;
@@ -614,32 +891,35 @@ public class Step implements Comparable<Step> {
 			}
 			HtmlOption tempOption = optionLocator(tempSelect);
 			if (tempOption == null) {
-				return false;
-			} else {
-				
-				try {
-					Page newPage = tempOption.setSelected(true);
-					if (newPage == null) {
-						resultMessage = "Returned a null page";
-						return false;
-					} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
-						return collectResources((HtmlPage)newPage);
-					} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-						currentBrowserState.setCurrentPage((HtmlPage)newPage);
-						return collectResources((HtmlPage)newPage);
-					} else {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-						return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
-					}
-				} catch (IOException e1) {
-					consoleLog.error("IOException during a addSelection.", e1);
-					resultMessage = "IOException - addSelection operation failed";
+				if (tempSelect.getOptionSize() > 0) {
+					tempOption = tempSelect.getOption(0);
+				} else {
+					resultMessage = "No options to use";
+					return false;
 				}
-				return true;
 			}
+			try {
+				Page newPage = tempOption.setSelected(true);
+				if (newPage == null) {
+					resultMessage = "Returned a null page";
+					return false;
+				} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
+					return collectResources((HtmlPage)newPage);
+				} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					currentBrowserState.setCurrentPage((HtmlPage)newPage);
+					return collectResources((HtmlPage)newPage);
+				} else {
+					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
+				}
+			} catch (IOException e1) {
+				consoleLog.error("IOException during a addSelection.", e1);
+				resultMessage = "IOException - addSelection operation failed";
+			}
+			return true;
 		} else {
 			resultMessage = "Element is not a select Element";
 			return false;
