@@ -17,6 +17,6 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.htm" />
-		<submit xpath="//input[@name='submitbutton' and @value='submit']" />
+		<submit xpath="//form[@id='one']" />
 	</steps>
 </script>

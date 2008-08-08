@@ -18,6 +18,6 @@
 		<pause waitTime="0" />
 		<open url="/form.htm" />
 		<click name="checkbox1" />
-		<click name="test_form" />
+		<submit name="test_form" />
 	</steps>
 </script>

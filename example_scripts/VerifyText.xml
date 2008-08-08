@@ -17,6 +17,6 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.htm" />
-		<verifyText value="mr" pattern="Positive" />
+		<verifyText xpath="//body/form[@id='one']/p[5]/input[@type='radio' and @name='title' and @value='mr']" pattern="unchecked" />
 	</steps>
 </script>

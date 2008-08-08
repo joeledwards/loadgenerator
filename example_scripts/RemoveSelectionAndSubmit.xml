@@ -17,8 +17,8 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.htm" />
-		<select name="computerbrands" label="IBM" />
-		<removeSelection name="computerbrands" label="IBM" />
+		<addSelection name="computerbrands" label="IBM" />
+		<removeSelection name="computerbrands" label="DELL" />
 		<submit name="test_form" />
 	</steps>
 </script>

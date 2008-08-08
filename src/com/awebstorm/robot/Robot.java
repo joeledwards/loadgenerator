@@ -17,7 +17,7 @@ public abstract class Robot implements Runnable {
 	protected PriorityQueue<Step> stepQueue = new PriorityQueue<Step>();
 	private String targetDomain;
 	private int targetPort;
-	private static int defaultWaitStep = 1000;
+	private int robotSpeed = 1000;
 	private InputStream scriptStream;
 	//Robot ID vars
 	protected String robotID;
@@ -64,7 +64,7 @@ public abstract class Robot implements Runnable {
 	 * Load the generic robot preferences.
 	 */
 	private void setDefaultRobotPreferences() {
-		defaultWaitStep = Integer.parseInt(prefs.get("waitstep"));
+		robotSpeed = Integer.parseInt(prefs.get("waitstep"));
 		robotID = prefs.get("jobID");
 		targetDomain = prefs.get("domain");
 		targetPort = Integer.parseInt(prefs.get("remoteport"));
@@ -95,21 +95,30 @@ public abstract class Robot implements Runnable {
 	}
 	
 	/**
-	 * Retrieve the value of the defaultWaitStep.
-	 * @return Length of the default WAIT step
+	 * Get the domain of the target of this Robot.
+	 * @return The domain of the target of this robot
 	 */
-	public static int getDefaultWaitStep() {
-		return defaultWaitStep;
-	}
 	public String getTargetDomain() {
 		return targetDomain;
 	}
+	/**
+	 * Get the proxy that will be used by all operations performed by this Robot.
+	 * @return The proxy to use
+	 */
 	public Proxy getCurrentProxy() {
 		return currentProxy;
 	}
+	/**
+	 * Get the current state of this Robot's thread.
+	 * @return The state of this Robot's thread
+	 */
 	public Thread.State getThreadState() {
 		return myRobotThread.getState();
 	}
+	/**
+	 * Get the port of the target of this Robot. The proxy will use this port to communicate with the target.
+	 * @return The port on which to communicate with the target.
+	 */
 	public int getTargetPort() {
 		return targetPort;
 	}
@@ -126,5 +135,19 @@ public abstract class Robot implements Runnable {
 	 */
 	protected boolean isEnd() {
 		return this.end;
+	}
+	/**
+	 * Set the robot speed. This delay will not be used if the last step was a pause.
+	 * @param robotSpeed New time between robot steps
+	 */
+	public void setRobotSpeed(int robotSpeed) {
+		this.robotSpeed = robotSpeed;
+	}
+	/**
+	 * Get the value of the robot speed. This delay will not be used if the last step was a pause.
+	 * @return Time between Robot steps
+	 */
+	public int getRobotSpeed() {
+		return robotSpeed;
 	}
 }

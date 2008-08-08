@@ -8,6 +8,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.concurrent.PriorityBlockingQueue;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import com.awebstorm.robot.HtmlRobot;
 import com.awebstorm.robot.Robot;
@@ -25,22 +26,22 @@ import com.awebstorm.robot.Robot;
  */
 public class LoadGenerator {
 
-	private Logger consoleLog = Logger.getLogger(this.getClass());
-	private static URL scheduler;
-	private static int numberOfRobots = 1;
-	private static int numberOfProxies = 1;
-	private static PropertyResourceBundle loadGeneratorProperties;
-	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator.properties";
+	private PropertyResourceBundle loadGeneratorProperties;
+	private static final String LOAD_GEN_PROPS_LOC = "LoadGenerator";
 	private static final String LOAD_GEN_LOG_PROPS_LOC = "log4j.properties";
+	private Logger consoleLog = Logger.getLogger(this.getClass());
+	private URL scheduler;
 	private static boolean stop = false;
 	private static PriorityBlockingQueue<Robot> aliveRobotList = new PriorityBlockingQueue<Robot>();
 	private static long robotThreadUID;
+	private static int numberOfProxies;
 	
 	/**
 	 * Main method constructs a new LoadGeneratorImpl and calls run() on it 
 	 * @param args Console parsing not functional
 	 */
 	public static void main(String[] args) {
+		PropertyConfigurator.configureAndWatch(LOAD_GEN_LOG_PROPS_LOC);
 		new LoadGenerator().run();
 	}
 	
@@ -99,6 +100,8 @@ public class LoadGenerator {
 	 * Run a LoadGenerator 
 	 */
 	public void run() {
+		loadGeneratorProperties = 
+			(PropertyResourceBundle) ResourceBundle.getBundle(LOAD_GEN_PROPS_LOC);
 		
 		if ( consoleLog.isDebugEnabled() ) {
 			consoleLog.debug("Starting Load Generator");
@@ -109,7 +112,7 @@ public class LoadGenerator {
 		
 		while (!stop) {
 			try {
-				this.wait(60000);
+				Thread.sleep(60000);
 			} catch (InterruptedException e) {
 				consoleLog.error("LoadGenerator interrupted during a wait cycle",e);
 			}

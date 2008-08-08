@@ -332,8 +332,30 @@ public class LogDataExtractor {
 			subline = subline.substring(j + 1);
 			infoLine.setJobID(subline.substring(0, 4));
 			subline = subline.substring(5);
-			if (subline.startsWith("pause")) {
-				subline = subline.substring(6);
+			if (subline.startsWith("pause") || subline.startsWith("verify")) {
+				if (subline.startsWith("pause")) {
+					subline = subline.substring(6);
+				} else if (subline.startsWith("verifyText,")) {
+					subline = subline.substring(11);
+				} else if (subline.startsWith("verifyTitle")) {
+					subline = subline.substring(12);
+				} else if (subline.startsWith("verifyChecked")) {
+					subline = subline.substring(14);
+				} else if (subline.startsWith("verifyTextPresent,")) {
+					subline = subline.substring(18);
+				} else if (subline.startsWith("verifyNotChecked")) {
+					subline = subline.substring(17);
+				} else if (subline.startsWith("verifyLocation")) {
+					subline = subline.substring(15);
+				} else if (subline.startsWith("verifyNotSelected")) {
+					subline = subline.substring(18);
+				} else if (subline.startsWith("verifySelected")) {
+					subline = subline.substring(15);
+				} else if (subline.startsWith("verifyCookiePresent")) {
+					subline = subline.substring(20);
+				} else {
+					return false;
+				}
 				//Extract Data params
 				infoLine.setStepNum(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getStepNum().length() + 1);
@@ -343,9 +365,17 @@ public class LogDataExtractor {
 				subline = subline.substring(infoLine.getStepStatus().length() + 1);
 				infoLine.setResultMessage(parseCommaEnded(subline));
 				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
-				return true;
-			} else if (subline.startsWith("open")) {
-				subline = subline.substring(5);
+				if (infoLine.getStepStatus().equals("success"))
+					return true;
+				return false;
+			} else if (subline.startsWith("open,") || subline.startsWith("refresh") || subline.startsWith("openWindow,")) {
+				if (subline.startsWith("open,")) {
+					subline = subline.substring(5);
+				} else if (subline.startsWith("refresh")) {
+					subline = subline.substring(8);
+				} else if (subline.startsWith("openWindow,")) {
+					subline = subline.substring(11);
+				}
 				//Extract Data params
 				infoLine.setStepNum(parseCommaEnded(subline));
 				subline = subline.substring(infoLine.getStepNum().length() + 1);
@@ -373,9 +403,9 @@ public class LogDataExtractor {
 				subline = subline.substring(infoLine.getStepStatus().length() + 1);
 				infoLine.setResultMessage(parseCommaEnded(subline));
 				myLines.put(infoLine.jobID + "-" + infoLine.stepNum, infoLine);
-				return true;
-			} else if (subline.startsWith("verifyTitle")) {
-				return true;
+				if (infoLine.getStepStatus().equals("success"))
+						return true;
+				return false;
 			} else {
 				return true;
 			}

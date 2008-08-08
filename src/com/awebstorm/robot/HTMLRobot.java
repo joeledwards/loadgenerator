@@ -59,15 +59,15 @@ public class HtmlRobot extends Robot {
 							+ ',' + stepNum);
 				}
 				this.currentStep = tempStep;
-				
 				Thread.yield();
 				tempStep.execute(robotID, currentState);
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					consoleLog.error("HtmlRobot interrupted during sleep.", e);
+				if (!tempStep.getName().equals("pause")) {
+					try {
+						Thread.sleep(this.getRobotSpeed());
+					} catch (InterruptedException e) {
+						consoleLog.error("HtmlRobot interrupted during sleep.", e);
+					}
 				}
-				
 				stepNum++;
 		}
 		if (consoleLog.isDebugEnabled()) {

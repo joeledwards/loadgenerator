@@ -4,6 +4,8 @@ import org.jbehave.core.behaviour.Behaviours;
 
 import com.awebstorm.robot.HtmlActionBehaviour;
 import com.awebstorm.robot.HtmlRobotBehaviour;
+import com.awebstorm.robot.HtmlUnitProxyBehaviour;
+import com.awebstorm.robot.HtmlVerifyBehaviour;
 import com.awebstorm.robot.StyleParserBehaviour;
 
 /**
@@ -22,9 +24,10 @@ public class BehaviourContainer implements Behaviours {
 		return new Class[] { 
 			//(new StyleParserBehaviour()).getClass(),
 			//(new HtmlRobotBehaviour()).getClass(),
-			(new HtmlActionBehaviour()).getClass(),
+			//(new HtmlActionBehaviour()).getClass(),
 			//(new ProxyBehaviour()).getClass(),
-			//(new HtmlVerifyBehaviour()).getClass(),
+			(new HtmlVerifyBehaviour()).getClass(),
+			//(new HtmlUnitProxyBehaviour()).getClass(),
 		};
 	}
 

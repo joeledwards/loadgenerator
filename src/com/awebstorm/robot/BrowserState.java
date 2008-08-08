@@ -160,5 +160,12 @@ public class BrowserState {
 	public WebWindow getResourceWindow() {
 		return resourceWindow;
 	}
+	/**
+	 * Set the main window used to open the Html Pages
+	 * @param mainWindow The new main window
+	 */
+	public void setMainWindow(WebWindow mainWindow) {
+		this.mainWindow = mainWindow;
+	}
 	
 }

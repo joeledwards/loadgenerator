@@ -19,6 +19,7 @@ import com.awebstorm.Proxy;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.Page;
+import com.gargoylesoftware.htmlunit.TopLevelWindow;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import com.gargoylesoftware.htmlunit.html.ClickableElement;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -70,6 +71,7 @@ public class Step implements Comparable<Step> {
 		select,
 		addSelection,
 		removeSelection,
+		removeAllSelections,
 		submit,
 		refresh,
 		type,
@@ -128,7 +130,7 @@ public class Step implements Comparable<Step> {
 	 * @return Will return negative, 1, or positive if o is greater, equal, or less than this Step
 	 */
 	public int compareTo(final Step o) {
-		return stepNumber - o.getValue();
+		return stepNumber - o.getStepNumber();
 	}
 
 	/**
@@ -222,16 +224,153 @@ public class Step implements Comparable<Step> {
 		case removeSelection:
 			stepReturnStatus = this.removeSelection();
 			break;
+		case removeAllSelections:
+			stepReturnStatus = this.removeAllSelections();
+			break;
+		case setSpeed:
+			stepReturnStatus = this.setSpeed();
+			break;
 		case refresh:
 			stepReturnStatus = this.refresh();
+			break;
+		case doubleClick:
+			stepReturnStatus = this.doubleClick();
+			break;
+		case openWindow:
+			stepReturnStatus = this.openWindow();
 			break;
 		default:
 			consoleLog.warn("Unknown Step type found.");
 			stepReturnStatus = false;
 			break;
 		}
-		
 		report(stepReturnStatus, jobID);
+	}
+	/**
+	 * Sets the speed of the Robot or the time between each step
+	 * @return Step return status
+	 */
+	private boolean setSpeed() {
+		String value = stepAttributeList.getValue(0);
+		if (value == null || value.equals("")) {
+			resultMessage = "Bad Speed";
+			return false;	
+		} else {
+			try {
+				stepRobotOwner.setRobotSpeed(Integer.parseInt(value));
+			} catch (NumberFormatException e) {
+				resultMessage = "Bad Speed";
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Unselect all options in the indicated selector.
+	 * @return Step success status
+	 */
+	private boolean removeAllSelections() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the select element";
+			return false;
+		}
+		if (HtmlSelect.class.isAssignableFrom(targetElement.getClass())) {
+			HtmlSelect tempSelect = ((HtmlSelect)targetElement);
+			boolean tempStatus = true;
+			try {
+				Iterator<HtmlOption> options = tempSelect.getSelectedOptions().iterator();
+				while (options.hasNext()) {
+					HtmlOption nextOption = options.next();
+						Page newPage = tempSelect.setSelectedAttribute(nextOption, false);
+						if (newPage == null) {
+							resultMessage = "Returned a null page";
+							return false;
+						} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
+							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+						} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+							replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+							bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
+							currentBrowserState.setCurrentPage((HtmlPage)newPage);
+							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
+						} else {
+							replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+							bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
+							tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
+						}
+				}
+			} catch (IOException e1) {
+				consoleLog.error("IOException during a select.", e1);
+				resultMessage = "IOException - Select operation failed";
+				tempStatus = false;
+			}
+			return tempStatus;
+		} else {
+			resultMessage = "Element is not a select Element";
+			return false;
+		}
+	}
+
+	/**
+	 * Call open() on a url location in a new window. This still obeys the resource cache. 
+	 * @return Step return status
+	 */
+	private boolean openWindow() {
+		currentBrowserState.setMainWindow(new TopLevelWindow("new window", currentBrowserState.getVUser()));
+		currentBrowserState.getVUser().setCurrentWindow(currentBrowserState.getMainWindow());
+		return open();
+	}
+
+	/**
+	 * Double Click on the Element indicated by the locator stored in the first element of the AttributeList.
+	 * This step could qualify as an entirely new page load, so it is reported like an open
+	 * @return Step Status
+	 */
+	private boolean doubleClick() {
+		HtmlElement targetElement = null;
+		try {
+			targetElement = locator();
+		} catch (ElementNotFoundException e) {
+			resultMessage = "Could not locate the element to click";
+			return false;
+		}
+		if (targetElement == null) {
+			resultMessage = "Could not locate the element to click";
+			return false;
+		}
+		if (!ClickableElement.class.isAssignableFrom(targetElement.getClass())) {
+			resultMessage = "Element is not clickable";
+			return false;
+		}
+		try {
+			Page newPage = ((ClickableElement)targetElement).dblClick();
+			if (newPage == null) {
+				resultMessage = "Returned a null page";
+				return false;
+			} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
+				return collectResources((HtmlPage)newPage);
+			} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+				replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+				bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+				currentBrowserState.setCurrentPage((HtmlPage)newPage);
+				return collectResources((HtmlPage)newPage);
+			} else {
+				replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
+				bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+				return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
+			}
+		} catch (IOException e1) {
+			consoleLog.error("IOException during a dblclick.", e1);
+			resultMessage = "IOException - DblClick operation failed";
+		}
+		return false;
 	}
 
 	/**
@@ -327,8 +466,10 @@ public class Step implements Comparable<Step> {
 			resultMessage = "Pattern is null or empty string";
 			return false;
 		}
-		if (currentBrowserState.getCurrentPage().asXml().contains(pattern)) {
-			return true;
+		if (currentBrowserState.getCurrentPage() != null) {
+			if (currentBrowserState.getCurrentPage().getDocumentElement().asText().contains(pattern)) {
+				return true;
+			}
 		}
 		resultMessage = "Pattern was not found";
 		return false;
@@ -639,6 +780,7 @@ public class Step implements Comparable<Step> {
 			replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
 			bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
 			if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
+				currentBrowserState.setCurrentPage((HtmlPage)newPage);
 				return collectResources((HtmlPage)newPage);
 			} else {
 				return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
@@ -789,7 +931,7 @@ public class Step implements Comparable<Step> {
 	
 	/**
 	 * Select the element indicated by the locator stored in the first entry of the stepAttributeList 
-	 * and unselect all others.
+	 * and unselect all others if the selector is a single select.
 	 * @return Step success status
 	 */
 	private boolean select() {
@@ -817,47 +959,26 @@ public class Step implements Comparable<Step> {
 			}
 			boolean tempStatus = true;
 			try {
-				Iterator<HtmlOption> selectedOptions = tempSelect.getSelectedOptions().iterator();
-				while (selectedOptions.hasNext()) {
-					HtmlOption nextSelectedOption = selectedOptions.next();
-					if (!nextSelectedOption.equals(tempOption)) {
-						Page newPage = tempOption.setSelected(false);
-						if (newPage == null) {
-							resultMessage = "Returned a null page";
-							return false;
-						} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
-							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-						} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-							replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-							bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-							currentBrowserState.setCurrentPage((HtmlPage)newPage);
-							tempStatus = tempStatus && collectResources((HtmlPage)newPage);
-						} else {
-							replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-							bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
-							tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
-						}
-					}
-				}
-				Page newPage = tempOption.setSelected(true);
+				Page newPage = tempSelect.setSelectedAttribute(tempOption, true);
 				if (newPage == null) {
 					resultMessage = "Returned a null page";
 					return false;
 				} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
 					tempStatus = tempStatus && collectResources((HtmlPage)newPage);
 				} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
 					currentBrowserState.setCurrentPage((HtmlPage)newPage);
 					tempStatus = tempStatus && collectResources((HtmlPage)newPage);
 				} else {
-					replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-					bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+					replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+					bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
 					tempStatus = tempStatus && !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 				}
 			} catch (IOException e1) {
 				consoleLog.error("IOException during a select.", e1);
 				resultMessage = "IOException - Select operation failed";
+				tempStatus = false;
 			}
 			return tempStatus;
 		} else {
@@ -950,20 +1071,20 @@ public class Step implements Comparable<Step> {
 				return false;
 			} else {
 				try {
-					Page newPage = tempOption.setSelected(false);
+					Page newPage = tempSelect.setSelectedAttribute(tempOption, false);
 					if (newPage == null) {
 						resultMessage = "Returned a null page";
 						return false;
 					} else if (newPage.equals(currentBrowserState.getCurrentPage())) {
 						return collectResources((HtmlPage)newPage);
 					} else if (HtmlPage.class.isAssignableFrom(newPage.getClass())) {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+						replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+						bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
 						currentBrowserState.setCurrentPage((HtmlPage)newPage);
 						return collectResources((HtmlPage)newPage);
 					} else {
-						replyTime = newPage.getWebResponse().getLoadTimeInMilliSeconds();
-						bodyByteAmount = newPage.getWebResponse().getContentAsStream().available();
+						replyTime += newPage.getWebResponse().getLoadTimeInMilliSeconds();
+						bodyByteAmount += newPage.getWebResponse().getContentAsStream().available();
 						return !(newPage.getWebResponse().getStatusCode() < 200 || newPage.getWebResponse().getStatusCode() > 299);
 					}
 				} catch (IOException e1) {
@@ -991,6 +1112,10 @@ public class Step implements Comparable<Step> {
 		if (value == null) {
 			resultMessage = "Bad option locator";
 			return null;
+		}
+		if (consoleLog.isDebugEnabled()) {
+			consoleLog.debug("OptionName: " + name);
+			consoleLog.debug("OptionValue: " + value);
 		}
 		if (name.equals("label")) {
 			Iterator<HtmlOption> options = select.getOptions().iterator();
@@ -1045,51 +1170,115 @@ public class Step implements Comparable<Step> {
 	 * @return The first HtmlElement that was located
 	 * @throws ElementNotFoundException If the Element was not found
 	 */
-	private final HtmlElement locator() throws ElementNotFoundException {
+	private final HtmlElement locator() {
 		String name = stepAttributeList.getQName(0);
+		String value = stepAttributeList.getValue(0);
+		if (name == null || name.equals("")) {
+			return null;
+		}
+		if (value == null || value.equals("")) {
+			return null;
+		}
+		if (consoleLog.isDebugEnabled()) {
+			consoleLog.debug("name:" + name);
+			consoleLog.debug("value: " + value);
+		}
 		if (name.equals("xpath")) {
-			Object tempNode = currentBrowserState.getCurrentPage().getFirstByXPath(stepAttributeList.getValue(0));
-			if (tempNode.getClass().isInstance(HtmlElement.class)) {
-				return (HtmlElement)tempNode;
-			} else {
-				return null;
+			HtmlElement currentElem = currentBrowserState.getCurrentPage().getDocumentElement();
+			Object node = currentElem.getFirstByXPath(value);
+			if (node != null) {
+				if (HtmlElement.class.isAssignableFrom(node.getClass())) {
+					return (HtmlElement)node;
+				} else {
+					return null;
+				}
 			}
+			//Go down max 3 levels
+			return locateByXPathRecursively(currentElem.getChildElements().iterator(), 0, 3, value);
 		} else if (name.equals("link")) {
 			List<HtmlAnchor> tempListAnchors = currentBrowserState.getCurrentPage().getAnchors();
 			HtmlAnchor[] tempArrayAnchors = (HtmlAnchor[]) tempListAnchors.toArray();
 			for (int i = 0; i < tempArrayAnchors.length; i++) {
 				String textContent = tempArrayAnchors[i].getTextContent();
-					if (textContent.equals(stepAttributeList.getValue(0))) {
+					if (textContent.equals(value)) {
 						return tempArrayAnchors[i];
 					}
 			}
 			return null;
 		} else if (name.equals("identifier")) {
-			HtmlElement tempElement = currentBrowserState.getCurrentPage().getHtmlElementById(stepAttributeList.getValue(0));
-			if (tempElement == null) {
-				return currentBrowserState.getCurrentPage().getHtmlElementsByName(stepAttributeList.getValue(0)).get(0);
+			HtmlElement tempElem = null;
+			try {
+				tempElem = currentBrowserState.getCurrentPage().getHtmlElementById(value);
+			} catch (ElementNotFoundException e) {}
+			if (tempElem == null) {
+				List<HtmlElement> nameList = currentBrowserState.getCurrentPage().getHtmlElementsByName(value);
+				if (nameList.isEmpty()) {
+					return null;
+				} else {
+					return nameList.get(0);
+				}
 			}
-			return tempElement;
+			return tempElem;
 		} else if (name.equals("id")) {
-			return currentBrowserState.getCurrentPage().getHtmlElementById(stepAttributeList.getValue(0));
+			try {
+				return currentBrowserState.getCurrentPage().getHtmlElementById(value);
+			} catch (ElementNotFoundException e) {
+				return null;
+			}
 		} else if (name.equals("name")) {
-			return currentBrowserState.getCurrentPage().getHtmlElementsByName(stepAttributeList.getValue(0)).get(0);
+			List<HtmlElement> nameList = currentBrowserState.getCurrentPage().getHtmlElementsByName(value);
+			if (nameList.isEmpty()) {
+				return null;
+			} else {
+				return nameList.get(0);
+			}
 		} else {
 			if (name.startsWith("//")) {
-				Object tempNode = currentBrowserState.getCurrentPage().getFirstByXPath(name);
-				if (tempNode.getClass().isInstance(HtmlElement.class)) {
-					return (HtmlElement)tempNode;
-				} else {
+				HtmlElement currentElem = currentBrowserState.getCurrentPage().getDocumentElement();
+				Object node = currentElem.getFirstByXPath(value);
+				if (node != null) {
+					if (HtmlElement.class.isAssignableFrom(node.getClass())) {
+						return (HtmlElement)node;
+					} else {
+						return null;
+					}
+				}
+				//Go down max 3 levels
+				return locateByXPathRecursively(currentElem.getChildElements().iterator(), 0, 3, value);
+			} else {
+				try {
+					return currentBrowserState.getCurrentPage().getHtmlElementById(value);
+				} catch (ElementNotFoundException e) {
 					return null;
 				}
-			} else {
-				HtmlElement tempElement = currentBrowserState.getCurrentPage().getHtmlElementById(name);
-				if (tempElement == null) {
-					return currentBrowserState.getCurrentPage().getHtmlElementsByName(name).get(0);
-				}
-				return tempElement;
 			}
 		}
+	}
+
+	/**
+	 * Goes down the current page's Html tree recursively to find the first match to the xpath indicator.
+	 * locator() helper method.
+	 * @return HtmlElement found or null if no element matching the criteria
+	 */
+	private HtmlElement locateByXPathRecursively(Iterator<HtmlElement> children, int depth, int max, String value) {
+			if (depth > max) {
+				return null;
+			}
+			while(children.hasNext()) {
+				HtmlElement child = children.next();
+				ListIterator<? extends Object> nodes = child.getByXPath(value).listIterator();
+				while (nodes.hasNext()) {
+					Object node = nodes.next();
+					if (HtmlElement.class.isAssignableFrom(node.getClass())) {
+						return (HtmlElement)node;
+					}
+				}
+				HtmlElement result = locateByXPathRecursively(child.getAllHtmlChildElements().iterator(), depth + 1, max, value);
+				if (result != null) {
+					return result;
+				}
+			}
+			return null;
 	}
 
 	/**
@@ -1156,7 +1345,7 @@ public class Step implements Comparable<Step> {
 				consoleLog.debug("Opened Page is null.");
 			}
 			return false;
-		} else if (tempPage.getClass() == HtmlPage.class) {
+		} else if (HtmlPage.class.isAssignableFrom(tempPage.getClass())) {
 			invokePage = (HtmlPage) tempPage;
 			currentBrowserState.setCurrentPage(invokePage);
 			replyTime = invokePage.getWebResponse().getLoadTimeInMilliSeconds();
@@ -1476,14 +1665,22 @@ public class Step implements Comparable<Step> {
 	 * @return True if title is correct, else false
 	 */
 	private boolean verifyTitle() {
+		String value = stepAttributeList.getValue(0);
+		if (value == null || value.equals("")) {
+			resultMessage = "Empty title parameter";
+			return false;
+		}
 		if (currentBrowserState.getCurrentPage() != null) {
 			if (consoleLog.isDebugEnabled()) {
 				consoleLog.debug(currentBrowserState.getCurrentPage().getTitleText());
 			}
-			return currentBrowserState.getCurrentPage().getTitleText().equals(stepAttributeList.getValue(0));
+			if (currentBrowserState.getCurrentPage().getTitleText().equals(value)) {
+				return true;
+			} else {
+				resultMessage = "Title text is: " + currentBrowserState.getCurrentPage().getTitleText();
+				return false;
+			}
 		}
-		if (resultMessage == null)
-			resultMessage = "Current page is null";
 		return false;
 	}
 
@@ -1491,9 +1688,10 @@ public class Step implements Comparable<Step> {
 	 * Instruct this thread to wait for a given period of time as this is a WAIT STEP.
 	 */
 	private void pause() {
-		if (stepAttributeList.getValue(0).equals("")) {
+		String value = stepAttributeList.getValue(0);
+		if (value == null || value.equals("")) {
 			try {
-				Thread.sleep(Robot.getDefaultWaitStep());
+				Thread.sleep(stepRobotOwner.getRobotSpeed());
 			} catch (InterruptedException e) {
 				if (resultMessage == null)
 					resultMessage = "Interrupted";
@@ -1501,13 +1699,13 @@ public class Step implements Comparable<Step> {
 			}
 		} else {
 			try {
-				Thread.sleep(Integer.parseInt(stepAttributeList.getValue(0)));
+				Thread.sleep(Integer.parseInt(value));
 			} catch (NumberFormatException e) {
 				if (resultMessage == null)
 					resultMessage = "Bad Script - Bad waitTime";
 				consoleLog.error("Could not determine the wait length during a WAIT Step", e);
 				try {
-					Thread.sleep(Robot.getDefaultWaitStep());
+					Thread.sleep(stepRobotOwner.getRobotSpeed());
 				} catch (InterruptedException e1) {
 					if (resultMessage == null)
 						resultMessage = "Interrupted";
@@ -1526,7 +1724,7 @@ public class Step implements Comparable<Step> {
 	 * @param stepStatus Success if true, Failure if false
 	 * @param jobID Current job ID
 	 */
-	private synchronized void report(final boolean stepStatus, final String jobID) {
+	private  void report(final boolean stepStatus, final String jobID) {
 
 		long proxyReceiveAmount = myProxy.getProxyReceiveAmount();
 		long proxySentAmount = myProxy.getProxySentAmount();
@@ -1548,13 +1746,16 @@ public class Step implements Comparable<Step> {
 		switch (currentType) {
 		case open:
 		case click:
+		case doubleClick:
 		case submit:
 		case check:
 		case uncheck:
 		case select:
 		case addSelection:
 		case removeSelection:
+		case removeAllSelections:
 		case refresh:
+		case openWindow:
 		case type:
 			if (resultLog.isDebugEnabled()) {
 				tempResult.append("jobID: " +jobID);
@@ -1649,7 +1850,16 @@ public class Step implements Comparable<Step> {
 			}
 			break;
 		case pause:
+		case setSpeed:
 		case verifyTitle:
+		case verifyChecked:
+		case verifyCookiePresent:
+		case verifyLocation:
+		case verifyNotChecked:
+		case verifyNotSelected:
+		case verifySelected:
+		case verifyText:
+		case verifyTextPresent:
 			tempResult.append(jobID);
 			tempResult.append(',');
 			tempResult.append(stepName);
@@ -1680,7 +1890,7 @@ public class Step implements Comparable<Step> {
 	 * Retrieve the number of a Step.
 	 * @return The number of this Step
 	 */
-	public final int getValue() {
+	public final int getStepNumber() {
 		return stepNumber;
 	}
 
