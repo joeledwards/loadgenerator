@@ -18,7 +18,7 @@
 		<pause waitTime="0" />
 		<open url="/form.htm" />
 		<doubleClick name="checkbox1" />
-		<verifyNotChecked name="checkbox1" />
+		<verifyChecked name="checkbox1" />
 		<submit name="test_form" />
 	</steps>
 </script>

@@ -17,7 +17,9 @@
     	<delete dir="${build.dir}" />
     	<delete dir="${bin.dir}" />
     	<delete dir="${LoadGenerator-1.0.dir}" />
-    	<delete file="*.log" />
+    	<delete file="console.log" />
+    	<delete file="result.log" />
+    	<delete file="wire.log" />
     </target>
 
     <target name="compile">

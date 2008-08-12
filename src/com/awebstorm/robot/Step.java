@@ -1300,14 +1300,23 @@ public class Step implements Comparable<Step> {
 			return false;
 		} catch (MalformedURLException e) {
 			//This should only occur if the HtmlRobot is passed a bad script
-			if (resultMessage == null)
+			if (myProxy.getProxyMessage() == null && resultMessage == null) {
+				//Problem with the proxy
 				resultMessage = "Bad Script - Malformed URL for " + currentPath;
+			} else {
+				//Problem with the target
+				resultMessage = myProxy.getProxyMessage();
+			}
 			consoleLog.error("MalformedURL", e);
 			return false;
 		} catch (SocketTimeoutException e) {
-			//Only possible if there is a problem with the proxy
-			if (resultMessage == null)
+			if (myProxy.getProxyMessage() == null && resultMessage == null) {
+				//Problem with the proxy
 				resultMessage = "Socket Timeout";
+			} else {
+				//Problem with the target
+				resultMessage = myProxy.getProxyMessage();
+			}
 				if (consoleLog.isDebugEnabled())
 					consoleLog.debug("Socket Timed Out from licit/illicit factors.");
 				if (myProxy.getThreadState().compareTo(Thread.State.BLOCKED) == 0) {
@@ -1319,22 +1328,34 @@ public class Step implements Comparable<Step> {
 			return false;
 		} catch (ConnectException e) {
 			//Only possible if there is a problem with the proxy
-			if (resultMessage == null)
+			if (myProxy.getProxyMessage() == null && resultMessage == null) {
+				//Problem with the proxy
 				resultMessage = "Server could not be contacted.";
+			} else {
+				//problem with the target
+				resultMessage = myProxy.getProxyMessage();
+			}
 			if (consoleLog.isDebugEnabled())
 				consoleLog.debug("Server could not be contacted. Exiting step sequence.", e);
 			stepRobotOwner.setEnd(true);
 			return false;
 		} catch (NoHttpResponseException e) {
-			//Should be the normal catch response if there is a problem with the target
-			//The proxy will close the socket and will pass the error reason back to the Robot
-			if (resultMessage == null)
+			if (myProxy.getProxyMessage() == null && resultMessage == null) {
+				//problem with the proxy
+				resultMessage = "NoHttpResponseException";
+			} else {
+				//problem with the target
 				resultMessage = myProxy.getProxyMessage();
+			}
 			return false;
 		} catch (IOException e) {
-			//Only possible if there is a problem with the proxy
-			if (resultMessage == null)
-				resultMessage = "IO Error";
+			if (myProxy.getProxyMessage() == null && resultMessage == null) {
+				//Problem with the proxy
+				resultMessage = "IO Error contacting proxy";
+			} else {
+				//Problem with the 
+				resultMessage = myProxy.getProxyMessage();
+			}
 			consoleLog.error("IO Error during Invoke.", e);
 			stepRobotOwner.setEnd(true);
 			return false;

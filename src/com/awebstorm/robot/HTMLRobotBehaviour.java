@@ -123,7 +123,7 @@ public class HtmlRobotBehaviour extends UsingMatchers {
 			}
 		}
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
-		ensureThat(reader.isConsoleLogHasNoErrors());
+		ensureThat(!reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("0011-1").getResultMessage().equals("null"));
 		ensureThat(results.get("0011-1").getStepStatus().equals("success"));

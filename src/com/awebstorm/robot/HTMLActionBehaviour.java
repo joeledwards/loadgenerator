@@ -150,7 +150,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 	public final void shouldSubmitById() {
 		consoleLog.info("shouldSubmitById");
 		try {
-			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitByID.xml"));
+			newStreams.add(new FileInputStream("example_scripts" + System.getProperty("file.separator") + "SubmitById.xml"));
 		} catch (FileNotFoundException e) {
 			consoleLog.error("Script File not found.", e);
 		}
@@ -403,10 +403,6 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
 		ensureThat(reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
-		System.out.println(results.get("2046-2").getReceiveBytes());
-		System.out.println(results.toString());
-		System.out.println(results.get("2046-3").getReceiveBytes());
-		
 		ensureThat((Integer.parseInt(results.get("2046-2").getReceiveBytes())-1398) == Integer.parseInt(results.get("2046-3").getReceiveBytes()));
 	}
 	/**
@@ -468,7 +464,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		}
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
-		ensureThat(reader.isConsoleLogHasNoErrors());
+		ensureThat(!reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("2012-2").getResultMessage().startsWith("ConnectException"));
 	}
@@ -492,7 +488,7 @@ public class HtmlActionBehaviour extends UsingMatchers{
 		}
 		tearDown();
 		LogDataExtractor reader = new LogDataExtractor("console.log", fileStart);
-		ensureThat(reader.isConsoleLogHasNoErrors());
+		ensureThat(!reader.isConsoleLogHasNoErrors());
 		HashMap<String,ALineData> results = reader.getMyLines();
 		ensureThat(results.get("2013-2").getResultMessage().startsWith("ConnectException"));
 	}
