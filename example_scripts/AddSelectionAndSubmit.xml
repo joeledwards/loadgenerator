@@ -1,7 +1,7 @@
 <script>
 	<properties>
 		<cacheSize>50</cacheSize>
-		<domain>my.ccx01.info</domain>
+		<domain>ccx2.us</domain>
 		<jobID>2010</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>

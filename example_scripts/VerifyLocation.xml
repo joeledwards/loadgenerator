@@ -1,7 +1,7 @@
 <script>
 	<properties>
 		<cacheSize>50</cacheSize>
-		<domain>my.ccx01.info</domain>
+		<domain>ccx2.us</domain>
 		<jobID>2003</jobID>
 		<timeout>5000</timeout>
 		<waitstep>1000</waitstep>
@@ -17,8 +17,8 @@
 	<steps>
 		<pause waitTime="0" />
 		<open url="/form.htm" />
-		<verifyLocation url="http://my.ccx01.info/form.htm"  />
+		<verifyLocation url="http://ccx2.us/form.htm"  />
 		<submit id="one" />
-		<verifyLocation url="http://my.ccx01.info/server.jsp" />
+		<verifyLocation url="http://ccx2.us/server.jsp" />
 	</steps>
 </script>
